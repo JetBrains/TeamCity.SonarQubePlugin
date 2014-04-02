@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jetbrains.teamcity.idea:annotations:95.677">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jetbrains/teamcity/idea/annotations/95.677/annotations-95.677.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jetbrains/teamcity/idea/annotations/95.677/annotations-95.677-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jetbrains/teamcity/idea/annotations/95.677/annotations-95.677-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

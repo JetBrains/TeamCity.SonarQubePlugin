@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<assembly>
+    <id>plugin-agent-assembly</id>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <files>
+        <file>
+            <source>../sonar-plugin-agent/teamcity-plugin.xml</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+    </files>
+    <moduleSets>
+        <moduleSet>
+            <useAllReactorProjects>true</useAllReactorProjects>
+            <includes>
+                <include>jetbrains.buildServer.sonarplugin:sonar-plugin-agent</include>
+                <include>jetbrains.buildServer.sonarplugin:sonar-plugin-common</include>
+            </includes>
+            <binaries>
+                <outputDirectory>lib</outputDirectory>
+                <unpack>false</unpack>
+                <dependencySets>
+                    <dependencySet>
+                        <includes>
+                            <include>*</include>
+                        </includes>
+                    </dependencySet>
+                </dependencySets>
+            </binaries>
+        </moduleSet>
+    </moduleSets>
+</assembly>
+
