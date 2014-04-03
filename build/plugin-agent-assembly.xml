@@ -8,7 +8,7 @@
     <fileSets>
         <fileSet>
             <directory>../sonar-plugin-agent/sonar-qube-runner/</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>/sonar-qube-runner</outputDirectory>
             <includes><include>**/*</include></includes>
         </fileSet>
         <fileSet>
