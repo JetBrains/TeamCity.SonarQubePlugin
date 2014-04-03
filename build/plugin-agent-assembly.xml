@@ -5,12 +5,18 @@
     <formats>
         <format>zip</format>
     </formats>
-    <files>
-        <file>
-            <source>../sonar-plugin-agent/teamcity-plugin.xml</source>
+    <fileSets>
+        <fileSet>
+            <directory>../sonar-plugin-agent/sonar-qube-runner/</directory>
             <outputDirectory>/</outputDirectory>
-        </file>
-    </files>
+            <includes><include>**/*</include></includes>
+        </fileSet>
+        <fileSet>
+            <directory>../sonar-plugin-agent/</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes><include>teamcity-plugin.xml</include></includes>
+        </fileSet>
+    </fileSets>
     <moduleSets>
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
