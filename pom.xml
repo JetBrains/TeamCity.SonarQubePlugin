@@ -14,6 +14,12 @@
         <url>http://repository.jetbrains.com/all</url>
     </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>JetBrains</id>
+      <url>http://repository.jetbrains.com/all</url>
+    </pluginRepository>
+  </pluginRepositories>
   <build>
       <pluginManagement>
           <plugins>
@@ -24,6 +30,12 @@
                       <source>1.5</source>
                       <target>1.5</target>
                   </configuration>
+              </plugin>
+              <plugin>
+                <groupId>org.jetbrains.teamcity</groupId>
+                <artifactId>teamcity-sdk-maven-plugin</artifactId>
+                <version>0.1-SNAPSHOT</version>
+                <inherited>false</inherited>
               </plugin>
           </plugins>
       </pluginManagement>

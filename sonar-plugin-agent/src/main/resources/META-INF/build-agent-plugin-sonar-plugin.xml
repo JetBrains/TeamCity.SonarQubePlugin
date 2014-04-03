@@ -3,4 +3,5 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans default-autowire="constructor">
+    <bean class="jetbrains.buildserver.sonarplugin.SonarQubeRunnerBuildRunner"/>
 </beans>
