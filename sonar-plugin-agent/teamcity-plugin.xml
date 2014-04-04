@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<teamcity-agent-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:shemas-jetbrains-com:teamcity-agent-plugin-v1-xml">
+    <plugin-deployment use-separate-classloader="true">
+        <layout>
+            <executable-files>
+                <include name='bin/sonar-runner'/>
+                <include name='bin/sonar-runner.bat'/>
+            </executable-files>
+        </layout>
+    </plugin-deployment>
+</teamcity-agent-plugin>
