@@ -19,8 +19,6 @@ import java.io.IOException;
  */
 public class SonarProcessListener extends AgentLifeCycleAdapter {
     private static final String ANALYSIS_SUCCESSFUL = "ANALYSIS SUCCESSFUL, you can browse ";
-    public static final String SONAR_SERVER_URL_FILENAME = "sonar_server.txt";
-    public static final String SONAR_SERVER_URL_ARTIF_LOCATION = ".teamcity/sonar/";
 
     @NotNull
     private final ArtifactsWatcher myWatcher;
@@ -44,10 +42,10 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
             final String URL = message.substring(start + ANALYSIS_SUCCESSFUL.length());
             FileWriter fw = null;
             try {
-                final File output = new File(build.getBuildTempDirectory(), SONAR_SERVER_URL_FILENAME);
+                final File output = new File(build.getBuildTempDirectory(), Constants.SONAR_SERVER_URL_FILENAME);
                 fw = new FileWriter(output);
                 fw.write(URL);
-                myWatcher.addNewArtifactsPath(output.getAbsolutePath() + "=>" + SONAR_SERVER_URL_ARTIF_LOCATION);
+                myWatcher.addNewArtifactsPath(output.getAbsolutePath() + "=>" + Constants.SONAR_SERVER_URL_ARTIF_LOCATION);
             } catch (IOException e) {
                 build.getBuildLogger().message("Cannot save Sonar URL \"" + URL + "\" to file \"" + "\": " + e.getMessage());
             } finally {
