@@ -6,5 +6,6 @@ package jetbrains.buildserver.sonarplugin;
 public final class Constants {
     public static final String RUNNER_TYPE = "sonar-runner";
 
-    private Constants() { /* disallowed */ }
+    private Constants() {
+    }
 }
