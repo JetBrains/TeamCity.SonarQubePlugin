@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 public class SonarProcessListener extends AgentLifeCycleAdapter {
     private static final String ANALYSIS_SUCCESSFUL = "ANALYSIS SUCCESSFUL, you can browse ";
-    public static final String SONAR_SERVER_URL_FILENAME = "sonar_server.url";
+    public static final String SONAR_SERVER_URL_FILENAME = "sonar_server.txt";
     public static final String SONAR_SERVER_URL_ARTIF_LOCATION = ".teamcity/sonar/";
 
     @NotNull
