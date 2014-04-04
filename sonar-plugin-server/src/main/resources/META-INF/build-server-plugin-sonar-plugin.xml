@@ -2,4 +2,8 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-autowire="constructor">
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQRRunType"/>
+    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.BuildSummaryLinkExtension"/>
+    <!--<bean class="jetbrains.buildserver.sonarplugin.sqrunner.ServerManagementProjectTab"/>-->
+
+    <!--<bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager"/>-->
 </beans>
