@@ -4,5 +4,6 @@
 
 <beans default-autowire="constructor">
     <bean class="jetbrains.buildserver.sonarplugin.SonarQubeRunnerBuildRunner"/>
+    <bean class="jetbrains.buildserver.sonarplugin.SonarProcessListener"/>
     <bean class="jetbrains.buildserver.sonarplugin.SQRBuildServiceFactory"/>
 </beans>

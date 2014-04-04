@@ -7,10 +7,10 @@ import jetbrains.buildServer.agent.runner.JavaCommandLineBuilder;
 import jetbrains.buildServer.agent.runner.JavaRunnerUtil;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.runner.JavaRunnerConstants;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,11 +18,11 @@ import java.util.List;
  * Created by linfar on 4/3/14.
  */
 public class SQRBuildService extends CommandLineBuildService {
-    private static final Logger LOG = Logger.getLogger(SQRBuildService.class.getName());
-
     private static final String SQR_JAR_NAME = "sonar-runner-dist-2.3.jar";
     private static final String SQR_JAR_PATH = "sonar-qube-runner" + File.separatorChar + "lib";
-    private PluginDescriptor myPluginDescriptor;
+
+    @NotNull
+    private final PluginDescriptor myPluginDescriptor;
 
     public SQRBuildService(final @NotNull PluginDescriptor pluginDescriptor) {
         myPluginDescriptor = pluginDescriptor;
@@ -35,8 +35,8 @@ public class SQRBuildService extends CommandLineBuildService {
         builder.setJavaHome(getRunnerContext().getRunnerParameters().get(JavaRunnerConstants.TARGET_JDK_HOME));
         builder.setWorkingDir(getBuild().getCheckoutDirectory().getAbsolutePath());
 
-        //builder.setSystemProperties(Map<String, String>);
-        //builder.setEnvVariables(Map<String, String>);
+        builder.setSystemProperties(Collections.<String, String>emptyMap());
+        builder.setEnvVariables(Collections.<String, String>emptyMap());
 
         builder.setJvmArgs(JavaRunnerUtil.extractJvmArgs(getRunnerContext().getRunnerParameters()));
         builder.setClassPath(getClasspath());
@@ -56,7 +56,7 @@ public class SQRBuildService extends CommandLineBuildService {
     }
 
     private List<String> composeSQRArgs() {
-        LinkedList<String> res = new LinkedList<String>();
+        List<String> res = new LinkedList<String>();
         res.add("-Dsonar.projectKey=sonar-plugin");
         res.add("-Dsonar.projectName=sonar-plugin");
         res.add("-Dsonar.projectVersion=1.0.1");
