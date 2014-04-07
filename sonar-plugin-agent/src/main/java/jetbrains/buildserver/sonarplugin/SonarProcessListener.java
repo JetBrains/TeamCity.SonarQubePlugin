@@ -9,7 +9,6 @@ import jetbrains.buildServer.messages.BuildMessage1;
 import jetbrains.buildServer.util.EventDispatcher;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -40,6 +39,7 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
         final int start = message.indexOf(ANALYSIS_SUCCESSFUL);
         if (start >= 0) {
             final String URL = message.substring(start + ANALYSIS_SUCCESSFUL.length());
+            // TODO: save URL to a parameter instead to be able to specify URL strictly in configuration
             FileWriter fw = null;
             try {
                 final File output = new File(build.getBuildTempDirectory(), Constants.SONAR_SERVER_URL_FILENAME);
@@ -49,17 +49,9 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
             } catch (IOException e) {
                 build.getBuildLogger().message("Cannot save Sonar URL \"" + URL + "\" to file \"" + "\": " + e.getMessage());
             } finally {
-                close(fw);
+                Util.close(fw);
             }
         }
     }
 
-    private static void close(Closeable fw) {
-        if (fw != null) {
-            try {
-                fw.close();
-            } catch (IOException ignore) {
-            }
-        }
-    }
 }
