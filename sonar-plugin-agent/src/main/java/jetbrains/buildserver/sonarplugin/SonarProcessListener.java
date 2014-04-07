@@ -54,23 +54,4 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
         }
     }
 
-    public void a(@NotNull AgentRunningBuild build, @NotNull BuildMessage1 buildMessage) {
-        final String message = buildMessage.getValue().toString();
-        final int start = message.indexOf(ANALYSIS_SUCCESSFUL);
-        if (start >= 0) {
-            final String URL = message.substring(start + ANALYSIS_SUCCESSFUL.length());
-            // TODO: save URL to a parameter instead to be able to specify URL strictly in configuration
-            FileWriter fw = null;
-            try {
-                final File output = new File(build.getBuildTempDirectory(), Constants.SONAR_SERVER_URL_FILENAME);
-                fw = new FileWriter(output);
-                fw.write(URL);
-                myWatcher.addNewArtifactsPath(output.getAbsolutePath() + "=>" + Constants.SONAR_SERVER_URL_ARTIF_LOCATION);
-            } catch (IOException e) {
-                build.getBuildLogger().message("Cannot save Sonar URL \"" + URL + "\" to file \"" + "\": " + e.getMessage());
-            } finally {
-                Util.close(fw);
-            }
-        }    }
-
 }
