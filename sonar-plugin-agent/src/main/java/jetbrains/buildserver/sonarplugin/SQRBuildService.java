@@ -65,7 +65,7 @@ public class SQRBuildService extends CommandLineBuildService {
         addSQRArg(res, "-Dsonar.modules", accessor.getProjectModules());
         final String additionalParameters = accessor.getAdditionalParameters();
         if (additionalParameters != null) {
-            res.addAll(Arrays.asList(additionalParameters.split(" ")));
+            res.addAll(Arrays.asList(additionalParameters.split("\\s")));
         }
         String jacocoExecFilePath = build.getSharedConfigParameters().get("teamcity.jacoco.coverage.datafile");
         final File file = new File(jacocoExecFilePath);

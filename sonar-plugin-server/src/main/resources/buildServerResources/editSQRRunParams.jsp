@@ -28,6 +28,6 @@
 </tr>
 <tr>
     <th class="noBorder"><label for="additionalParameters">Additional parameters: </label></th>
-    <td><props:textProperty name="additionalParameters" className="multilineProperty longField"/>
+    <td><props:multilineProperty name="additionalParameters" className="longField" linkTitle="Any additional parameters to be passed to SonarQube Runner as is" cols="40" rows="3" expanded="true"/>
     </td>
 </tr>
