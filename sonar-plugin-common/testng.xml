@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Sonar common">
+    <test name="Sonar common">
+        <classes>
+            <class name="jetbrains.buildserver.sonarplugin.SQRParametersAccessorTest"/>
+        </classes>
+    </test>
+</suite>
