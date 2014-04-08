@@ -1,6 +1,7 @@
 package jetbrains.buildserver.sonarplugin;
 
 import jetbrains.buildServer.RunBuildException;
+import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.plugins.beans.PluginDescriptor;
 import jetbrains.buildServer.agent.runner.CommandLineBuildService;
 import jetbrains.buildServer.agent.runner.JavaCommandLineBuilder;
@@ -11,10 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by linfar on 4/3/14.
@@ -44,7 +42,7 @@ public class SQRBuildService extends CommandLineBuildService {
         builder.setClassPath(getClasspath());
 
         builder.setMainClass("org.sonar.runner.Main");
-        builder.setProgramArgs(composeSQRArgs(getRunnerContext().getRunnerParameters()));
+        builder.setProgramArgs(composeSQRArgs(getRunnerContext().getRunnerParameters(), getBuild()));
         builder.setWorkingDir(getRunnerContext().getWorkingDirectory().getAbsolutePath());
 
         final ProgramCommandLine cmd = builder.build();
@@ -57,7 +55,7 @@ public class SQRBuildService extends CommandLineBuildService {
         return cmd;
     }
 
-    private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters) {
+    private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters, @NotNull final AgentRunningBuild build) {
         List<String> res = new LinkedList<String>();
         SQRParametersAccessor accessor = new SQRParametersAccessor(runnerParameters);
         addSQRArg(res, "-Dsonar.projectKey", accessor.getProjectKey());
@@ -67,7 +65,12 @@ public class SQRBuildService extends CommandLineBuildService {
         addSQRArg(res, "-Dsonar.modules", accessor.getProjectModules());
         final String additionalParameters = accessor.getAdditionalParameters();
         if (additionalParameters != null) {
-            res.add(additionalParameters);
+            res.addAll(Arrays.asList(additionalParameters.split(" ")));
+        }
+        String jacocoExecFilePath = build.getSharedConfigParameters().get("teamcity.jacoco.coverage.datafile");
+        final File file = new File(jacocoExecFilePath);
+        if (file.exists() && file.isFile() && file.canRead()) {
+            addSQRArg(res, "-Dsonar.jacoco.reportPath", jacocoExecFilePath);
         }
         return res;
     }
