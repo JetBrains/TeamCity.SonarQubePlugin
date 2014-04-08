@@ -28,6 +28,6 @@
 </tr>
 <tr>
     <th class="noBorder"><label for="additionalParameters">Additional parameters: </label></th>
-    <td><props:textProperty name="additionalParameters" className="longField"/>
+    <td><props:textProperty name="additionalParameters" className="multilineProperty longField"/>
     </td>
 </tr>
