@@ -65,6 +65,10 @@ public class SQRBuildService extends CommandLineBuildService {
         addSQRArg(res, "-Dsonar.projectVersion", accessor.getProjectVersion());
         addSQRArg(res, "-Dsonar.sources", accessor.getProjectSources());
         addSQRArg(res, "-Dsonar.modules", accessor.getProjectModules());
+        final String additionalParameters = accessor.getAdditionalParameters();
+        if (additionalParameters != null) {
+            res.add(additionalParameters);
+        }
         return res;
     }
 

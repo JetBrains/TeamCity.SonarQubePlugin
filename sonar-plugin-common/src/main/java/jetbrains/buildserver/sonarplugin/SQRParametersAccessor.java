@@ -41,4 +41,8 @@ public class SQRParametersAccessor {
     public String getProjectModules() {
         return myParameters.get(Constants.SONAR_PROJECT_MODULES);
     }
+
+    public String getAdditionalParameters() {
+        return myParameters.get(Constants.SONAR_ADDITIONAL_PARAMETERS);
+    }
 }

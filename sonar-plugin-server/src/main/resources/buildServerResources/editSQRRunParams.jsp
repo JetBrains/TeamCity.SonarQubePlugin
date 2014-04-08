@@ -26,3 +26,8 @@
     <td><props:textProperty name="sonarProjectModules" className="longField"/>
     </td>
 </tr>
+<tr>
+    <th class="noBorder"><label for="additionalParameters">Additional parameters: </label></th>
+    <td><props:textProperty name="additionalParameters" className="longField"/>
+    </td>
+</tr>
