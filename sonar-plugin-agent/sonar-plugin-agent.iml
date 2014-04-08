@@ -19,6 +19,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Gaya-8.1" level="project" />
     <orderEntry type="module" module-name="sonar-plugin-common" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.jetbrains.teamcity:agent-api:8.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.jetbrains.teamcity:common-api:8.1" level="project" />
