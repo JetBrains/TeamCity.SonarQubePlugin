@@ -8,11 +8,13 @@ import jetbrains.buildServer.agent.runner.JavaRunnerUtil;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.runner.JavaRunnerConstants;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by linfar on 4/3/14.
@@ -42,7 +44,7 @@ public class SQRBuildService extends CommandLineBuildService {
         builder.setClassPath(getClasspath());
 
         builder.setMainClass("org.sonar.runner.Main");
-        builder.setProgramArgs(composeSQRArgs());
+        builder.setProgramArgs(composeSQRArgs(getRunnerContext().getRunnerParameters()));
         builder.setWorkingDir(getRunnerContext().getWorkingDirectory().getAbsolutePath());
 
         final ProgramCommandLine cmd = builder.build();
@@ -55,21 +57,30 @@ public class SQRBuildService extends CommandLineBuildService {
         return cmd;
     }
 
-    private List<String> composeSQRArgs() {
+    private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters) {
         List<String> res = new LinkedList<String>();
-        res.add("-Dsonar.projectKey=sonar-plugin");
-        res.add("-Dsonar.projectName=sonar-plugin");
-        res.add("-Dsonar.projectVersion=1.0.1");
-        res.add("-Dsonar.sources=src");
-        res.add("-Dsonar.modules=sonar-plugin-agent,sonar-plugin-common,sonar-plugin-server");
+        SQRParametersAccessor accessor = new SQRParametersAccessor(runnerParameters);
+        addSQRArg(res, "-Dsonar.projectKey", accessor.getProjectKey());
+        addSQRArg(res, "-Dsonar.projectName", accessor.getProjectName());
+        addSQRArg(res, "-Dsonar.projectVersion", accessor.getProjectVersion());
+        addSQRArg(res, "-Dsonar.sources", accessor.getProjectSources());
+        addSQRArg(res, "-Dsonar.modules", accessor.getProjectModules());
         return res;
     }
 
+    private static void addSQRArg(@NotNull final List<String> argList, @NotNull final String key, @Nullable final String value) {
+        if (value != null) {
+            argList.add(key + "=" + value);
+        }
+    }
+
+    @NotNull
     private String getClasspath() throws SQRJarException {
         File pluginJar = getSQRJar(myPluginDescriptor.getPluginRoot());
         return pluginJar.getAbsolutePath();
     }
 
+    @NotNull
     private File getSQRJar(File sqrRoot) throws SQRJarException {
         File pluginJar = new File(sqrRoot, SQR_JAR_PATH + File.separatorChar + SQR_JAR_NAME);
         if (!pluginJar.exists()) {

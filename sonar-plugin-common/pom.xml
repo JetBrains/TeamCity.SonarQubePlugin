@@ -8,4 +8,12 @@
   </parent>
   <artifactId>sonar-plugin-common</artifactId>
   <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.teamcity.idea</groupId>
+            <artifactId>annotations</artifactId>
+            <version>132.719</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>
