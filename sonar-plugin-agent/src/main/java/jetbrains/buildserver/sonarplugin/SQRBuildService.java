@@ -23,9 +23,13 @@ public class SQRBuildService extends CommandLineBuildService {
 
     @NotNull
     private final PluginDescriptor myPluginDescriptor;
+    @NotNull
+    private final SonarProcessListener mySonarProcessListener;
 
-    public SQRBuildService(final @NotNull PluginDescriptor pluginDescriptor) {
+    public SQRBuildService(@NotNull final PluginDescriptor pluginDescriptor,
+                           @NotNull final SonarProcessListener sonarProcessListener) {
         myPluginDescriptor = pluginDescriptor;
+        mySonarProcessListener = sonarProcessListener;
     }
 
     @NotNull
@@ -67,12 +71,27 @@ public class SQRBuildService extends CommandLineBuildService {
         if (additionalParameters != null) {
             res.addAll(Arrays.asList(additionalParameters.split("\\s")));
         }
+        final Set<String> collectedReports = mySonarProcessListener.getCollectedReports();
+        if (!collectedReports.isEmpty()) {
+            addSQRArg(res, "-Dsonar.dynamicAnalysis", "reuseReports");
+            addSQRArg(res, "-Dsonar.junit.reportsPath", toString(collectedReports));
+        }
+
         String jacocoExecFilePath = build.getSharedConfigParameters().get("teamcity.jacoco.coverage.datafile");
         final File file = new File(jacocoExecFilePath);
         if (file.exists() && file.isFile() && file.canRead()) {
+            addSQRArg(res, "-Dsonar.java.coveragePlugin", "jacoco");
             addSQRArg(res, "-Dsonar.jacoco.reportPath", jacocoExecFilePath);
         }
         return res;
+    }
+
+    private String toString(Set<String> collectedReports) {
+        StringBuilder sb = new StringBuilder();
+        for (String report : collectedReports) {
+            sb.append(report).append(',');
+        }
+        return sb.substring(0, sb.length() - 1);
     }
 
     private static void addSQRArg(@NotNull final List<String> argList, @NotNull final String key, @Nullable final String value) {

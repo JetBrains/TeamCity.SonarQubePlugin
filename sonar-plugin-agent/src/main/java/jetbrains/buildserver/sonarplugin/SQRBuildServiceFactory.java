@@ -12,16 +12,19 @@ import org.jetbrains.annotations.NotNull;
 public class SQRBuildServiceFactory implements CommandLineBuildServiceFactory {
     @NotNull private final SonarQubeRunnerBuildRunner mySonarQubeRunnerBuildRunner;
     @NotNull private final PluginDescriptor myPluginDescriptor;
+    private SonarProcessListener mySonarProcessListener;
 
     public SQRBuildServiceFactory(@NotNull final SonarQubeRunnerBuildRunner sonarQubeRunnerBuildRunner,
-                                  @NotNull final PluginDescriptor pluginDescriptor) {
+                                  @NotNull final PluginDescriptor pluginDescriptor,
+                                  @NotNull final SonarProcessListener sonarProcessListener) {
         mySonarQubeRunnerBuildRunner = sonarQubeRunnerBuildRunner;
         myPluginDescriptor = pluginDescriptor;
+        mySonarProcessListener = sonarProcessListener;
     }
 
     @NotNull
     public CommandLineBuildService createService() {
-        return new SQRBuildService(myPluginDescriptor);
+        return new SQRBuildService(myPluginDescriptor, mySonarProcessListener);
     }
 
     @NotNull
