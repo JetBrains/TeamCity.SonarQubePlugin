@@ -5,9 +5,9 @@ import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher;
 import jetbrains.buildServer.messages.BlockData;
 import jetbrains.buildServer.messages.BuildMessage1;
 import jetbrains.buildServer.messages.DefaultMessagesInfo;
-import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.util.EventDispatcher;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -52,6 +52,13 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
     @Override
     public void messageLogged(@NotNull AgentRunningBuild build, @NotNull BuildMessage1 buildMessage) {
         final String message = buildMessage.getValue().toString();
+        final String blockName = getBlockName(buildMessage);
+        final String typeId = buildMessage.getTypeId();
+
+        processMessage(build, message, blockName, typeId);
+    }
+
+    protected void processMessage(AgentRunningBuild build, String message, String blockName, String typeId) {
         final int start = message.indexOf(ANALYSIS_SUCCESSFUL);
         if (start >= 0) {
             final String url = message.substring(start + ANALYSIS_SUCCESSFUL.length());
@@ -68,30 +75,34 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
                 Util.close(fw);
             }
         } else {
-            if (TeamCityProperties.getBoolean("sonar-plugin.experimental.autodetectReports") || true) {
-                if (!isReports) {
-                    if (buildMessage.getValue() instanceof BlockData) {
-                        isReports = ((BlockData) buildMessage.getValue()).blockName.equals("Successfully parsed");
-                    }
+            if (!isReports) {
+                if (blockName != null) {
+                    isReports = blockName.equals("Successfully parsed");
+                }
+            } else {
+                if (typeId.equals(DefaultMessagesInfo.MSG_BLOCK_END)) {
+                    isReports = false;
                 } else {
-                    if (buildMessage.getTypeId().equals(DefaultMessagesInfo.MSG_BLOCK_END)) {
-                        isReports = false;
-                    } else {
-                        if (!message.matches("\\d+ report")) {
-                            final File file = new File(build.getCheckoutDirectory(), message);
+                    if (!message.matches("\\d+ report")) {
+                        final File file = new File(build.getCheckoutDirectory(), message);
 
-                            if (file.exists() && file.canRead()) {
-                                if (file.isDirectory()) {
-                                    myCollectedReports.add(message);
-                                } else {
-                                    myCollectedReports.add(file.getParentFile().getAbsolutePath());
-                                }
+                        if (file.exists() && file.canRead()) {
+                            if (file.isDirectory()) {
+                                myCollectedReports.add(message);
+                            } else {
+                                myCollectedReports.add(file.getParentFile().getAbsolutePath());
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    @Nullable
+    private static String getBlockName(@Nullable final BuildMessage1 buildMessage) {
+        return buildMessage != null && buildMessage.getValue() instanceof BlockData ?
+                ((BlockData) buildMessage.getValue()).blockName : null;
     }
 
     public Set<String> getCollectedReports() {
