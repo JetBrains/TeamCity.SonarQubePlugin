@@ -78,10 +78,12 @@ public class SQRBuildService extends CommandLineBuildService {
         }
 
         String jacocoExecFilePath = build.getSharedConfigParameters().get("teamcity.jacoco.coverage.datafile");
-        final File file = new File(jacocoExecFilePath);
-        if (file.exists() && file.isFile() && file.canRead()) {
-            addSQRArg(res, "-Dsonar.java.coveragePlugin", "jacoco");
-            addSQRArg(res, "-Dsonar.jacoco.reportPath", jacocoExecFilePath);
+        if (jacocoExecFilePath != null) {
+            final File file = new File(jacocoExecFilePath);
+            if (file.exists() && file.isFile() && file.canRead()) {
+                addSQRArg(res, "-Dsonar.java.coveragePlugin", "jacoco");
+                addSQRArg(res, "-Dsonar.jacoco.reportPath", jacocoExecFilePath);
+            }
         }
         return res;
     }
