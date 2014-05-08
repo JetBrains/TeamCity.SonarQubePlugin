@@ -1,5 +1,6 @@
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <tr>
     <th class="noBorder"><label for="sonarProjectName">Project name: </label></th>
@@ -19,6 +20,13 @@
 <tr>
     <th class="noBorder"><label for="sonarProjectSources">Sources location: </label></th>
     <td><props:textProperty name="sonarProjectSources" className="longField"/>
+    <bs:vcsTree fieldId="sonarProjectSources"/>
+    </td>
+</tr>
+<tr>
+    <th class="noBorder"><label for="sonarProjectTests">Tests location: </label></th>
+    <td><props:textProperty name="sonarProjectTests" className="longField"/>
+    <bs:vcsTree fieldId="sonarProjectTests"/>
     </td>
 </tr>
 <tr>
