@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -18,13 +19,14 @@ import java.util.List;
  * SonarQube Server data manager
  */
 public class SQSManager {
+    public static final String PROPERTIES_FILE_EXTENSION = ".properties";
     private final @NotNull ProjectManager myProjectManager;
 
-    public SQSManager(@NotNull ProjectManager projectManager) {
+    public SQSManager(final @NotNull ProjectManager projectManager) {
         myProjectManager = projectManager;
     }
 
-    public List<SQSInfo> getAvailableServers(SProject currentProject) {
+    public synchronized List<SQSInfo> getAvailableServers(final @NotNull SProject currentProject) {
         LinkedList<SQSInfo> res = new LinkedList<SQSInfo>();
         final File pluginSettingsDir = getPluginDataDirectory(currentProject);
         if (!pluginSettingsDir.exists()) {
@@ -42,7 +44,7 @@ public class SQSManager {
         }
     }
 
-    private SQSInfo readInfoFile(File serverInfo) {
+    private SQSInfo readInfoFile(final @NotNull File serverInfo) {
         FileInputStream inStream = null;
         try {
             inStream = new FileInputStream(serverInfo);
@@ -55,7 +57,7 @@ public class SQSManager {
         return null;
     }
 
-    private String getServerInfoId(File serverInfo) {
+    private String getServerInfoId(final @NotNull File serverInfo) {
         final String name = serverInfo.getName();
         final int idx = name.lastIndexOf('.');
         if (idx >= 0) {
@@ -65,13 +67,13 @@ public class SQSManager {
         }
     }
 
-    public void addServer(@NotNull final SQSInfo newServer, @NotNull final SProject currentProject) throws IOException {
+    public synchronized void addServer(@NotNull final SQSInfo newServer, @NotNull final SProject currentProject) throws IOException {
         final File pluginSettingsDir = getPluginDataDirectory(currentProject);
         final String id = newServer.getId();
         if (id == null) {
             throw new ServerIdMissing();
         }
-        final File serverInfoFile = new File(pluginSettingsDir, id + ".properties");
+        final File serverInfoFile = new File(pluginSettingsDir, id + PROPERTIES_FILE_EXTENSION);
         if (serverInfoFile.exists()) {
             throw new ServerInfoExists();
         }
@@ -82,12 +84,33 @@ public class SQSManager {
         newServer.storeTo(serverInfoFile);
     }
 
-    private static File getPluginDataDirectory(SProject currentProject) {
+    private static File getPluginDataDirectory(final @NotNull SProject currentProject) {
         return currentProject.getPluginDataDirectory("sonar-qube");
     }
 
+    public synchronized boolean removeIfExists(final @NotNull SProject currentProject, final @NotNull String id) throws CannotDeleteData {
+        final File pluginSettingsDir = getPluginDataDirectory(currentProject);
+        if (!pluginSettingsDir.exists()) {
+            return false;
+        }
+        final File[] files = pluginSettingsDir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.equals(id + PROPERTIES_FILE_EXTENSION);
+            }
+        });
+        if (files == null || files.length == 0) {
+            return false;
+        } else {
+            if (files[0].delete()) {
+                return true;
+            } else {
+                throw new CannotDeleteData("Cannot delete file " + files[0].getAbsolutePath());
+            }
+        }
+    }
+
     public static class CannotWriteData extends IOException {
-        public CannotWriteData(String message) {
+        public CannotWriteData(final @NotNull String message) {
             super(message);
         }
     }
@@ -96,5 +119,11 @@ public class SQSManager {
     }
 
     public static class ServerIdMissing extends RuntimeException {
+    }
+
+    public static class CannotDeleteData extends IOException {
+        public CannotDeleteData(final @NotNull String message) {
+            super(message);
+        }
     }
 }

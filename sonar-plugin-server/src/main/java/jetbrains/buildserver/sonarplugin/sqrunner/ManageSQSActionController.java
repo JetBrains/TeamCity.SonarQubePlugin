@@ -66,7 +66,14 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     private void editServerInfo(HttpServletRequest request, HttpServletResponse response, SProject project) {
     }
 
-    private void removeServerInfo(HttpServletRequest request, HttpServletResponse response, SProject project) {
+    private void removeServerInfo(HttpServletRequest request, HttpServletResponse response, final @NotNull SProject project) {
+        try {
+            if (mySqsManager.removeIfExists(project, request.getParameter(SQSInfo.SERVERINFO_ID))) {
+
+            }
+        } catch (SQSManager.CannotDeleteData cannotDeleteData) {
+            cannotDeleteData.printStackTrace();
+        }
     }
 
     private void addServerInfo(HttpServletRequest request, HttpServletResponse response, SProject project) {

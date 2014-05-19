@@ -2,6 +2,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ include file="/include-internal.jsp" %>
 <%--@elvariable id="availableServers" type="java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
+<%--@elvariable id="projectId" type="java.lang.String"--%>
 <div class="manageSQS">
     <c:choose>
         <c:when test="${fn:length(availableServers) > 0}">
@@ -15,6 +16,9 @@
                     <c:if test="${not empty server.JDBCPassword}">
                         <div class="dbPass">Database password: <c:out value="${server.JDBCPassword}"/></div>
                     </c:if>
+                    <div class="remove">
+                        <forms:addButton id="removeNewServer" onclick="SonarPlugin.removeServer('${projectId}', '${server.id}'); return false">remove</forms:addButton>
+                    </div>
                 </div>
             </c:forEach>
         </c:when>
@@ -28,16 +32,16 @@
         <div><label for="sonar.jdbc.url">Database url: </label><input type="text" id="sonar.jdbc.url"/></div>
         <div><label for="sonar.jdbc.username">Database username: </label><input type="text" id="sonar.jdbc.username"/></div>
         <div><label for="sonar.jdbc.password">Database password: </label><input type="text" id="sonar.jdbc.password"/></div>
-        <forms:addButton id="createNewServer" onclick="SonarPlugin.createServer(); return false">Add new server</forms:addButton>
+        <forms:addButton id="createNewServer" onclick="SonarPlugin.createServer('${projectId}'); return false">Add new server</forms:addButton>
     </div>
     <script language="javascript">
         SonarPlugin = {
-            createServer: function () {
+            createServer: function (projectId) {
                 var fields = ["serverinfo.id", "sonar.host.url", "sonar.jdbc.url", "sonar.jdbc.username", "sonar.jdbc.password"];
 
                 var params = {
                     action: 'addSqs',
-                    projectId: '${projectId}'
+                    projectId: projectId
                 };
 
                 for (var i = 0; i < fields.length; ++i) {
@@ -47,6 +51,15 @@
 
                 BS.ajaxRequest('<c:url value="/admin/manageSonarServers.html"/>', {
                     parameters: Object.toQueryString(params)
+                });
+            },
+            removeServer: function(projectId, serverId) {
+                BS.ajaxRequest('<c:url value="/admin/manageSonarServers.html"/>', {
+                    parameters: Object.toQueryString({
+                        action: 'removeSqs',
+                        projectId: projectId,
+                        'serverinfo.id': serverId
+                    })
                 });
             }
         };
