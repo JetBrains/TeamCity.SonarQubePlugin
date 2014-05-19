@@ -61,7 +61,7 @@ public class SQSInfo {
         if (!accessor.contains(SONAR_URL)) {
             errors.add(new ValidationError("Server url missing", SONAR_URL));
         }
-        return null;
+        return errors.toArray(new ValidationError[errors.size()]);
     }
 
     public static class ValidationError {
