@@ -54,39 +54,47 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
             return;
         }
         final String action = getAction(request);
-        if (ADD_SQS_ACTION.equals(action)) {
-            addServerInfo(request, response, project);
-        } else if (REMOVE_SQS_ACTION.equals(action)) {
-            removeServerInfo(request, response, project);
-        } else if ("editSqs".equals(action)) {
-            editServerInfo(request, response, project);
+        try {
+            if (ADD_SQS_ACTION.equals(action)) {
+                addServerInfo(request, project, ajaxResponse);
+            } else if (REMOVE_SQS_ACTION.equals(action)) {
+                removeServerInfo(request, project, ajaxResponse);
+            } else if ("editSqs".equals(action)) {
+                editServerInfo(request, response, project);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     private void editServerInfo(HttpServletRequest request, HttpServletResponse response, SProject project) {
     }
 
-    private void removeServerInfo(HttpServletRequest request, HttpServletResponse response, final @NotNull SProject project) {
+    private void removeServerInfo(final @NotNull HttpServletRequest request, final @NotNull SProject project, final @NotNull Element ajaxResponse) throws IOException {
         try {
-            if (mySqsManager.removeIfExists(project, request.getParameter(SQSInfo.SERVERINFO_ID))) {
-
+            final String serverinfoId = request.getParameter(SQSInfo.SERVERINFO_ID);
+            final boolean wasRemoved = mySqsManager.removeIfExists(project, serverinfoId);
+            if (wasRemoved) {
+                ajaxResponse.setAttribute("serverRemoved", serverinfoId + " was removed");
+            } else {
+                ajaxResponse.setAttribute("error", serverinfoId + " wasn't removed");
             }
         } catch (SQSManager.CannotDeleteData cannotDeleteData) {
-            cannotDeleteData.printStackTrace();
+            ajaxResponse.setAttribute("error", "Cannot delete data - " + cannotDeleteData.getMessage());
         }
     }
 
-    private void addServerInfo(HttpServletRequest request, HttpServletResponse response, SProject project) {
-        try {
-            final SQSInfo.ValidationError[] validationResult = SQSInfo.validate(request.getParameterMap());
-            if (validationResult != null) {
-                response.getWriter().write("{errors: '" + validationResult.length + "'}");
-            } else {
-                final SQSInfo info = SQSInfo.from(request.getParameterMap());
+    private void addServerInfo(HttpServletRequest request, SProject project, Element ajaxResponse) throws IOException {
+        final SQSInfo.ValidationError[] validationResult = SQSInfo.validate(request.getParameterMap());
+        if (validationResult != null) {
+            ajaxResponse.setAttribute("error", Integer.toString(validationResult.length));
+        } else {
+            final SQSInfo info = SQSInfo.from(request.getParameterMap());
+            try {
                 mySqsManager.addServer(info, project);
+            } catch (IOException e) {
+                ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
