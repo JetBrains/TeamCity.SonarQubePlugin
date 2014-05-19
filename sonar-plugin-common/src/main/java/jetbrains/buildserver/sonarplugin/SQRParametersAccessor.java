@@ -38,6 +38,10 @@ public class SQRParametersAccessor {
         return myParameters.get(Constants.SONAR_PROJECT_SOURCES);
     }
 
+    public String getProjectTests() {
+        return myParameters.get(Constants.SONAR_PROJECT_TESTS);
+    }
+
     public String getProjectModules() {
         return myParameters.get(Constants.SONAR_PROJECT_MODULES);
     }
