@@ -46,7 +46,7 @@
 
                 for (var i = 0; i < fields.length; ++i) {
                     var val = $j("[id='" + fields[i] + "']").val();
-                    if (val != null) params[fields[i]] = val;
+                    if (val != null && !val.empty()) params[fields[i]] = val;
                 }
 
                 BS.ajaxRequest('<c:url value="/admin/manageSonarServers.html"/>', {
