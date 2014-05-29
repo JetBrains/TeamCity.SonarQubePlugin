@@ -24,6 +24,22 @@
     </td>
 </tr>
 <tr>
+    <th class="noBorder"><label for="sonarServerId">SonarQube Server: </label></th>
+    <td>
+        <c:choose>
+            <c:when test="${not empty bean.sonarServers}">
+                <props:selectProperty name="sonarServerId" className="longField">
+                    <c:forEach items="${bean.sonarServers}" var="sonarServer">
+                        <props:option value="${sonarServer.id}"><c:out value="${sonarServer.description}"/></props:option>
+                    </c:forEach>
+                </props:selectProperty>
+            </c:when>
+            <c:otherwise>
+                No SonarQube Servers registered.
+            </c:otherwise>
+        </c:choose></td>
+</tr>
+<tr>
     <th class="noBorder"><label for="sonarProjectTests">Tests location: </label></th>
     <td><props:textProperty name="sonarProjectTests" className="longField"/>
     <bs:vcsTree fieldId="sonarProjectTests"/>
