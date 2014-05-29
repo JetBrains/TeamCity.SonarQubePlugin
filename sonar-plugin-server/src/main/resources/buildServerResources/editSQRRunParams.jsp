@@ -39,6 +39,7 @@
             </c:otherwise>
         </c:choose></td>
 </tr>
+<props:javaSettings/>
 <tr>
     <th class="noBorder"><label for="sonarProjectTests">Tests location: </label></th>
     <td><props:textProperty name="sonarProjectTests" className="longField"/>
