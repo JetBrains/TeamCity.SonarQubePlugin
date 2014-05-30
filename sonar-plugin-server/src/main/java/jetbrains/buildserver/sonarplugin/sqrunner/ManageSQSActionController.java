@@ -86,7 +86,7 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
 
     private void addServerInfo(HttpServletRequest request, SProject project, Element ajaxResponse) throws IOException {
         final SQSInfo.ValidationError[] validationResult = SQSInfo.validate(request.getParameterMap());
-        if (validationResult != null) {
+        if (validationResult != null && validationResult.length > 0) {
             ajaxResponse.setAttribute("error", Integer.toString(validationResult.length));
         } else {
             final SQSInfo info = SQSInfo.from(request.getParameterMap());
