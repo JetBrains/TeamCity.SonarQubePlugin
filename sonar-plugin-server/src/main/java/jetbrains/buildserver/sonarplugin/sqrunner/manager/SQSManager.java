@@ -1,6 +1,5 @@
 package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
-import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildserver.sonarplugin.Util;
 import org.jetbrains.annotations.NotNull;
@@ -20,14 +19,12 @@ import java.util.List;
  */
 public class SQSManager {
     public static final String PROPERTIES_FILE_EXTENSION = ".properties";
-    private final @NotNull ProjectManager myProjectManager;
-
-    public SQSManager(final @NotNull ProjectManager projectManager) {
-        myProjectManager = projectManager;
-    }
 
     public synchronized List<SQSInfo> getAvailableServers(final @NotNull SProject currentProject) {
         LinkedList<SQSInfo> res = new LinkedList<SQSInfo>();
+        if (currentProject.getParentProject() != null) {
+            res.addAll(getAvailableServers(currentProject.getParentProject()));
+        }
         final File pluginSettingsDir = getPluginDataDirectory(currentProject);
         if (!pluginSettingsDir.exists()) {
             pluginSettingsDir.mkdirs();
