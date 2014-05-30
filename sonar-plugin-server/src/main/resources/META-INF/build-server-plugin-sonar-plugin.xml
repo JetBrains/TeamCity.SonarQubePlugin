@@ -3,7 +3,8 @@
 <beans default-autowire="constructor">
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQRRunType"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.BuildSummaryLinkExtension"/>
-    <!--<bean class="jetbrains.buildserver.sonarplugin.sqrunner.ServerManagementProjectTab"/>-->
-
-    <!--<bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager"/>-->
+    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.ServerManagementProjectTab"/>
+    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.ManageSQSActionController"/>
+    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager"/>
+    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.EditSQRRunType"/>
 </beans>
