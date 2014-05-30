@@ -18,13 +18,12 @@
     <td><props:textProperty name="sonarProjectVersion" className="longField"/></td>
 </tr>
 
-<tr>
-    <th><label for="sqsChooser">SonarQube Server: </label></th>
+<tr><th><label for="sqsChooser">SonarQube Server: </label></th>
     <td>
         <c:choose>
+            <%--@elvariable id="servers" type="java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
             <c:when test="${not empty servers}">
                 <forms:select name="sqsChooser" enableFilter="true" className="mediumField">
-                    <%--@elvariable id="servers" type="java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
                     <c:forEach items="${servers}" var="server">
                         <forms:option value="${server.id}"><c:if test="${not empty server.id}">
                             <c:out value="${server.id}"/>: </c:if><c:out value="${server.url}"/>
@@ -33,7 +32,7 @@
                 </forms:select>
             </c:when>
             <c:otherwise>
-
+                <span class="smallNote">No SonarQube Server registered yet for this project</span>
             </c:otherwise>
         </c:choose>
     </td>
