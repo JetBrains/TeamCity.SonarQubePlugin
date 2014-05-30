@@ -57,24 +57,24 @@
 
 <props:javaSettings/>
 
-<tr>
+<tr class="advancedSetting">
     <th class="noBorder"><label for="sonarProjectSources">Sources location: </label></th>
     <td><props:textProperty name="sonarProjectSources" className="longField"/>
         <bs:vcsTree fieldId="sonarProjectSources"/>
     </td>
 </tr>
-<tr>
+<tr class="advancedSetting">
     <th class="noBorder"><label for="sonarProjectTests">Tests location: </label></th>
     <td><props:textProperty name="sonarProjectTests" className="longField"/>
     <bs:vcsTree fieldId="sonarProjectTests"/>
     </td>
 </tr>
-<tr>
+<tr class="advancedSetting">
     <th class="noBorder"><label for="sonarProjectModules">Modules: </label></th>
     <td><props:textProperty name="sonarProjectModules" className="longField"/>
     </td>
 </tr>
-<tr>
+<tr class="advancedSetting">
     <th class="noBorder"><label for="additionalParameters">Additional parameters: </label></th>
     <td><props:multilineProperty name="additionalParameters" className="longField" linkTitle="any additional parameters to be passed to SonarQube Runner as is" cols="40" rows="3" expanded="true"/>
     </td>
