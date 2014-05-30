@@ -6,12 +6,16 @@ import jetbrains.buildServer.controllers.admin.projects.BuildTypeForm;
 import jetbrains.buildServer.controllers.admin.projects.EditRunTypeControllerExtension;
 import jetbrains.buildServer.serverSide.BuildTypeSettings;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildserver.sonarplugin.Constants;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,7 +32,14 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
     }
 
     public void fillModel(@NotNull HttpServletRequest request, @NotNull BuildTypeForm form, @NotNull Map model) {
-        model.put("servers", mySqsManager.getAvailableServers(form.getProject()));
+        SProject project = form.getProject();
+        final List<SQSInfo> availableServers = new LinkedList<SQSInfo>();
+        while (project != null) {
+            availableServers.addAll(mySqsManager.getAvailableServers(project));
+            project = project.getParentProject();
+        }
+
+        model.put("servers", availableServers);
     }
 
     public void updateState(@NotNull HttpServletRequest request, @NotNull BuildTypeForm form) {

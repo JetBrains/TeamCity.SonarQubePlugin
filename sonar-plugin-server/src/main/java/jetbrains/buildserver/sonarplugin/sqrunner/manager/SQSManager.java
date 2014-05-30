@@ -22,9 +22,6 @@ public class SQSManager {
 
     public synchronized List<SQSInfo> getAvailableServers(final @NotNull SProject currentProject) {
         LinkedList<SQSInfo> res = new LinkedList<SQSInfo>();
-        if (currentProject.getParentProject() != null) {
-            res.addAll(getAvailableServers(currentProject.getParentProject()));
-        }
         final File pluginSettingsDir = getPluginDataDirectory(currentProject);
         if (!pluginSettingsDir.exists()) {
             pluginSettingsDir.mkdirs();
