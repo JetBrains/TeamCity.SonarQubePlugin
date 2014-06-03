@@ -4,28 +4,6 @@
 <%--@elvariable id="availableServers" type="java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
 <%--@elvariable id="projectId" type="java.lang.String"--%>
 <div class="manageSQS">
-    <c:choose>
-        <c:when test="${fn:length(availableServers) > 0}">
-            <c:forEach items="${availableServers}" var="server">
-                <div class="sqsInfo">
-                    <div class="url">URL: <c:out value="${server.url}"/></div>
-                    <div class="db">Database: <c:out value="${server.JDBCUrl}"/></div>
-                    <c:if test="${not empty server.JDBCUsername}">
-                        <div class="dbUser">Database username: <c:out value="${server.JDBCUsername}"/></div>
-                    </c:if>
-                    <c:if test="${not empty server.JDBCPassword}">
-                        <div class="dbPass">Database password: <c:out value="${server.JDBCPassword}"/></div>
-                    </c:if>
-                    <div class="remove">
-                        <forms:addButton id="removeNewServer" onclick="SonarPlugin.removeServer('${projectId}', '${server.id}'); return false">remove</forms:addButton>
-                    </div>
-                </div>
-            </c:forEach>
-        </c:when>
-        <c:otherwise>
-            No SonarQuve Servers registered yet. You can still select a server with additional SonarQube Runner parameters or use local installation.
-        </c:otherwise>
-    </c:choose>
     <div class="add">
         <div><label for="serverinfo.id">Server id: </label><input type="text" id="serverinfo.id"/></div>
         <div><label for="sonar.host.url">Server url: </label><input type="text" id="sonar.host.url"/></div>
@@ -33,6 +11,44 @@
         <div><label for="sonar.jdbc.username">Database username: </label><input type="text" id="sonar.jdbc.username"/></div>
         <div><label for="sonar.jdbc.password">Database password: </label><input type="text" id="sonar.jdbc.password"/></div>
         <forms:addButton id="createNewServer" onclick="SonarPlugin.createServer('${projectId}'); return false">Add new server</forms:addButton>
+    </div>
+    <div class="sqsList">
+        <c:choose>
+            <c:when test="${fn:length(availableServers) > 0}">
+                <table class="sqsTable parametersTable">
+                    <tr>
+                        <th class="id">Name</th>
+                        <th class="host">Server</th>
+                        <th class="db">Database</th>
+                        <th class="actions">Manage</th>
+                    </tr>
+                    <c:forEach items="${availableServers}" var="server">
+                        <tr class="sqsInfo">
+                            <td class="name"><c:out value="${server.id}"/></td>
+                            <td class="url"><c:out value="${server.url}"/></td>
+                            <td class="db">
+                                <div class="url"><c:out value="${server.JDBCUrl}"/></div>
+                                <c:if test="${not empty server.JDBCUsername}">
+                                    <div class="dbUser">Username: <c:out value="${server.JDBCUsername}"/></div>
+                                </c:if>
+                                <c:if test="${not empty server.JDBCPassword}">
+                                    <div class="dbPass">Password: <c:out value="${server.JDBCPassword}"/></div>
+                                </c:if>
+                            </td>
+                            <td class="remove">
+                                <forms:addButton id="removeNewServer"
+                                                 onclick="SonarPlugin.removeServer('${projectId}', '${server.id}'); return false">remove</forms:addButton>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </table>
+            </c:when>
+            <c:otherwise>
+                <div class="noSqsFound">
+                    No SonarQuve Servers registered yet. You can still select a server with additional SonarQube Runner parameters or use local installation.
+                </div>
+            </c:otherwise>
+        </c:choose>
     </div>
     <script language="javascript">
         SonarPlugin = {

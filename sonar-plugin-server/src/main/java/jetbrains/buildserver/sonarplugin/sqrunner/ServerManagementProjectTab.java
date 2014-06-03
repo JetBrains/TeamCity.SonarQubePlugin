@@ -21,6 +21,7 @@ public class ServerManagementProjectTab extends EditProjectTab {
     public ServerManagementProjectTab(@NotNull final PagePlaces pagePlaces, @NotNull final PluginDescriptor pluginDescriptor, @NotNull final SQSManager sqsManager) {
         super(pagePlaces, pluginDescriptor.getPluginName(), "manageSonarServers.jsp", "Sonar Server");
         mySqsManager = sqsManager;
+        addCssFile(pluginDescriptor.getPluginResourcesPath("manageSonarServers.css"));
     }
 
     @Override
