@@ -8,10 +8,7 @@ import jetbrains.buildserver.sonarplugin.Constants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by linfar on 4/2/14.
@@ -55,7 +52,14 @@ public class SQRRunType extends RunType {
     public PropertiesProcessor getRunnerPropertiesProcessor() {
         return new PropertiesProcessor() {
             public Collection<InvalidProperty> process(Map<String, String> properties) {
-                return Collections.emptyList();
+                List<InvalidProperty> invalidProperties = new LinkedList<InvalidProperty>();
+
+                final String serverId = properties.get(Constants.SONAR_SERVER_ID);
+                if (serverId == null) {
+                    invalidProperties.add(new InvalidProperty(Constants.SQS_CHOOSER, "Choose a SonarQube Server to send information to"));
+                }
+
+                return invalidProperties;
             }
         };
     }

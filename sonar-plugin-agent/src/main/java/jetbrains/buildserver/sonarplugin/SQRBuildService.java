@@ -62,6 +62,10 @@ public class SQRBuildService extends CommandLineBuildService {
     private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters, @NotNull final AgentRunningBuild build) {
         List<String> res = new LinkedList<String>();
         SQRParametersAccessor accessor = new SQRParametersAccessor(runnerParameters);
+        addSQRArg(res, "-Dsonar.host.url", accessor.getHostUrl());
+        addSQRArg(res, "-Dsonar.jdbc.url", accessor.getJDBCUrl());
+        addSQRArg(res, "-Dsonar.jdbc.username", accessor.getJDBCUsername());
+        addSQRArg(res, "-Dsonar.jdbc.password", accessor.getJDBCPassword());
         addSQRArg(res, "-Dsonar.projectKey", accessor.getProjectKey());
         addSQRArg(res, "-Dsonar.projectName", accessor.getProjectName());
         addSQRArg(res, "-Dsonar.projectVersion", accessor.getProjectVersion());

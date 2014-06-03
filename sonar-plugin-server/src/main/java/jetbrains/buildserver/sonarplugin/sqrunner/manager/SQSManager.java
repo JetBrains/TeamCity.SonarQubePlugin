@@ -3,12 +3,12 @@ package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildserver.sonarplugin.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,21 +21,75 @@ public class SQSManager {
     public static final String PROPERTIES_FILE_EXTENSION = ".properties";
 
     public synchronized List<SQSInfo> getAvailableServers(final @NotNull SProject currentProject) {
-        LinkedList<SQSInfo> res = new LinkedList<SQSInfo>();
-        final File pluginSettingsDir = getPluginDataDirectory(currentProject);
+        final LinkedList<SQSInfo> res = new LinkedList<SQSInfo>();
+        processAvailableServers(currentProject, new SQSInfoProcessor() {
+            @Override
+            public State process(SQSInfo sqsInfo) {
+                res.add(sqsInfo);
+                return State.CONTINUE;
+            }
+        });
+        return res;
+    }
+
+    private synchronized void processAvailableServers(final @NotNull SProject project, final @NotNull SQSInfoProcessor processor) {
+        final File pluginSettingsDir = getPluginDataDirectory(project);
         if (!pluginSettingsDir.exists()) {
-            pluginSettingsDir.mkdirs();
-            return res;
+            return;
         }
         final File[] files = pluginSettingsDir.listFiles();
-        if (files == null) {
-            return Collections.emptyList();
-        } else {
+        if (files != null) {
             for (File serverInfo : files) {
-                res.add(readInfoFile(serverInfo));
+                switch (processor.process(serverInfo)) {
+                    case STOP:
+                        return;
+                    case READ:
+                        switch (processor.process(readInfoFile(serverInfo))) {
+                            case STOP: return;
+                        }
+                        break;
+                    case CONTINUE:
+                        break;
+                }
             }
-            return res;
         }
+    }
+
+    public static abstract class SQSInfoProcessor {
+        public static enum State {CONTINUE, STOP, READ}
+
+        public State process(File serverInfo) {
+            return State.READ;
+        }
+
+        public State process(SQSInfo sqsInfo) {
+            return State.CONTINUE;
+        }
+    }
+
+    @Nullable
+    public synchronized SQSInfo findServer(final @NotNull SProject project, final @NotNull String serverId) {
+        final SQSInfo info[] = new SQSInfo[] {null};
+
+        processAvailableServers(project, new SQSInfoProcessor() {
+            @Override
+            public State process(File serverInfo) {
+                final String id = getServerInfoId(serverInfo);
+                if (serverId.equals(id)) {
+                    return State.READ;
+                } else {
+                    return State.CONTINUE;
+                }
+            }
+
+            @Override
+            public State process(SQSInfo sqsInfo) {
+                info[0] = sqsInfo;
+                return State.STOP;
+            }
+        });
+
+        return info[0];
     }
 
     private SQSInfo readInfoFile(final @NotNull File serverInfo) {

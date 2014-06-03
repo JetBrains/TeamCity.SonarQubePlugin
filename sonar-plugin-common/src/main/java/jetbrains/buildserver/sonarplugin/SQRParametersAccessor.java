@@ -46,6 +46,22 @@ public class SQRParametersAccessor {
         return myParameters.get(Constants.SONAR_PROJECT_MODULES);
     }
 
+    public String getHostUrl() {
+        return myParameters.get(Constants.SONAR_HOST_URL);
+    }
+
+    public String getJDBCUrl() {
+        return myParameters.get(Constants.SONAR_SERVER_JDBC_URL);
+    }
+
+    public String getJDBCUsername() {
+        return myParameters.get(Constants.SONAR_SERVER_JDBC_USERNAME);
+    }
+
+    public String getJDBCPassword() {
+        return myParameters.get(Constants.SONAR_SERVER_JDBC_PASSWORD);
+    }
+
     public String getAdditionalParameters() {
         return myParameters.get(Constants.SONAR_ADDITIONAL_PARAMETERS);
     }
