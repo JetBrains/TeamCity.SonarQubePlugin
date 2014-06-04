@@ -44,7 +44,7 @@ public class SQRPropertiesProvider implements BuildStartContextProcessor {
     private static void addIfNotNull(final @NotNull SRunnerContext runnerContext,
                                      final @NotNull String key,
                                      final @Nullable String value) {
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
             runnerContext.addRunnerParameter(key, value);
         }
     }
