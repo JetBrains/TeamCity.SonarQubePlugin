@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ include file="/include-internal.jsp" %>
-<%--@elvariable id="availableServers" type="java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
+<%--@elvariable id="availableServersMap" type="java.util.Map<jetbrains.buildServer.serverSide.SProject, java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
 <%--@elvariable id="projectId" type="java.lang.String"--%>
 <div class="manageSQS">
     <h2 class="noBorder">SonarQube Server profiles</h2>
@@ -10,7 +10,7 @@
     <bs:refreshable containerId="SQservers" pageUrl="${pageUrl}">
         <div class="sqsList">
             <c:choose>
-                <c:when test="${fn:length(availableServers) > 0}">
+                <c:when test="${fn:length(availableServersMap) > 0}">
                     <table class="sqsTable parametersTable">
                         <tr>
                             <th class="id">Name</th>
@@ -18,29 +18,37 @@
                             <th class="db">Database</th>
                             <th class="actions" colspan="2">Manage</th>
                         </tr>
-                        <c:forEach items="${availableServers}" var="server">
-                            <tr class="sqsInfo">
-                                <td class="name"><c:out value="${server.id}"/></td>
-                                <td class="url"><c:out value="${server.url}"/></td>
-                                <td class="db">
-                                    <div class="url"><c:out value="${server.JDBCUrl}"/></div>
-                                    <c:if test="${not empty server.JDBCUsername}">
-                                        <div class="dbUser">Username: <c:out value="${server.JDBCUsername}"/></div>
-                                    </c:if>
-                                    <c:if test="${not empty server.JDBCPassword}">
-                                        <div class="dbPass">Password: <c:out value="${server.JDBCPassword}"/></div>
-                                    </c:if>
-                                </td>
-                                <td class="remove">
-                                    <a id="removeNewServer" href="#"
-                                       onclick="SonarPlugin.removeServer('${projectId}', '${server.id}'); return false">remove</a>
-                                </td>
-                                <td class="edit">
-                                    <a id="editServer" href="#"
-                                       onclick="SonarPlugin.editServer('${server.id}', '${server.url}',
-                                               '${server.JDBCUrl}', '${server.JDBCUsername}', '${server.JDBCPassword}'); return false">edit</a>
-                                </td>
-                            </tr>
+                        <c:forEach items="${availableServersMap}" var="projectServersEntry">
+                            <c:forEach items="${projectServersEntry.value}" var="server">
+                                <tr class="sqsInfo">
+                                    <td class="name"><c:out value="${server.id}"/>
+                                        <c:if test="${projectServersEntry.key.externalId != projectId}"> belongs to
+                                            <admin:editProjectLink projectId="${projectServersEntry.key.externalId}">
+                                                <c:out value="${projectServersEntry.key.name}"/>
+                                            </admin:editProjectLink>
+                                        </c:if>
+                                    </td>
+                                    <td class="url"><c:out value="${server.url}"/></td>
+                                    <td class="db">
+                                        <div class="url"><c:out value="${server.JDBCUrl}"/></div>
+                                        <c:if test="${not empty server.JDBCUsername}">
+                                            <div class="dbUser">Username: <c:out value="${server.JDBCUsername}"/></div>
+                                        </c:if>
+                                        <c:if test="${not empty server.JDBCPassword}">
+                                            <div class="dbPass">Password: <c:out value="${server.JDBCPassword}"/></div>
+                                        </c:if>
+                                    </td>
+                                    <td class="remove">
+                                        <a id="removeNewServer" href="#"
+                                           onclick="SonarPlugin.removeServer('${projectId}', '${server.id}'); return false">remove</a>
+                                    </td>
+                                    <td class="edit">
+                                        <a id="editServer" href="#"
+                                           onclick="SonarPlugin.editServer('${server.id}', '${server.url}',
+                                                   '${server.JDBCUrl}', '${server.JDBCUsername}', '${server.JDBCPassword}'); return false">edit</a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
                         </c:forEach>
                     </table>
                 </c:when>

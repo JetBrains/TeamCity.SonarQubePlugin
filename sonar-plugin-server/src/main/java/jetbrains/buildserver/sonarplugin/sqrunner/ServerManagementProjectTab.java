@@ -4,10 +4,13 @@ import jetbrains.buildServer.controllers.admin.projects.EditProjectTab;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +34,21 @@ public class ServerManagementProjectTab extends EditProjectTab {
         if (currentProject == null) {
             return;
         }
-        model.put("availableServers", mySqsManager.getAvailableServers(currentProject));
+        HashMap<SProject, List<SQSInfo>> infoMap = getServersMap(currentProject);
+        model.put("availableServersMap", infoMap);
         model.put("projectId", currentProject.getExternalId());
+    }
+
+    private HashMap<SProject, List<SQSInfo>> getServersMap(@NotNull final SProject currentProject) {
+        SProject project = currentProject;
+        HashMap<SProject, List<SQSInfo>> infoMap = new HashMap<SProject, List<SQSInfo>>();
+        while (project != null) {
+            if (infoMap.containsKey(project)) {
+                break;
+            }
+            infoMap.put(project, mySqsManager.getAvailableServers(project));
+            project = project.getParentProject();
+        }
+        return infoMap;
     }
 }
