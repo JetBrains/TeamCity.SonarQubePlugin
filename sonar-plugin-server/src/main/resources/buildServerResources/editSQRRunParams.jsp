@@ -57,6 +57,11 @@
 <props:javaSettings/>
 
 <tr class="advancedSetting">
+    <th class="noBorder"><label for="sonarProjectModules">Modules: </label></th>
+    <td><props:textProperty name="sonarProjectModules" className="longField"/>
+    </td>
+</tr>
+<tr class="advancedSetting">
     <th class="noBorder"><label for="sonarProjectSources">Sources location: </label></th>
     <td><props:textProperty name="sonarProjectSources" className="longField"/>
         <bs:vcsTree fieldId="sonarProjectSources"/>
@@ -69,8 +74,9 @@
     </td>
 </tr>
 <tr class="advancedSetting">
-    <th class="noBorder"><label for="sonarProjectModules">Modules: </label></th>
-    <td><props:textProperty name="sonarProjectModules" className="longField"/>
+    <th class="noBorder"><label for="sonarProjectBinaries">Binaries location: </label></th>
+    <td><props:textProperty name="sonarProjectBinaries" className="longField"/>
+    <bs:vcsTree fieldId="sonarProjectBinaries"/>
     </td>
 </tr>
 <tr class="advancedSetting">

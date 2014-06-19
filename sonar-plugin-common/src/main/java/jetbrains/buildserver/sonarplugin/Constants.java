@@ -16,6 +16,7 @@ public final class Constants {
     public static final String SONAR_PROJECT_MODULES = "sonarProjectModules";
     public static final String SONAR_PROJECT_SOURCES = "sonarProjectSources";
     public static final String SONAR_PROJECT_TESTS = "sonarProjectTests";
+    public static final String SONAR_PROJECT_BINARIES = "sonarProjectBinaries";
     public static final String SONAR_PROJECT_VERSION = "sonarProjectVersion";
     public static final String SONAR_PROJECT_KEY = "sonarProjectKey";
     public static final String SONAR_PROJECT_NAME = "sonarProjectName";
