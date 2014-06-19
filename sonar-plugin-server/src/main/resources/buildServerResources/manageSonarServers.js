@@ -16,7 +16,7 @@ SonarPlugin = {
         });
     },
     editServer: function(id, url, JDBCUrl, JDBCUsername, JDBCPassword) {
-        SonarPlugin.ServerConnectionDialog.showDialog('editSQS', id, url, JDBCUrl, JDBCUsername, JDBCPassword);
+        SonarPlugin.ServerConnectionDialog.showDialog('editSqs', id, url, JDBCUrl, JDBCUsername, JDBCPassword);
     },
     addServer: function() {
         SonarPlugin.ServerConnectionDialog.showDialog('addSqs', '', '', '', '', '');

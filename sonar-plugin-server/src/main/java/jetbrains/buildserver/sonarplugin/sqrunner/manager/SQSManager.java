@@ -92,6 +92,11 @@ public class SQSManager {
         return info[0];
     }
 
+    public synchronized void editServer(final @NotNull SProject project, final @NotNull String serverId, final @NotNull SQSInfo modifiedSerever) throws IOException {
+        removeIfExists(project, serverId);
+        addServer(modifiedSerever, project);
+    }
+
     private SQSInfo readInfoFile(final @NotNull File serverInfo) {
         FileInputStream inStream = null;
         try {

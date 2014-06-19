@@ -22,7 +22,8 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
 
     public static final String ADD_SQS_ACTION = "addSqs";
     public static final String REMOVE_SQS_ACTION = "removeSqs";
-    public static final String SQS_ACTION = "sqsAction";
+    public static final String EDIT_SQS_ACTION = "editSqs";
+    public static final String SQS_ACTION = "action";
     @NotNull
     private final SQSManager mySqsManager;
     @NotNull
@@ -40,12 +41,14 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     }
 
     public boolean canProcess(@NotNull final HttpServletRequest request) {
-        return ADD_SQS_ACTION.equals(getAction(request)) ||
-               REMOVE_SQS_ACTION.equals(getAction(request));
+        final String action = getAction(request);
+        return ADD_SQS_ACTION.equals(action) ||
+               EDIT_SQS_ACTION.equals(action) ||
+               REMOVE_SQS_ACTION.equals(action);
     }
 
     private static String getAction(HttpServletRequest request) {
-        return request.getParameter("action");
+        return request.getParameter(SQS_ACTION);
     }
 
     public void process(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @Nullable Element ajaxResponse) {
@@ -59,20 +62,25 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                 addServerInfo(request, project, ajaxResponse);
             } else if (REMOVE_SQS_ACTION.equals(action)) {
                 removeServerInfo(request, project, ajaxResponse);
-            } else if ("editSqs".equals(action)) {
-                editServerInfo(request, response, project);
+            } else if (EDIT_SQS_ACTION.equals(action)) {
+                editServerInfo(request, project, ajaxResponse);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void editServerInfo(HttpServletRequest request, HttpServletResponse response, SProject project) {
+    private void editServerInfo(HttpServletRequest request, SProject project, Element ajaxResponse) {
+        try {
+            mySqsManager.editServer(project, getServerInfoId(request), SQSInfo.from(request.getParameterMap()));
+        } catch (IOException e) {
+            ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
+        }
     }
 
     private void removeServerInfo(final @NotNull HttpServletRequest request, final @NotNull SProject project, final @NotNull Element ajaxResponse) throws IOException {
         try {
-            final String serverinfoId = request.getParameter(SQSInfo.SERVERINFO_ID);
+            final String serverinfoId = getServerInfoId(request);
             final boolean wasRemoved = mySqsManager.removeIfExists(project, serverinfoId);
             if (wasRemoved) {
                 ajaxResponse.setAttribute("serverRemoved", serverinfoId + " was removed");
@@ -101,5 +109,9 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     @Nullable
     private SProject getProject(HttpServletRequest request) {
         return myProjectManager.findProjectByExternalId(request.getParameter("projectId"));
+    }
+
+    private static String getServerInfoId(final @NotNull HttpServletRequest request) {
+        return request.getParameter(SQSInfo.SERVERINFO_ID);
     }
 }
