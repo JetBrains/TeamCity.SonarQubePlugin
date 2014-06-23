@@ -20,15 +20,18 @@ import java.util.List;
 public class SQSManager {
     public static final String PROPERTIES_FILE_EXTENSION = ".properties";
 
-    public synchronized List<SQSInfo> getAvailableServers(final @NotNull SProject currentProject) {
+    public synchronized List<SQSInfo> getAvailableServers(final @NotNull ProjectAccessor accessor) {
+        SProject currentProject = null;
         final LinkedList<SQSInfo> res = new LinkedList<SQSInfo>();
-        processAvailableServers(currentProject, new SQSInfoProcessor() {
-            @Override
-            public State process(SQSInfo sqsInfo) {
-                res.add(sqsInfo);
-                return State.CONTINUE;
-            }
-        });
+        while((currentProject = accessor.get(currentProject)) != null) {
+            processAvailableServers(currentProject, new SQSInfoProcessor() {
+                @Override
+                public State process(SQSInfo sqsInfo) {
+                    res.add(sqsInfo);
+                    return State.CONTINUE;
+                }
+            });
+        }
         return res;
     }
 
@@ -68,31 +71,41 @@ public class SQSManager {
     }
 
     @Nullable
-    public synchronized SQSInfo findServer(final @NotNull SProject project, final @NotNull String serverId) {
-        final SQSInfo info[] = new SQSInfo[] {null};
+    public synchronized SQSInfo findServer(final @NotNull ProjectAccessor accessor, final @NotNull String serverId) {
+        SProject project = null;
+        while ((project = accessor.get(project)) != null) {
+            final SQSInfo infoContainer[] = new SQSInfo[] {null};
 
-        processAvailableServers(project, new SQSInfoProcessor() {
-            @Override
-            public State process(File serverInfo) {
-                final String id = getServerInfoId(serverInfo);
-                if (serverId.equals(id)) {
-                    return State.READ;
-                } else {
-                    return State.CONTINUE;
+            processAvailableServers(project, new SQSInfoProcessor() {
+                @Override
+                public State process(File serverInfo) {
+                    final String id = getServerInfoId(serverInfo);
+                    if (serverId.equals(id)) {
+                        return State.READ;
+                    } else {
+                        return State.CONTINUE;
+                    }
                 }
-            }
 
-            @Override
-            public State process(SQSInfo sqsInfo) {
-                info[0] = sqsInfo;
-                return State.STOP;
-            }
-        });
+                @Override
+                public State process(SQSInfo sqsInfo) {
+                    infoContainer[0] = sqsInfo;
+                    return State.STOP;
+                }
+            });
 
-        return info[0];
+            final SQSInfo info = infoContainer[0];
+            if (info != null) {
+                return info;
+            }
+            project = project.getParentProject();
+        }
+        return null;
     }
 
-    public synchronized void editServer(final @NotNull SProject project, final @NotNull String serverId, final @NotNull SQSInfo modifiedSerever) throws IOException {
+    public synchronized void editServer(final @NotNull SProject project,
+                                        final @NotNull String serverId,
+                                        final @NotNull SQSInfo modifiedSerever) throws IOException {
         removeIfExists(project, serverId);
         addServer(modifiedSerever, project);
     }
@@ -120,8 +133,9 @@ public class SQSManager {
         }
     }
 
-    public synchronized void addServer(@NotNull final SQSInfo newServer, @NotNull final SProject currentProject) throws IOException {
-        final File pluginSettingsDir = getPluginDataDirectory(currentProject);
+    public synchronized void addServer(@NotNull final SQSInfo newServer,
+                                       @NotNull final SProject toProject) throws IOException {
+        final File pluginSettingsDir = getPluginDataDirectory(toProject);
         final String id = newServer.getId();
         if (id == null) {
             throw new ServerIdMissing();
@@ -131,7 +145,9 @@ public class SQSManager {
             throw new ServerInfoExists();
         }
 
-        if (!serverInfoFile.createNewFile() || !serverInfoFile.canWrite()) {
+        if (Util.assureDirExistence(serverInfoFile.getParentFile())
+                || !serverInfoFile.createNewFile()
+                || !serverInfoFile.canWrite()) {
             throw new CannotWriteData("Cannot write to directory " + pluginSettingsDir.getAbsolutePath());
         }
         newServer.storeTo(serverInfoFile);
@@ -141,7 +157,8 @@ public class SQSManager {
         return currentProject.getPluginDataDirectory("sonar-qube");
     }
 
-    public synchronized boolean removeIfExists(final @NotNull SProject currentProject, final @NotNull String id) throws CannotDeleteData {
+    public synchronized boolean removeIfExists(final @NotNull SProject currentProject,
+                                               final @NotNull String id) throws CannotDeleteData {
         final File pluginSettingsDir = getPluginDataDirectory(currentProject);
         if (!pluginSettingsDir.exists()) {
             return false;
@@ -178,5 +195,26 @@ public class SQSManager {
         public CannotDeleteData(final @NotNull String message) {
             super(message);
         }
+    }
+
+    public static abstract class ProjectAccessor {
+        public abstract SProject get(SProject project);
+    }
+
+    public static ProjectAccessor recurse(final SProject project) {
+        return new ProjectAccessor() {
+            public SProject get(SProject p) {
+                return p == null ? project : p.getParentProject();
+            }
+        };
+    }
+
+    public static ProjectAccessor single(final SProject project) {
+        return new ProjectAccessor() {
+            @Override
+            public SProject get(SProject p) {
+                return p == null ? project : null;
+            }
+        };
     }
 }

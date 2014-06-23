@@ -7,6 +7,8 @@ import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.recurse;
+
 /**
  * Created by linfar on 6/2/14.
  */
@@ -27,14 +29,13 @@ public class SQRPropertiesProvider implements BuildStartContextProcessor {
                 final String serverId = runnerContext.getParameters().get(Constants.SONAR_SERVER_ID);
                 if (serverId != null) {
                     final SProject project = myProjectManager.findProjectById(context.getBuild().getProjectId());
-                    if (project != null) {
-                        final SQSInfo server = mySqsManager.findServer(project, serverId);
-                        if (server != null) {
-                            addIfNotNull(runnerContext, Constants.SONAR_HOST_URL, server.getUrl());
-                            addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_URL, server.getJDBCUrl());
-                            addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_USERNAME, server.getJDBCUsername());
-                            addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_PASSWORD, server.getJDBCPassword());
-                        }
+                    final SQSInfo server = mySqsManager.findServer(recurse(project), serverId);
+                    if (server != null) {
+                        addIfNotNull(runnerContext, Constants.SONAR_HOST_URL, server.getUrl());
+                        addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_URL, server.getJDBCUrl());
+                        addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_USERNAME, server.getJDBCUsername());
+                        addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_PASSWORD, server.getJDBCPassword());
+                        break;
                     }
                 }
             }

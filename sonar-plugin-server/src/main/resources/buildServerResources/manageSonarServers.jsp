@@ -40,12 +40,13 @@
                                     </td>
                                     <td class="remove">
                                         <a id="removeNewServer" href="#"
-                                           onclick="SonarPlugin.removeServer('${projectId}', '${server.id}'); return false">remove</a>
+                                           onclick="SonarPlugin.removeServer('${projectServersEntry.key.externalId}', '${server.id}'); return false">remove</a>
                                     </td>
                                     <td class="edit">
                                         <a id="editServer" href="#"
                                            onclick="SonarPlugin.editServer('${server.id}', '${server.url}',
-                                                   '${server.JDBCUrl}', '${server.JDBCUsername}', '${server.JDBCPassword}'); return false">edit</a>
+                                                   '${server.JDBCUrl}', '${server.JDBCUsername}', '${server.JDBCPassword}',
+                                                   '${projectServersEntry.key.externalId}'); return false">edit</a>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -62,7 +63,7 @@
     </bs:refreshable>
 
     <div class="add">
-        <forms:addButton id="createNewServer" onclick="SonarPlugin.addServer(); return false">Add new server</forms:addButton>
+        <forms:addButton id="createNewServer" onclick="SonarPlugin.addServer('${projectId}'); return false">Add new server</forms:addButton>
     </div>
 
     <bs:dialog dialogId="serverInfoDialog"
@@ -110,7 +111,7 @@
                 </tr>
             </table>
             <input type="hidden" name="action" id="SQSaction" value="addSqs"/>
-            <input type="hidden" name="projectId" value="${projectId}"/>
+            <input type="hidden" name="projectId" id="projectId" value="${projectId}"/>
             <div class="popupSaveButtonsBlock">
                 <forms:submit id="serverInfoDialogSubmit" label="Save"/>
                 <forms:cancel onclick="SonarPlugin.ServerConnectionDialog.close()"/>

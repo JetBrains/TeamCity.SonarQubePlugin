@@ -14,9 +14,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.recurse;
 
 /**
  * Created by linfar on 5/29/14.
@@ -33,12 +34,7 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
 
     public void fillModel(@NotNull HttpServletRequest request, @NotNull BuildTypeForm form, @NotNull Map model) {
         SProject project = form.getProject();
-        final List<SQSInfo> availableServers = new LinkedList<SQSInfo>();
-        while (project != null) {
-            availableServers.addAll(mySqsManager.getAvailableServers(project));
-            project = project.getParentProject();
-        }
-
+        final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(recurse(project));
         model.put("servers", availableServers);
     }
 

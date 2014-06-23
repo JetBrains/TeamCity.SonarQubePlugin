@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.single;
+
 /**
  * Created by linfar on 4/4/14.
  */
@@ -46,7 +48,7 @@ public class ServerManagementProjectTab extends EditProjectTab {
             if (infoMap.containsKey(project)) {
                 break;
             }
-            infoMap.put(project, mySqsManager.getAvailableServers(project));
+            infoMap.put(project, mySqsManager.getAvailableServers(single(project)));
             project = project.getParentProject();
         }
         return infoMap;
