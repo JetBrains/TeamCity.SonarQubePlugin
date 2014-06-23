@@ -59,6 +59,7 @@
 <tr class="advancedSetting">
     <th class="noBorder"><label for="sonarProjectModules">Modules: </label></th>
     <td><props:textProperty name="sonarProjectModules" className="longField"/>
+        <bs:vcsTree fieldId="sonarProjectModules"/>
     </td>
 </tr>
 <tr class="advancedSetting">
