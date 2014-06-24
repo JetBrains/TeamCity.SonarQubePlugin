@@ -25,6 +25,7 @@ public final class Util {
             try {
                 fw.close();
             } catch (IOException ignore) {
+                // ignore
             }
         }
     }

@@ -10,7 +10,7 @@ import java.util.Collections;
  */
 public class SQRParametersAccessorTest {
     @Test
-    public void testGetProjectName() throws Exception {
+    public void testGetProjectName() {
         final SQRParametersAccessor accessor = new SQRParametersAccessor(Collections.singletonMap(Constants.SONAR_PROJECT_KEY, "key"));
         Assert.assertEquals(accessor.getProjectName(), "key", "Should be 'key'");
     }

@@ -79,7 +79,7 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
         } else {
             if (!isReports) {
                 if (blockName != null) {
-                    isReports = blockName.equals("Successfully parsed");
+                    isReports = "Successfully parsed".equals(blockName);
                 }
             } else {
                 if (typeId.equals(DefaultMessagesInfo.MSG_BLOCK_END)) {

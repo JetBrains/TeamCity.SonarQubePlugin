@@ -47,7 +47,7 @@ public class ServerManagementProjectTab extends EditProjectTab {
 
     private Map<SProject, List<SQSInfo>> getServersMap(@NotNull final SProject currentProject) {
         SProject project = currentProject;
-        HashMap<SProject, List<SQSInfo>> infoMap = new HashMap<SProject, List<SQSInfo>>();
+        Map<SProject, List<SQSInfo>> infoMap = new HashMap<SProject, List<SQSInfo>>();
         while (project != null) {
             if (infoMap.containsKey(project)) {
                 break;

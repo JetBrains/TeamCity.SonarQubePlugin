@@ -113,7 +113,9 @@ public class SQSInfo {
 
     private static void put(final @NotNull Accessor access, final @NotNull Properties props, final @NotNull String key) {
         final String value = access.get(key);
-        if (value != null) props.put(key, value);
+        if (value != null) {
+            props.put(key, value);
+        }
     }
 
     public void storeTo(@NotNull final File serverInfoFile) throws IOException {

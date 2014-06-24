@@ -14,13 +14,13 @@ import static org.testng.Assert.assertTrue;
  */
 public class SQRBuildServiceTest {
     @Test
-    public void test_addSQRArg() {
+    public void testAddSQRArg() {
         final List<String> res = new LinkedList<String>();
         SQRBuildService.addSQRArg(res, "-Dkey", null);
         assertTrue(res.isEmpty(), "Null values should not be passed to the resulting list. List: " + Arrays.toString(res.toArray()));
 
         SQRBuildService.addSQRArg(res, "-Dkey", "value");
-        assertTrue(res.size() != 0, "'-Dkey=value' pair should be added to the resulting list. Nothing was added.");
+        assertTrue(!res.isEmpty(), "'-Dkey=value' pair should be added to the resulting list. Nothing was added.");
         assertEquals(res.get(0), "-Dkey=value", "'-Dkey=value' pair should be added to the resulting list. List: " + Arrays.toString(res.toArray()));
         assertTrue(res.size() == 1, "Only '-Dkey=value' pair should be added to the resulting list. List: " + Arrays.toString(res.toArray()));
 

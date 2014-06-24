@@ -43,22 +43,33 @@ public class SQSManager {
         final File[] files = pluginSettingsDir.listFiles();
         if (files != null) {
             for (File serverInfo : files) {
-                switch (processor.process(serverInfo)) {
-                    case STOP:
-                        return;
-                    case READ:
-                        switch (processor.process(readInfoFile(serverInfo))) {
-                            case STOP:
-                                return;
-                            default:
-                        }
-                        break;
-                    case CONTINUE:
-                    default:
-                        break;
+                if (!processServerFile(serverInfo, processor)) {
+                    break;
                 }
             }
         }
+    }
+
+    private boolean processServerFile(final @NotNull File serverInfo, final @NotNull SQSInfoProcessor processor) {
+        switch (processor.process(serverInfo)) {
+            case STOP:
+                return false;
+            case READ:
+                if (!processSQSInfo(serverInfo, processor)) return false;
+                break;
+            case CONTINUE:
+            default:
+        }
+        return true;
+    }
+
+    private boolean processSQSInfo(final @NotNull File serverInfo, final @NotNull SQSInfoProcessor processor) {
+        switch (processor.process(readInfoFile(serverInfo))) {
+            case STOP:
+                return false;
+            default:
+        }
+        return true;
     }
 
     @Nullable
@@ -210,7 +221,11 @@ public class SQSManager {
     }
 
     public static abstract class SQSInfoProcessor {
-        public static enum State {CONTINUE, STOP, READ}
+        public static enum State {
+            CONTINUE,
+            STOP,
+            READ
+        }
 
         public State process(File serverInfo) {
             return State.READ;
