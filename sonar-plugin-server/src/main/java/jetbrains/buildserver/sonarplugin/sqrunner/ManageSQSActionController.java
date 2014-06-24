@@ -56,6 +56,10 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     public void process(final @NotNull HttpServletRequest request,
                         final @NotNull HttpServletResponse response,
                         final @Nullable Element ajaxResponse) {
+        if (ajaxResponse == null) {
+            return;
+        }
+
         final SProject project = getProject(request);
         if (project == null) {
             return;
@@ -70,48 +74,48 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                 editServerInfo(request, project, ajaxResponse);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            ajaxResponse.setAttribute("error", "Exception occurred: " + e.getMessage());
         }
     }
 
     private void editServerInfo(final @NotNull HttpServletRequest request,
                                 final @NotNull SProject project,
-                                final @Nullable Element ajaxResponse) {
+                                final @NotNull Element ajaxResponse) {
         try {
             mySqsManager.editServer(project, getServerInfoId(request), SQSInfo.from(request.getParameterMap()));
         } catch (IOException e) {
-            addError(ajaxResponse, "error", "Cannot add server: " + e.getMessage());
+            ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
         }
     }
 
     private void removeServerInfo(final @NotNull HttpServletRequest request,
                                   final @NotNull SProject project,
-                                  final @Nullable Element ajaxResponse) throws IOException {
+                                  final @NotNull Element ajaxResponse) throws IOException {
         try {
             final String serverinfoId = getServerInfoId(request);
             final boolean wasRemoved = mySqsManager.removeIfExists(project, serverinfoId);
             if (wasRemoved) {
-                addError(ajaxResponse, "serverRemoved", serverinfoId + " was removed");
+                ajaxResponse.setAttribute("serverRemoved", serverinfoId + " was removed");
             } else {
-                addError(ajaxResponse, "error", serverinfoId + " wasn't removed");
+                ajaxResponse.setAttribute("error", serverinfoId + " wasn't removed");
             }
         } catch (SQSManager.CannotDeleteData cannotDeleteData) {
-            addError(ajaxResponse, "error", "Cannot delete data - " + cannotDeleteData.getMessage());
+            ajaxResponse.setAttribute("error", "Cannot delete data - " + cannotDeleteData.getMessage());
         }
     }
 
     private void addServerInfo(final @NotNull HttpServletRequest request,
                                final @NotNull SProject project,
-                               final @Nullable Element ajaxResponse) throws IOException {
+                               final @NotNull Element ajaxResponse) throws IOException {
         final SQSInfo.ValidationError[] validationResult = SQSInfo.validate(request.getParameterMap());
-        if (validationResult != null && validationResult.length > 0) {
-            addError(ajaxResponse, "error", Integer.toString(validationResult.length));
+        if (validationResult.length > 0) {
+            ajaxResponse.setAttribute("error", Integer.toString(validationResult.length));
         } else {
             final SQSInfo info = SQSInfo.from(request.getParameterMap());
             try {
                 mySqsManager.addServer(info, project);
             } catch (IOException e) {
-                addError(ajaxResponse, "error", "Cannot add server: " + e.getMessage());
+                ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
             }
         }
     }
@@ -125,11 +129,4 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
         return request.getParameter(SQSInfo.SERVERINFO_ID);
     }
 
-    private static void addError(final @Nullable Element ajaxResponse,
-                                 final @NotNull String key,
-                                 final @NotNull String error) {
-        if (ajaxResponse != null) {
-            ajaxResponse.setAttribute(key, error);
-        }
-    }
 }
