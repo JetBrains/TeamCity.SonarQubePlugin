@@ -20,7 +20,9 @@ import java.util.Map;
 import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.recurse;
 
 /**
- * Created by linfar on 5/29/14.
+ * Created by Andrey Titov on 5/29/14.
+ *
+ * Controller for the Edit SonarQube Runner page. Adds SonarQube Servers available for the current project.
  */
 public class EditSQRRunType implements EditRunTypeControllerExtension {
     @NotNull
@@ -32,25 +34,30 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
         server.registerExtension(EditRunTypeControllerExtension.class, Constants.RUNNER_TYPE, this);
     }
 
-    public void fillModel(@NotNull HttpServletRequest request, @NotNull BuildTypeForm form, @NotNull Map model) {
+    public void fillModel(final @NotNull HttpServletRequest request,
+                          final @NotNull BuildTypeForm form,
+                          final @NotNull Map model) {
         SProject project = form.getProject();
         final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(recurse(project));
         model.put("servers", availableServers);
     }
 
-    public void updateState(@NotNull HttpServletRequest request, @NotNull BuildTypeForm form) {
+    public void updateState(final @NotNull HttpServletRequest request, final @NotNull BuildTypeForm form) {
     }
 
     @Nullable
-    public StatefulObject getState(@NotNull HttpServletRequest request, @NotNull BuildTypeForm form) {
+    public StatefulObject getState(final @NotNull HttpServletRequest request, final @NotNull BuildTypeForm form) {
         return null;
     }
 
-    @NotNull
-    public ActionErrors validate(@NotNull HttpServletRequest request, @NotNull BuildTypeForm form) {
+    final @NotNull
+    public ActionErrors validate(final @NotNull HttpServletRequest request, final @NotNull BuildTypeForm form) {
         return new ActionErrors();
     }
 
-    public void updateBuildType(@NotNull HttpServletRequest request, @NotNull BuildTypeForm form, @NotNull BuildTypeSettings buildTypeSettings, @NotNull ActionErrors errors) {
+    public void updateBuildType(final @NotNull HttpServletRequest request,
+                                final @NotNull BuildTypeForm form,
+                                final @NotNull BuildTypeSettings buildTypeSettings,
+                                final @NotNull ActionErrors errors) {
     }
 }

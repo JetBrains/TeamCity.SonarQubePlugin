@@ -16,14 +16,18 @@ import java.util.Map;
 import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.single;
 
 /**
- * Created by linfar on 4/4/14.
+ * Created by Andrey Titov on 4/4/14.
+ *
+ * Controller for SonarQube Server management page
  */
 public class ServerManagementProjectTab extends EditProjectTab {
 
     @NotNull
     private final SQSManager mySqsManager;
 
-    public ServerManagementProjectTab(@NotNull final PagePlaces pagePlaces, @NotNull final PluginDescriptor pluginDescriptor, @NotNull final SQSManager sqsManager) {
+    public ServerManagementProjectTab(@NotNull final PagePlaces pagePlaces,
+                                      @NotNull final PluginDescriptor pluginDescriptor,
+                                      @NotNull final SQSManager sqsManager) {
         super(pagePlaces, pluginDescriptor.getPluginName(), "manageSonarServers.jsp", "Sonar Server");
         mySqsManager = sqsManager;
         addCssFile(pluginDescriptor.getPluginResourcesPath("manageSonarServers.css"));

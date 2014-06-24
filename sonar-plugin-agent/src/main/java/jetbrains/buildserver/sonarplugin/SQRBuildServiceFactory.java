@@ -7,12 +7,14 @@ import jetbrains.buildServer.agent.runner.CommandLineBuildServiceFactory;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by linfar on 4/3/14.
+ * Created by Andrey Titov on 4/3/14.
+ *
+ * Factory for SQRBuildService
  */
 public class SQRBuildServiceFactory implements CommandLineBuildServiceFactory {
     @NotNull private final SonarQubeRunnerBuildRunner mySonarQubeRunnerBuildRunner;
     @NotNull private final PluginDescriptor myPluginDescriptor;
-    private SonarProcessListener mySonarProcessListener;
+    @NotNull private SonarProcessListener mySonarProcessListener;
 
     public SQRBuildServiceFactory(@NotNull final SonarQubeRunnerBuildRunner sonarQubeRunnerBuildRunner,
                                   @NotNull final PluginDescriptor pluginDescriptor,

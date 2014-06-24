@@ -16,7 +16,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by linfar on 4/4/14.
+ * Created by Andrey Titov on 4/4/14.
+ *
+ * Experimental. Attempt to find test results by reading the build log for test report analysis.
  */
 public class SonarProcessListener extends AgentLifeCycleAdapter {
     private static final String ANALYSIS_SUCCESSFUL = "ANALYSIS SUCCESSFUL, you can browse ";

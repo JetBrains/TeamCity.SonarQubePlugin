@@ -16,7 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Created by linfar on 4/10/14.
+ * Created by Andrery Titov on 4/10/14.
+ *
+ * Ajax controller for SonarQube Server management
  */
 public class ManageSQSActionController extends BaseAjaxActionController implements ControllerAction {
 
@@ -47,11 +49,13 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                REMOVE_SQS_ACTION.equals(action);
     }
 
-    private static String getAction(HttpServletRequest request) {
+    private static String getAction(final @NotNull HttpServletRequest request) {
         return request.getParameter(SQS_ACTION);
     }
 
-    public void process(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @Nullable Element ajaxResponse) {
+    public void process(final @NotNull HttpServletRequest request,
+                        final @NotNull HttpServletResponse response,
+                        final @Nullable Element ajaxResponse) {
         final SProject project = getProject(request);
         if (project == null) {
             return;
@@ -70,48 +74,62 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
         }
     }
 
-    private void editServerInfo(HttpServletRequest request, SProject project, Element ajaxResponse) {
+    private void editServerInfo(final @NotNull HttpServletRequest request,
+                                final @NotNull SProject project,
+                                final @Nullable Element ajaxResponse) {
         try {
             mySqsManager.editServer(project, getServerInfoId(request), SQSInfo.from(request.getParameterMap()));
         } catch (IOException e) {
-            ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
+            addError(ajaxResponse, "error", "Cannot add server: " + e.getMessage());
         }
     }
 
-    private void removeServerInfo(final @NotNull HttpServletRequest request, final @NotNull SProject project, final @NotNull Element ajaxResponse) throws IOException {
+    private void removeServerInfo(final @NotNull HttpServletRequest request,
+                                  final @NotNull SProject project,
+                                  final @Nullable Element ajaxResponse) throws IOException {
         try {
             final String serverinfoId = getServerInfoId(request);
             final boolean wasRemoved = mySqsManager.removeIfExists(project, serverinfoId);
             if (wasRemoved) {
-                ajaxResponse.setAttribute("serverRemoved", serverinfoId + " was removed");
+                addError(ajaxResponse, "serverRemoved", serverinfoId + " was removed");
             } else {
-                ajaxResponse.setAttribute("error", serverinfoId + " wasn't removed");
+                addError(ajaxResponse, "error", serverinfoId + " wasn't removed");
             }
         } catch (SQSManager.CannotDeleteData cannotDeleteData) {
-            ajaxResponse.setAttribute("error", "Cannot delete data - " + cannotDeleteData.getMessage());
+            addError(ajaxResponse, "error", "Cannot delete data - " + cannotDeleteData.getMessage());
         }
     }
 
-    private void addServerInfo(HttpServletRequest request, SProject project, Element ajaxResponse) throws IOException {
+    private void addServerInfo(final @NotNull HttpServletRequest request,
+                               final @NotNull SProject project,
+                               final @Nullable Element ajaxResponse) throws IOException {
         final SQSInfo.ValidationError[] validationResult = SQSInfo.validate(request.getParameterMap());
         if (validationResult != null && validationResult.length > 0) {
-            ajaxResponse.setAttribute("error", Integer.toString(validationResult.length));
+            addError(ajaxResponse, "error", Integer.toString(validationResult.length));
         } else {
             final SQSInfo info = SQSInfo.from(request.getParameterMap());
             try {
                 mySqsManager.addServer(info, project);
             } catch (IOException e) {
-                ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
+                addError(ajaxResponse, "error", "Cannot add server: " + e.getMessage());
             }
         }
     }
 
     @Nullable
-    private SProject getProject(HttpServletRequest request) {
+    private SProject getProject(final @NotNull HttpServletRequest request) {
         return myProjectManager.findProjectByExternalId(request.getParameter("projectId"));
     }
 
     private static String getServerInfoId(final @NotNull HttpServletRequest request) {
         return request.getParameter(SQSInfo.SERVERINFO_ID);
+    }
+
+    private static void addError(final @Nullable Element ajaxResponse,
+                                 final @NotNull String key,
+                                 final @NotNull String error) {
+        if (ajaxResponse != null) {
+            ajaxResponse.setAttribute(key, error);
+        }
     }
 }

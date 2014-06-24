@@ -1,18 +1,32 @@
 package jetbrains.buildserver.sonarplugin;
 
 /**
- * Created by linfar on 4/2/14.
+ * Created by Andrey Titov on 4/2/14.
+ *
+ * Constants used across the plugin
  */
 public final class Constants {
+    /**
+     * Plugin name. Same as Runner type.
+     */
     public static final String RUNNER_TYPE = "sonar-plugin";
-    public static final String PLUGIN_NAME = "sonar-plugin";
+    /**
+     * Name of SonarQube Server link artifact file
+     */
     public static final String SONAR_SERVER_URL_FILENAME = "sonar_server.txt";
+    /**
+     * Location of SonarQube Server link artifact file
+     */
+    public static final String SONAR_SERVER_URL_ARTIF_LOCATION = ".teamcity/sonar/";
+    /**
+     * Full location of SonarQube Server link artifact file
+     */
+    public static final String SONAR_SERVER_URL_ARTIF_LOCATION_FULL = SONAR_SERVER_URL_ARTIF_LOCATION + SONAR_SERVER_URL_FILENAME;
+
     public static final String SONAR_HOST_URL = "sonar.host.url";
     public static final String SONAR_SERVER_JDBC_URL = "sonar.jdbc.url";
     public static final String SONAR_SERVER_JDBC_USERNAME = "sonar.jdbc.username";
     public static final String SONAR_SERVER_JDBC_PASSWORD = "sonar.jdbc.password";
-    public static final String SONAR_SERVER_URL_ARTIF_LOCATION = ".teamcity/sonar/";
-    public static final String SONAR_SERVER_URL_ARTIF_LOCATION_FULL = SONAR_SERVER_URL_ARTIF_LOCATION + SONAR_SERVER_URL_FILENAME;
     public static final String SONAR_PROJECT_MODULES = "sonarProjectModules";
     public static final String SONAR_PROJECT_SOURCES = "sonarProjectSources";
     public static final String SONAR_PROJECT_TESTS = "sonarProjectTests";

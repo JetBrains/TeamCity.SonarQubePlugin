@@ -5,13 +5,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 /**
- * Created by linfar on 4/8/14.
+ * Created by Andrey Titov on 4/8/14.
+ *
+ * Accessor to simplify SQR parameters managing
  */
 public class SQRParametersAccessor {
     @NotNull
     private final Map<String, String> myParameters;
-
-
 
     public SQRParametersAccessor(final @NotNull Map<String, String> parameters) {
         myParameters = parameters;

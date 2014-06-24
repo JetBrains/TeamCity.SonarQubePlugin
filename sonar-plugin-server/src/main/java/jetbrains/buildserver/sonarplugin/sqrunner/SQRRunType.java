@@ -11,15 +11,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 /**
- * Created by linfar on 4/2/14.
+ * Created by Andrey Titov on 4/2/14.
  *
- * RunType for SonarQubeRunner - cmd tool collecting and pushing data for SonarQube Server
+ * RunType definition for SonarQube Runner
  */
 public class SQRRunType extends RunType {
     private static final String EDIT_SQRRUN_PARAMS_JSP_PATH = "editSQRRunParams.jsp";
     private static final String VIEW_SQRRUN_PARAMS_JSP_PATH = "viewSQRRunParams.jsp";
     private static final String RUNNER_DISPLAY_NAME = "SonarQube Runner";
     private static final String RUNNER_DESCRIPTION = "Runner for SonarQube Runner";
+
     public static final String DEFAULT_PROJECT_NAME = "%system.teamcity.projectName%";
     public static final String DEFAULT_PROJECT_KEY = "%teamcity.project.id%";
     public static final String DEFAULT_PROJECT_VERSION = "%build.number%";

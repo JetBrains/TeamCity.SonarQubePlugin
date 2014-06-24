@@ -22,7 +22,7 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 /**
- * Created by linfar on 4/4/14.
+ * Created by Andrey Titov on 4/4/14.
  * <p>
  * Link to the SonarQube Server on the Build Summary table
  * </p>
@@ -34,14 +34,15 @@ public class BuildSummaryLinkExtension extends SimplePageExtension {
 
     public BuildSummaryLinkExtension(final @NotNull WebControllerManager manager,
                                      final @NotNull PluginDescriptor pluginDescriptor,
-                                     @NotNull SBuildServer server) {
+                                     final @NotNull SBuildServer server) {
         super(manager, PlaceId.BUILD_SUMMARY, pluginDescriptor.getPluginName(), "buildSummary.jsp");
         myServer = server;
         register();
     }
 
     @Override
-    public void fillModel(@NotNull Map<String, Object> model, @NotNull HttpServletRequest request) {
+    public void fillModel(final @NotNull Map<String, Object> model,
+                          final @NotNull HttpServletRequest request) {
         final SBuild build = BuildDataExtensionUtil.retrieveBuild(request, myServer);
         if (build != null) {
             final BuildArtifact artifact = build.getArtifacts(BuildArtifactsViewMode.VIEW_HIDDEN_ONLY).getArtifact(Constants.SONAR_SERVER_URL_ARTIF_LOCATION_FULL);

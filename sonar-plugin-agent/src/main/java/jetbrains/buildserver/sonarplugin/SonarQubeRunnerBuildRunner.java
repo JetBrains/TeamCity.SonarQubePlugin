@@ -5,7 +5,7 @@ import jetbrains.buildServer.agent.BuildAgentConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by linfar on 4/2/14.
+ * Created by Andrey Titov on 4/2/14.
  *
  * Build runner for SonarQube Runner - a CMD utility collecting data for SonarQube
  */

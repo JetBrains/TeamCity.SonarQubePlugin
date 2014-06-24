@@ -82,6 +82,6 @@
 </tr>
 <tr class="advancedSetting">
     <th class="noBorder"><label for="additionalParameters">Additional parameters: </label></th>
-    <td><props:multilineProperty name="additionalParameters" className="longField" linkTitle="any additional parameters to be passed to SonarQube Runner as is" cols="40" rows="3" expanded="true"/>
+    <td><props:multilineProperty name="additionalParameters" className="longField" linkTitle="any additional parameters separated with newline to be passed to SonarQube Runner as is" cols="40" rows="3" expanded="true"/>
     </td>
 </tr>

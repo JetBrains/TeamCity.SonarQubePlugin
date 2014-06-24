@@ -10,20 +10,22 @@ import org.jetbrains.annotations.Nullable;
 import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.recurse;
 
 /**
- * Created by linfar on 6/2/14.
+ * Created by Andrey Titov on 6/2/14.
+ *
+ * SonarQube Server parameters provider. Resolves SQS parameters by it's ID before build is started.
  */
-public class SQRPropertiesProvider implements BuildStartContextProcessor {
+public class SQSPropertiesProvider implements BuildStartContextProcessor {
     @NotNull
     private final ProjectManager myProjectManager;
     @NotNull
     private final SQSManager mySqsManager;
 
-    public SQRPropertiesProvider(@NotNull ProjectManager projectManager, @NotNull SQSManager sqsManager) {
+    public SQSPropertiesProvider(final @NotNull ProjectManager projectManager, final @NotNull SQSManager sqsManager) {
         myProjectManager = projectManager;
         mySqsManager = sqsManager;
     }
 
-    public void updateParameters(@NotNull BuildStartContext context) {
+    public void updateParameters(final @NotNull BuildStartContext context) {
         for (SRunnerContext runnerContext : context.getRunnerContexts()) {
             if (Constants.RUNNER_TYPE.equals(runnerContext.getType())) {
                 final String serverId = runnerContext.getParameters().get(Constants.SONAR_SERVER_ID);

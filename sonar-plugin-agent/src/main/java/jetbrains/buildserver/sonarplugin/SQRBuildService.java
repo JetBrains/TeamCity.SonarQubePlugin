@@ -15,7 +15,9 @@ import java.io.File;
 import java.util.*;
 
 /**
- * Created by linfar on 4/3/14.
+ * Created by Andrey Titov on 4/3/14.
+ *
+ * SonarQube Runner wrapper process.
  */
 public class SQRBuildService extends CommandLineBuildService {
     private static final String SQR_JAR_NAME = "sonar-runner-dist-2.3.jar";
@@ -59,7 +61,14 @@ public class SQRBuildService extends CommandLineBuildService {
         return cmd;
     }
 
-    private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters, @NotNull final AgentRunningBuild build) {
+    /**
+     * Composes SonarQube Runner arguments.
+     * @param runnerParameters Parameters to compose arguments from
+     * @param build Build instance
+     * @return List of arguments to be passed to the SQR
+     */
+    private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters,
+                                        @NotNull final AgentRunningBuild build) {
         List<String> res = new LinkedList<String>();
         SQRParametersAccessor accessor = new SQRParametersAccessor(runnerParameters);
         addSQRArg(res, "-Dsonar.host.url", accessor.getHostUrl());
@@ -75,8 +84,9 @@ public class SQRBuildService extends CommandLineBuildService {
         addSQRArg(res, "-Dsonar.modules", accessor.getProjectModules());
         final String additionalParameters = accessor.getAdditionalParameters();
         if (additionalParameters != null) {
-            res.addAll(Arrays.asList(additionalParameters.split("\\s")));
+            res.addAll(Arrays.asList(additionalParameters.split("\\n")));
         }
+
         final Set<String> collectedReports = mySonarProcessListener.getCollectedReports();
         if (!collectedReports.isEmpty()) {
             addSQRArg(res, "-Dsonar.dynamicAnalysis", "reuseReports");
@@ -102,20 +112,35 @@ public class SQRBuildService extends CommandLineBuildService {
         return sb.substring(0, sb.length() - 1);
     }
 
+    /**
+     * Adds argument only if it's value is not null
+     * @param argList Result list of arguments
+     * @param key Argument key
+     * @param value Argument value
+     */
     private static void addSQRArg(@NotNull final List<String> argList, @NotNull final String key, @Nullable final String value) {
         if (value != null) {
             argList.add(key + "=" + value);
         }
     }
 
+    /**
+     * @return Classpath for SonarQube Runner
+     * @throws SQRJarException
+     */
     @NotNull
     private String getClasspath() throws SQRJarException {
         File pluginJar = getSQRJar(myPluginDescriptor.getPluginRoot());
         return pluginJar.getAbsolutePath();
     }
 
+    /**
+     * @param sqrRoot SQR root directory
+     * @return SonarQube Runner jar location
+     * @throws SQRJarException
+     */
     @NotNull
-    private File getSQRJar(File sqrRoot) throws SQRJarException {
+    private File getSQRJar(final @NotNull File sqrRoot) throws SQRJarException {
         File pluginJar = new File(sqrRoot, SQR_JAR_PATH + File.separatorChar + SQR_JAR_NAME);
         if (!pluginJar.exists()) {
             throw new SQRJarException("SonarQube Runner jar doesn't exist on path: " + pluginJar.getAbsolutePath());
