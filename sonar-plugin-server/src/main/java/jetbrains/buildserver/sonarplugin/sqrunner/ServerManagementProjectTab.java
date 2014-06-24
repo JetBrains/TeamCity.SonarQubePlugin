@@ -40,12 +40,12 @@ public class ServerManagementProjectTab extends EditProjectTab {
         if (currentProject == null) {
             return;
         }
-        HashMap<SProject, List<SQSInfo>> infoMap = getServersMap(currentProject);
+        Map<SProject, List<SQSInfo>> infoMap = getServersMap(currentProject);
         model.put("availableServersMap", infoMap);
         model.put("projectId", currentProject.getExternalId());
     }
 
-    private HashMap<SProject, List<SQSInfo>> getServersMap(@NotNull final SProject currentProject) {
+    private Map<SProject, List<SQSInfo>> getServersMap(@NotNull final SProject currentProject) {
         SProject project = currentProject;
         HashMap<SProject, List<SQSInfo>> infoMap = new HashMap<SProject, List<SQSInfo>>();
         while (project != null) {

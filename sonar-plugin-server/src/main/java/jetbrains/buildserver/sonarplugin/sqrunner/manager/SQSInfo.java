@@ -4,8 +4,12 @@ import jetbrains.buildserver.sonarplugin.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -68,7 +72,7 @@ public class SQSInfo {
     @NotNull
     public static ValidationError[] validate(@NotNull final Map<String, String[]> parameterMap) {
         final Accessor accessor = getAccessor(parameterMap);
-        ArrayList<ValidationError> errors = new ArrayList<ValidationError>();
+        List<ValidationError> errors = new ArrayList<ValidationError>();
         if (!accessor.contains(SERVERINFO_ID)) {
             errors.add(new ValidationError("Server id missing", SERVERINFO_ID));
         }

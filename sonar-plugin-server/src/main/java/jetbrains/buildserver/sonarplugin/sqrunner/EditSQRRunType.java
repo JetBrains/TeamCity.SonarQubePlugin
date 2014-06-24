@@ -44,6 +44,7 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
     }
 
     public void updateState(final @NotNull HttpServletRequest request, final @NotNull BuildTypeForm form) {
+        // do nothing
     }
 
     @Nullable
@@ -60,5 +61,6 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
                                 final @NotNull BuildTypeForm form,
                                 final @NotNull BuildTypeSettings buildTypeSettings,
                                 final @NotNull ActionErrors errors) {
+        // do nothing
     }
 }

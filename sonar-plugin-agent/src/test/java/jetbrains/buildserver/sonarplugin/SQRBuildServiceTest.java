@@ -4,6 +4,7 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -14,7 +15,7 @@ import static org.testng.Assert.assertTrue;
 public class SQRBuildServiceTest {
     @Test
     public void test_addSQRArg() {
-        final LinkedList<String> res = new LinkedList<String>();
+        final List<String> res = new LinkedList<String>();
         SQRBuildService.addSQRArg(res, "-Dkey", null);
         assertTrue(res.isEmpty(), "Null values should not be passed to the resulting list. List: " + Arrays.toString(res.toArray()));
 

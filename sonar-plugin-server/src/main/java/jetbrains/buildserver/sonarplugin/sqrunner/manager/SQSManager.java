@@ -22,7 +22,7 @@ public class SQSManager {
 
     public synchronized List<SQSInfo> getAvailableServers(final @NotNull ProjectAccessor accessor) {
         SProject currentProject = null;
-        final LinkedList<SQSInfo> res = new LinkedList<SQSInfo>();
+        final List<SQSInfo> res = new LinkedList<SQSInfo>();
         while((currentProject = accessor.get(currentProject)) != null) {
             processAvailableServers(currentProject, new SQSInfoProcessor() {
                 @Override
@@ -48,10 +48,13 @@ public class SQSManager {
                         return;
                     case READ:
                         switch (processor.process(readInfoFile(serverInfo))) {
-                            case STOP: return;
+                            case STOP:
+                                return;
+                            default:
                         }
                         break;
                     case CONTINUE:
+                    default:
                         break;
                 }
             }
