@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by linfar on 4/4/14.
+ * Created by Andrey Titov on 4/4/14.
  *
  * SonarQube Server data manager
  */
@@ -55,18 +55,6 @@ public class SQSManager {
                         break;
                 }
             }
-        }
-    }
-
-    public static abstract class SQSInfoProcessor {
-        public static enum State {CONTINUE, STOP, READ}
-
-        public State process(File serverInfo) {
-            return State.READ;
-        }
-
-        public State process(SQSInfo sqsInfo) {
-            return State.CONTINUE;
         }
     }
 
@@ -164,7 +152,7 @@ public class SQSManager {
             return false;
         }
         final File[] files = pluginSettingsDir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
+            public boolean accept(@NotNull final File dir, @NotNull final String name) {
                 return name.equals(id + PROPERTIES_FILE_EXTENSION);
             }
         });
@@ -177,6 +165,23 @@ public class SQSManager {
                 throw new CannotDeleteData("Cannot delete file " + files[0].getAbsolutePath());
             }
         }
+    }
+
+    public static ProjectAccessor recurse(@NotNull final SProject project) {
+        return new ProjectAccessor() {
+            public SProject get(SProject p) {
+                return p == null ? project : p.getParentProject();
+            }
+        };
+    }
+
+    public static ProjectAccessor single(@NotNull final SProject project) {
+        return new ProjectAccessor() {
+            @Override
+            public SProject get(SProject p) {
+                return p == null ? project : null;
+            }
+        };
     }
 
     public static class CannotWriteData extends IOException {
@@ -201,20 +206,15 @@ public class SQSManager {
         public abstract SProject get(SProject project);
     }
 
-    public static ProjectAccessor recurse(final SProject project) {
-        return new ProjectAccessor() {
-            public SProject get(SProject p) {
-                return p == null ? project : p.getParentProject();
-            }
-        };
-    }
+    public static abstract class SQSInfoProcessor {
+        public static enum State {CONTINUE, STOP, READ}
 
-    public static ProjectAccessor single(final SProject project) {
-        return new ProjectAccessor() {
-            @Override
-            public SProject get(SProject p) {
-                return p == null ? project : null;
-            }
-        };
+        public State process(File serverInfo) {
+            return State.READ;
+        }
+
+        public State process(SQSInfo sqsInfo) {
+            return State.CONTINUE;
+        }
     }
 }

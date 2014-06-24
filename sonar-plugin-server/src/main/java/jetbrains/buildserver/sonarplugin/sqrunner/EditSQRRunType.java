@@ -34,6 +34,7 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
         server.registerExtension(EditRunTypeControllerExtension.class, Constants.RUNNER_TYPE, this);
     }
 
+    @SuppressWarnings("unchecked")
     public void fillModel(final @NotNull HttpServletRequest request,
                           final @NotNull BuildTypeForm form,
                           final @NotNull Map model) {

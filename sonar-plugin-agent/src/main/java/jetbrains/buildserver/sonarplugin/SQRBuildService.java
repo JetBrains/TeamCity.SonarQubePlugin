@@ -1,7 +1,6 @@
 package jetbrains.buildserver.sonarplugin;
 
 import jetbrains.buildServer.RunBuildException;
-import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.plugins.beans.PluginDescriptor;
 import jetbrains.buildServer.agent.runner.CommandLineBuildService;
 import jetbrains.buildServer.agent.runner.JavaCommandLineBuilder;
@@ -48,7 +47,11 @@ public class SQRBuildService extends CommandLineBuildService {
         builder.setClassPath(getClasspath());
 
         builder.setMainClass("org.sonar.runner.Main");
-        builder.setProgramArgs(composeSQRArgs(getRunnerContext().getRunnerParameters(), getBuild()));
+        builder.setProgramArgs(
+                composeSQRArgs(
+                        getRunnerContext().getRunnerParameters(),
+                        getBuild().getSharedConfigParameters()
+                ));
         builder.setWorkingDir(getRunnerContext().getWorkingDirectory().getAbsolutePath());
 
         final ProgramCommandLine cmd = builder.build();
@@ -64,12 +67,12 @@ public class SQRBuildService extends CommandLineBuildService {
     /**
      * Composes SonarQube Runner arguments.
      * @param runnerParameters Parameters to compose arguments from
-     * @param build Build instance
+     * @param sharedConfigParameters Shared config parameters to compose arguments from
      * @return List of arguments to be passed to the SQR
      */
     private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters,
-                                        @NotNull final AgentRunningBuild build) {
-        List<String> res = new LinkedList<String>();
+                                        @NotNull final Map<String, String> sharedConfigParameters) {
+        final List<String> res = new LinkedList<String>();
         SQRParametersAccessor accessor = new SQRParametersAccessor(runnerParameters);
         addSQRArg(res, "-Dsonar.host.url", accessor.getHostUrl());
         addSQRArg(res, "-Dsonar.jdbc.url", accessor.getJDBCUrl());
@@ -93,7 +96,7 @@ public class SQRBuildService extends CommandLineBuildService {
             addSQRArg(res, "-Dsonar.junit.reportsPath", toString(collectedReports));
         }
 
-        String jacocoExecFilePath = build.getSharedConfigParameters().get("teamcity.jacoco.coverage.datafile");
+        final String jacocoExecFilePath = sharedConfigParameters.get("teamcity.jacoco.coverage.datafile");
         if (jacocoExecFilePath != null) {
             final File file = new File(jacocoExecFilePath);
             if (file.exists() && file.isFile() && file.canRead()) {
@@ -118,7 +121,7 @@ public class SQRBuildService extends CommandLineBuildService {
      * @param key Argument key
      * @param value Argument value
      */
-    private static void addSQRArg(@NotNull final List<String> argList, @NotNull final String key, @Nullable final String value) {
+    protected static void addSQRArg(@NotNull final List<String> argList, @NotNull final String key, @Nullable final String value) {
         if (value != null) {
             argList.add(key + "=" + value);
         }

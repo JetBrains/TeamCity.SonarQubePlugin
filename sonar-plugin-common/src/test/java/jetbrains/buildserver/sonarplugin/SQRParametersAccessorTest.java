@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 import java.util.Collections;
 
 /**
- * Created by linfar on 4/8/14.
+ * Created by Andrey Titov on 4/8/14.
  */
 public class SQRParametersAccessorTest {
     @Test

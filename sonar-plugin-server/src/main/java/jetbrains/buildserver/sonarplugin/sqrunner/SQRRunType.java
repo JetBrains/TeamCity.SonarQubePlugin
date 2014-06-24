@@ -87,4 +87,10 @@ public class SQRRunType extends RunType {
         map.put(Constants.SONAR_PROJECT_SOURCES, DEFAULT_SOURCE_PATH);
         return map;
     }
+
+    @NotNull
+    @Override
+    public String describeParameters(@NotNull Map<String, String> parameters) {
+        return "hi";
+    }
 }

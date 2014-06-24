@@ -10,9 +10,10 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Created by linfar on 4/4/14.
- * <p/>
+ * Created by Andrey Titov on 4/4/14.
+ * <p>
  * SonarQube Server info class
+ * </p>
  */
 public class SQSInfo {
     public static final String SERVERINFO_ID = "serverinfo.id";
@@ -22,36 +23,49 @@ public class SQSInfo {
     public static final String SONAR_JDBC_PASSWORD = "sonar.jdbc.password";
     private Properties myProps;
 
-    private SQSInfo(Properties props) {
+    private SQSInfo(final @NotNull Properties props) {
         myProps = props;
     }
 
+    @Nullable
     public String getUrl() {
         return (String)myProps.get(SONAR_URL);
     }
 
+    @Nullable
     public String getJDBCUrl() {
         return (String)myProps.get(SONAR_JDBC_URL);
     }
 
+    @Nullable
     public String getJDBCUsername() {
         return (String)myProps.get(SONAR_JDBC_USERNAME);
     }
 
+    @Nullable
     public String getJDBCPassword() {
         return (String)myProps.get(SONAR_JDBC_PASSWORD);
     }
 
+    @Nullable
     public String getId() {
         return (String)myProps.get(SERVERINFO_ID);
     }
 
-    public static SQSInfo from(@NotNull final FileInputStream inStream) throws IOException {
+    /**
+     * <p>Creates SQSInfo reading it's properties from the stream</p>
+     * @param inStream Stream to load properties from
+     * @return SQSInfo read from the stream
+     * @throws IOException
+     */
+    @NotNull
+    public static SQSInfo from(@NotNull final InputStream inStream) throws IOException {
         final Properties props = new Properties();
         props.load(inStream);
         return new SQSInfo(props);
     }
 
+    @NotNull
     public static ValidationError[] validate(@NotNull final Map<String, String[]> parameterMap) {
         final Accessor accessor = getAccessor(parameterMap);
         ArrayList<ValidationError> errors = new ArrayList<ValidationError>();
@@ -64,21 +78,11 @@ public class SQSInfo {
         return errors.toArray(new ValidationError[errors.size()]);
     }
 
-    public static class ValidationError {
-        public final String myError;
-        public final String myKey;
-
-        public ValidationError(String myError, String myKey) {
-            this.myError = myError;
-            this.myKey = myKey;
-        }
-    }
-
     public static SQSInfo from(@NotNull final Map<String, String[]> parameterMap) {
         return from(getAccessor(parameterMap));
     }
 
-    private static Accessor getAccessor(final Map<String, String[]> parameterMap) {
+    private static Accessor getAccessor(final @NotNull Map<String, String[]> parameterMap) {
         return new Accessor() {
             @Nullable
             public String get(@NotNull String key) {
@@ -92,7 +96,8 @@ public class SQSInfo {
         };
     }
 
-    private static SQSInfo from(Accessor access) {
+    @NotNull
+    private static SQSInfo from(final @NotNull Accessor access) {
         Properties props = new Properties();
         put(access, props, SERVERINFO_ID);
         put(access, props, SONAR_URL);
@@ -102,7 +107,7 @@ public class SQSInfo {
         return new SQSInfo(props);
     }
 
-    private static void put(Accessor access, Properties props, String key) {
+    private static void put(final @NotNull Accessor access, final @NotNull Properties props, final @NotNull String key) {
         final String value = access.get(key);
         if (value != null) props.put(key, value);
     }
@@ -121,8 +126,19 @@ public class SQSInfo {
         @Nullable
         public abstract String get(@NotNull final String key);
 
+        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
         public boolean contains(@NotNull final String key) {
             return get(key) != null;
+        }
+    }
+
+    public static class ValidationError {
+        public final String myError;
+        public final String myKey;
+
+        public ValidationError(@NotNull final String myError, @NotNull final String myKey) {
+            this.myError = myError;
+            this.myKey = myKey;
         }
     }
 }
