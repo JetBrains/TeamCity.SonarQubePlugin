@@ -91,9 +91,9 @@ public class SQRBuildService extends CommandLineBuildService {
         }
 
         final Set<String> collectedReports = mySonarProcessListener.getCollectedReports();
-        if (!collectedReports.isEmpty()) {
+        if (!collectedReports.isEmpty() && (accessor.getAdditionalParameters() == null || !accessor.getAdditionalParameters().contains("-Dsonar.junit.reportsPath"))) {
             addSQRArg(res, "-Dsonar.dynamicAnalysis", "reuseReports");
-            addSQRArg(res, "-Dsonar.junit.reportsPath", toString(collectedReports));
+            addSQRArg(res, "-Dsonar.junit.reportsPath", collectReportsPath(collectedReports, accessor.getProjectModules()));
         }
 
         final String jacocoExecFilePath = sharedConfigParameters.get("teamcity.jacoco.coverage.datafile");
@@ -107,12 +107,27 @@ public class SQRBuildService extends CommandLineBuildService {
         return res;
     }
 
-    private String toString(Set<String> collectedReports) {
+    @Nullable
+    private String collectReportsPath(Set<String> collectedReports, String projectModules) {
         StringBuilder sb = new StringBuilder();
+        final String[] modules = projectModules != null ? projectModules.split(",") : new String[0];
+        Set<String> filteredReports = new HashSet<String>();
         for (String report : collectedReports) {
-            sb.append(report).append(',');
+            if (!new File(report).exists()) continue;
+            for (String module : modules) {
+                final int indexOf = report.indexOf(module);
+                if (indexOf > 0) {
+                    report = report.substring(indexOf + module.length() + 1);
+                }
+            }
+            filteredReports.add(report);
         }
-        return sb.substring(0, sb.length() - 1);
+
+        for (String report : filteredReports) {
+            sb.append(report).append(',');
+            break; // At the moment sonar.junit.reportsPath doesn't accept several paths
+        }
+        return sb.length() > 0 ? sb.substring(0, sb.length() - 1) : null;
     }
 
     /**
