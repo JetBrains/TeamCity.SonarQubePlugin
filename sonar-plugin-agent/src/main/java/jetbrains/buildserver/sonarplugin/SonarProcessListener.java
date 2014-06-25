@@ -2,12 +2,12 @@ package jetbrains.buildserver.sonarplugin;
 
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher;
-import jetbrains.buildServer.messages.BlockData;
 import jetbrains.buildServer.messages.BuildMessage1;
-import jetbrains.buildServer.messages.DefaultMessagesInfo;
+import jetbrains.buildServer.messages.serviceMessages.AbstractTextMessageProcessor;
+import jetbrains.buildServer.messages.serviceMessages.ServiceMessage;
+import jetbrains.buildServer.messages.serviceMessages.ServiceMessagesProcessor;
 import jetbrains.buildServer.util.EventDispatcher;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -26,7 +26,7 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
 
     @NotNull
     private final ArtifactsWatcher myWatcher;
-    private boolean isReports;
+    private AbstractTextMessageProcessor myMessageProcessor = new ImportDataMessageProcessor();
 
     public SonarProcessListener(@NotNull final EventDispatcher<AgentLifeCycleListener> agentDispatcher,
                                 @NotNull final ArtifactsWatcher watcher) {
@@ -42,25 +42,19 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
     @Override
     public void buildFinished(@NotNull AgentRunningBuild build, @NotNull BuildFinishedStatus buildStatus) {
         myCollectedReports.clear();
-        isReports = false;
     }
 
     @Override
     public void buildStarted(@NotNull AgentRunningBuild runningBuild) {
         myCollectedReports.clear();
-        isReports = false;
     }
 
     @Override
     public void messageLogged(@NotNull AgentRunningBuild build, @NotNull BuildMessage1 buildMessage) {
-        final String message = buildMessage.getValue().toString();
-        final String blockName = getBlockName(buildMessage);
-        final String typeId = buildMessage.getTypeId();
-
-        processMessage(build, message, blockName, typeId);
+        processMessage(build, buildMessage.getValue().toString(), buildMessage);
     }
 
-    protected void processMessage(AgentRunningBuild build, String message, String blockName, String typeId) {
+    protected void processMessage(AgentRunningBuild build, String message, BuildMessage1 buildMessage) {
         final int start = message.indexOf(ANALYSIS_SUCCESSFUL);
         if (start >= 0) {
             final String url = message.substring(start + ANALYSIS_SUCCESSFUL.length());
@@ -77,37 +71,29 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
                 Util.close(fw);
             }
         } else {
-            if (!isReports) {
-                if (blockName != null) {
-                    isReports = "Successfully parsed".equals(blockName);
-                }
-            } else {
-                if (typeId.equals(DefaultMessagesInfo.MSG_BLOCK_END)) {
-                    isReports = false;
-                } else {
-                    if (!message.matches("\\d+ report")) {
-                        final File file = new File(build.getCheckoutDirectory(), message);
-
-                        if (file.exists() && file.canRead()) {
-                            if (file.isDirectory()) {
-                                myCollectedReports.add(message);
-                            } else {
-                                myCollectedReports.add(file.getParentFile().getAbsolutePath());
-                            }
-                        }
-                    }
-                }
-            }
+            ServiceMessagesProcessor.processTextMessage(buildMessage, myMessageProcessor);
         }
-    }
-
-    @Nullable
-    private static String getBlockName(@Nullable final BuildMessage1 buildMessage) {
-        return buildMessage != null && buildMessage.getValue() instanceof BlockData ?
-                ((BlockData) buildMessage.getValue()).blockName : null;
     }
 
     public Set<String> getCollectedReports() {
         return new HashSet<String>(myCollectedReports);
+    }
+
+    private class ImportDataMessageProcessor extends AbstractTextMessageProcessor {
+        public void processServiceMessage(@NotNull ServiceMessage serviceMessage, @NotNull BuildMessage1 buildMessage1) {
+            if ("importData".equals(serviceMessage.getMessageName())) {
+                final String path = serviceMessage.getAttributes().get("path");
+                if (path != null) {
+                    final String dir;
+                    final File file = new File(path);
+                    if (file.exists() && file.isDirectory()) {
+                        dir = path;
+                    } else {
+                        dir = path.substring(0, path.lastIndexOf(File.separatorChar));
+                    }
+                    myCollectedReports.add(dir);
+                }
+            }
+        }
     }
 }
