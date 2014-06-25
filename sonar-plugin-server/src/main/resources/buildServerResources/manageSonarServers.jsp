@@ -30,13 +30,18 @@
                                     </td>
                                     <td class="url"><c:out value="${server.url}"/></td>
                                     <td class="db">
-                                        <div class="url"><c:out value="${server.JDBCUrl}"/></div>
-                                        <c:if test="${not empty server.JDBCUsername}">
-                                            <div class="dbUser">Username: <c:out value="${server.JDBCUsername}"/></div>
-                                        </c:if>
-                                        <c:if test="${not empty server.JDBCPassword}">
-                                            <div class="dbPass">Password: <c:out value="${server.JDBCPassword}"/></div>
-                                        </c:if>
+                                        <c:choose>
+                                            <c:when test="${not empty server.JDBCUrl}"><div class="url"><c:out value="${server.JDBCUrl}"/></div></c:when>
+                                            <c:otherwise><div class="defaultValue grayNote">jdbc:h2:tcp://localhost:9092/sonar</div></c:otherwise>
+                                        </c:choose>
+                                        <c:choose>
+                                            <c:when test="${not empty server.JDBCUsername}"><div class="dbUser">Username: <c:out value="${server.JDBCUsername}"/></div></c:when>
+                                            <c:otherwise><div class="defaultValue grayNote">Username: sonar</div></c:otherwise>
+                                        </c:choose>
+                                        <c:choose>
+                                            <c:when test="${not empty server.JDBCPassword}"><div class="dbPass">Password: <c:out value="${server.JDBCPassword}"/></div></c:when>
+                                            <c:otherwise><div class="defaultValue grayNote">Password: sonar</div></c:otherwise>
+                                        </c:choose>
                                     </td>
                                     <td class="remove">
                                         <a id="removeNewServer" href="#"
@@ -77,7 +82,7 @@
 
             <table class="runnerFormTable">
                 <tr>
-                    <th>Name</th>
+                    <th>Name<l:star/></th>
                     <td>
                         <div><input type="text" id="serverinfo.id" name="serverinfo.id"/></div>
                     </td>
