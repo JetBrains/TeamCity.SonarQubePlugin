@@ -114,6 +114,8 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
             final SQSInfo info = SQSInfo.from(request.getParameterMap());
             try {
                 mySqsManager.addServer(info, project);
+            } catch (SQSManager.ServerInfoExists e) {
+                ajaxResponse.setAttribute("error", "Server with such name already exists");
             } catch (IOException e) {
                 ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
             }

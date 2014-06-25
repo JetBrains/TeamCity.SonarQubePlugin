@@ -17,6 +17,7 @@ SonarPlugin = {
     },
     editServer: function(id, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
         SonarPlugin.ServerConnectionDialog.showDialog('editSqs', id, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId);
+        $j(".runnerFormTable input[id='serverinfo.id']").prop("disabled", true);
     },
     addServer: function(projectId) {
         SonarPlugin.ServerConnectionDialog.showDialog('addSqs', '', '', '', '', '', projectId);
@@ -35,25 +36,51 @@ SonarPlugin = {
 
         cleanFields: function (id, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
             $j(".runnerFormTable input[id='serverinfo.id']").val(id);
+            $j(".runnerFormTable input[id='serverinfo.id']").prop("disabled", false);
             $j(".runnerFormTable input[id='sonar.host.url']").val(url);
             $j(".runnerFormTable input[id='sonar.jdbc.url']").val(JDBCUrl);
             $j(".runnerFormTable input[id='sonar.jdbc.username']").val(JDBCUsername);
             $j(".runnerFormTable input[id='sonar.jdbc.password']").val(JDBCPassword);
             $j("#serverInfoForm input[id='projectId']").val(projectId);
+
+            this.cleanErrors();
         },
 
         cleanErrors: function () {
+            $j("#serverInfoForm .error").remove();
         },
 
-        error: function(message) {
-            alert("error: " + message);
+        error: function($element, message) {
+            var next = $element.next();
+            if (next != null && next.prop("class") != null && next.prop("class").indexOf('error') > 0) {
+                next.text(message);
+            } else {
+                $element.after("<p class='error'>" + message + "</p>");
+            }
+        },
+
+        doValidate: function() {
+            var errorFound = false;
+
+            var url = $j('input[id="sonar.host.url"]');
+            if (url.val() == "") {
+                this.error(url, "Please set the server URL");
+                errorFound = true;
+            }
+
+            var name = $j('input[id="serverinfo.id"]');
+            if (name.val() == "") {
+                this.error(name, "Please set the server name");
+                errorFound = true;
+            }
+
+            return !errorFound;
         },
 
         doPost: function() {
-            var url = $j('input[id="sonar.host.url"]').val();
+            this.cleanErrors();
 
-            if (url == "") {
-                this.error("Please set the server URL");
+            if (!this.doValidate()) {
                 return false;
             }
 
@@ -63,8 +90,22 @@ SonarPlugin = {
             BS.ajaxRequest(window['base_uri'] + '/admin/manageSonarServers.html', {
                 parameters: parameters,
                 onComplete: function(transport) {
-                    $("SQservers").refresh();
-                    dialog.close();
+                    var shouldClose = true;
+                    if (transport != null && transport.responseXML != null) {
+                        var response = transport.responseXML.getElementsByTagName("response");
+                        if (response != null && response.length > 0) {
+                            var responseTag = response[0];
+                            var error = responseTag.getAttribute("error");
+                            if (error != null) {
+                                shouldClose = false;
+                                alert(error);
+                            }
+                        }
+                    }
+                    if (shouldClose) {
+                        $("SQservers").refresh();
+                        dialog.close();
+                    }
                 }
             });
 
