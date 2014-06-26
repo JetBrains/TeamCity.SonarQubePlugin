@@ -38,4 +38,8 @@ public final class Util {
     public static boolean assureDirExistence(final @NotNull File dir) {
         return !dir.getParentFile().exists() && dir.getParentFile().mkdirs();
     }
+
+    static boolean isSonarRunner(final @NotNull String runType) {
+        return Constants.RUNNER_TYPE.equals(runType);
+    }
 }
