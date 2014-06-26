@@ -6,4 +6,5 @@
     <bean class="jetbrains.buildserver.sonarplugin.SonarQubeRunnerBuildRunner"/>
     <bean class="jetbrains.buildserver.sonarplugin.SonarProcessListener"/>
     <bean class="jetbrains.buildserver.sonarplugin.SQRBuildServiceFactory"/>
+    <bean class="jetbrains.buildserver.sonarplugin.BuildBreakerProblemListener"/>
 </beans>
