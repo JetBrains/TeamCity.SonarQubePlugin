@@ -26,7 +26,9 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
 
     @NotNull
     private final ArtifactsWatcher myWatcher;
-    private AbstractTextMessageProcessor myMessageProcessor = new ImportDataMessageProcessor();
+    @NotNull
+    private final AbstractTextMessageProcessor myMessageProcessor = new ImportDataMessageProcessor();
+    private boolean mySonarIsWorking = false;
 
     public SonarProcessListener(@NotNull final EventDispatcher<AgentLifeCycleListener> agentDispatcher,
                                 @NotNull final ArtifactsWatcher watcher) {
@@ -36,7 +38,12 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
 
     @Override
     public void beforeRunnerStart(@NotNull BuildRunnerContext runner) {
-        // TODO: check Sonar is enabled
+        mySonarIsWorking = Util.isSonarRunner(runner.getRunType());
+    }
+
+    @Override
+    public void runnerFinished(@NotNull BuildRunnerContext runner, @NotNull BuildFinishedStatus status) {
+        mySonarIsWorking = false;
     }
 
     @Override
@@ -55,20 +62,22 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
     }
 
     protected void processMessage(AgentRunningBuild build, String message, BuildMessage1 buildMessage) {
-        final int start = message.indexOf(ANALYSIS_SUCCESSFUL);
-        if (start >= 0) {
-            final String url = message.substring(start + ANALYSIS_SUCCESSFUL.length());
-            // TODO: save URL to a parameter instead to be able to specify URL strictly in configuration
-            FileWriter fw = null;
-            try {
-                final File output = new File(build.getBuildTempDirectory(), Constants.SONAR_SERVER_URL_FILENAME);
-                fw = new FileWriter(output);
-                fw.write(url);
-                myWatcher.addNewArtifactsPath(output.getAbsolutePath() + "=>" + Constants.SONAR_SERVER_URL_ARTIF_LOCATION);
-            } catch (IOException e) {
-                build.getBuildLogger().message("Cannot save Sonar URL \"" + url + "\" to file \"" + "\": " + e.getMessage());
-            } finally {
-                Util.close(fw);
+        if (mySonarIsWorking) {
+            final int start = message.indexOf(ANALYSIS_SUCCESSFUL);
+            if (start >= 0) {
+                final String url = message.substring(start + ANALYSIS_SUCCESSFUL.length());
+                // TODO: save URL to a parameter instead to be able to specify URL strictly in configuration
+                FileWriter fw = null;
+                try {
+                    final File output = new File(build.getBuildTempDirectory(), Constants.SONAR_SERVER_URL_FILENAME);
+                    fw = new FileWriter(output);
+                    fw.write(url);
+                    myWatcher.addNewArtifactsPath(output.getAbsolutePath() + "=>" + Constants.SONAR_SERVER_URL_ARTIF_LOCATION);
+                } catch (IOException e) {
+                    build.getBuildLogger().message("Cannot save Sonar URL \"" + url + "\" to file \"" + "\": " + e.getMessage());
+                } finally {
+                    Util.close(fw);
+                }
             }
         } else {
             ServiceMessagesProcessor.processTextMessage(buildMessage, myMessageProcessor);
