@@ -44,7 +44,11 @@ public class ServerManagementProjectTab extends EditProjectTab {
             return TAB_TITLE;
         }
         final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(single(currentProject));
-        return TAB_TITLE + " (" + availableServers.size() + ")";
+        if (availableServers.isEmpty()) {
+            return TAB_TITLE;
+        } else {
+            return TAB_TITLE + " (" + availableServers.size() + ")";
+        }
     }
 
     @Override
