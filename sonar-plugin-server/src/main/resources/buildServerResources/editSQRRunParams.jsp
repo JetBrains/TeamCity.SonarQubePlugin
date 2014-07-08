@@ -5,23 +5,8 @@
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
-<l:settingsGroup title="SonarQube Runner parameters" className="advancedSetting">
-    <tr>
-        <th class="noBorder"><label for="sonarProjectName">Project name: </label></th>
-        <td><props:textProperty name="sonarProjectName" className="longField"/>
-        </td>
-    </tr>
-    <tr>
-        <th class="noBorder"><label for="sonarProjectKey">Project key: </label></th>
-        <td><props:textProperty name="sonarProjectKey" className="longField"/>
-        </td>
-    </tr>
-    <tr>
-        <th class="noBorder"><label for="sonarProjectVersion">Project version: </label></th>
-        <td><props:textProperty name="sonarProjectVersion" className="longField"/></td>
-    </tr>
-
-    <tr><th><label for="sqsChooser">SonarQube Server: </label></th>
+<l:settingsGroup title="SonarQube Runner Parameters" className="advancedSetting">
+    <tr><th class="noBorder"><label for="sqsChooser">SonarQube Server: </label></th>
         <td>
             <c:choose>
                 <%--@elvariable id="servers" type="java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
@@ -41,33 +26,36 @@
         </td>
     </tr>
     <tr style="display: none;"><th></th><td><props:textProperty name="sonarServer"/></td></tr>
-</l:settingsGroup>
+    <script type="application/javascript">
+        (function () {
+            var sonarServer = $j('#sonarServer');
+            var chooser = $j('#sqsChooser');
 
-<script type="application/javascript">
-    (function () {
-        var sonarServer = $j('#sonarServer');
-        var chooser = $j('#sqsChooser');
+            var onSqsChooserChange = function() {
+                sonarServer.val($j('#sqsChooser option:selected').val());
+            };
 
-        var onSqsChooserChange = function() {
-            sonarServer.val($j('#sqsChooser option:selected').val());
-        };
+            chooser.change(onSqsChooserChange);
+            chooser.val(sonarServer.val());
+        })();
+    </script>
 
-        chooser.change(onSqsChooserChange);
-        chooser.val(sonarServer.val());
-    })();
-
-</script>
-
-<props:javaSettings/>
-
-<l:settingsGroup title="Project structure" className="advancedSetting">
-    <tr class="advancedSetting">
-        <th class="noBorder"><label for="sonarProjectModules">Modules: </label></th>
-        <td><props:textProperty name="sonarProjectModules" className="longField"/>
-            <bs:vcsTree fieldId="sonarProjectModules"/>
+    <tr>
+        <th class="noBorder"><label for="sonarProjectName">Project name: </label></th>
+        <td><props:textProperty name="sonarProjectName" className="longField"/>
         </td>
     </tr>
-    <tr class="advancedSetting">
+    <tr>
+        <th class="noBorder"><label for="sonarProjectKey">Project key: </label></th>
+        <td><props:textProperty name="sonarProjectKey" className="longField"/>
+        </td>
+    </tr>
+    <tr>
+        <th class="noBorder"><label for="sonarProjectVersion">Project version: </label></th>
+        <td><props:textProperty name="sonarProjectVersion" className="longField"/></td>
+    </tr>
+
+    <tr>
         <th class="noBorder"><label for="sonarProjectSources">Sources location: </label></th>
         <td><props:textProperty name="sonarProjectSources" className="longField"/>
             <bs:vcsTree fieldId="sonarProjectSources"/>
@@ -85,9 +73,17 @@
         <bs:vcsTree fieldId="sonarProjectBinaries"/>
         </td>
     </tr>
+    <tr class="advancedSetting">
+        <th class="noBorder"><label for="sonarProjectModules">Modules: </label></th>
+        <td><props:textProperty name="sonarProjectModules" className="longField"/>
+            <bs:vcsTree fieldId="sonarProjectModules"/>
+        </td>
+    </tr>
 </l:settingsGroup>
 <tr class="advancedSetting">
-    <th><label for="additionalParameters">Additional parameters: </label></th>
+    <th class="noBorder"><label for="additionalParameters">Additional parameters: </label></th>
     <td><props:multilineProperty name="additionalParameters" className="longField" linkTitle="any additional parameters separated with newline to be passed to SonarQube Runner as is" cols="40" rows="3" expanded="true"/>
     </td>
 </tr>
+
+<props:javaSettings/>
