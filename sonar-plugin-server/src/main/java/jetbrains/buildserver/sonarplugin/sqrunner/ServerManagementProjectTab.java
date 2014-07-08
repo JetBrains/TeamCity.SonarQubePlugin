@@ -25,13 +25,26 @@ public class ServerManagementProjectTab extends EditProjectTab {
     @NotNull
     private final SQSManager mySqsManager;
 
+    private static final String TAB_TITLE = "SonarQube Servers";
+
     public ServerManagementProjectTab(@NotNull final PagePlaces pagePlaces,
                                       @NotNull final PluginDescriptor pluginDescriptor,
                                       @NotNull final SQSManager sqsManager) {
-        super(pagePlaces, pluginDescriptor.getPluginName(), "manageSonarServers.jsp", "Sonar Server");
+        super(pagePlaces, pluginDescriptor.getPluginName(), "manageSonarServers.jsp", TAB_TITLE);
         mySqsManager = sqsManager;
         addCssFile(pluginDescriptor.getPluginResourcesPath("manageSonarServers.css"));
         addJsFile(pluginDescriptor.getPluginResourcesPath("manageSonarServers.js"));
+    }
+
+    @NotNull
+    @Override
+    public String getTabTitle(@NotNull final HttpServletRequest request) {
+        final SProject currentProject = getProject(request);
+        if (currentProject == null) {
+            return TAB_TITLE;
+        }
+        final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(single(currentProject));
+        return TAB_TITLE + " (" + availableServers.size() + ")";
     }
 
     @Override
