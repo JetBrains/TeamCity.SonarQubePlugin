@@ -8,9 +8,12 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by linfar on 7/9/14.
+ * Created by Andrey Titov on 7/9/14.
+ *
+ * SonarQube Server data manager
  */
 public interface SQSManager {
+    @NotNull
     List<SQSInfo> getAvailableServers(@NotNull ProjectAccessor accessor);
 
     @Nullable

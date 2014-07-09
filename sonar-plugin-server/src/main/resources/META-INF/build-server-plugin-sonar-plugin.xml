@@ -5,7 +5,7 @@
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.BuildSummaryLinkExtension"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.ServerManagementProjectTab"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.ManageSQSActionController"/>
-    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.FileBasedSQSManagerImpl"/>
+    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerImpl"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.EditSQRRunType"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQSPropertiesProvider"/>
 </beans>

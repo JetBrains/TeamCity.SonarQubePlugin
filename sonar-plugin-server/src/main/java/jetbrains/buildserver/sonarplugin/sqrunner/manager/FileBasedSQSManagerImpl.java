@@ -20,6 +20,7 @@ import java.util.List;
 public class FileBasedSQSManagerImpl implements SQSManager {
     public static final String PROPERTIES_FILE_EXTENSION = ".properties";
 
+    @NotNull
     public synchronized List<SQSInfo> getAvailableServers(final @NotNull ProjectAccessor accessor) {
         SProject currentProject;
         final List<SQSInfo> res = new LinkedList<SQSInfo>();
