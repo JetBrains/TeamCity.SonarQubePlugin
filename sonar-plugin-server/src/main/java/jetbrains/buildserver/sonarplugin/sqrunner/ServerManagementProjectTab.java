@@ -69,7 +69,10 @@ public class ServerManagementProjectTab extends EditProjectTab {
             if (infoMap.containsKey(project)) {
                 break;
             }
-            infoMap.put(project, mySqsManager.getAvailableServers(single(project)));
+            final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(single(project));
+            if (!availableServers.isEmpty()) {
+                infoMap.put(project, availableServers);
+            }
             project = project.getParentProject();
         }
         return infoMap;
