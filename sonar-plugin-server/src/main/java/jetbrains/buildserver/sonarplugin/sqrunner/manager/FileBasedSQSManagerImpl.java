@@ -108,14 +108,14 @@ public class FileBasedSQSManagerImpl implements SQSManager {
                                         final @NotNull String serverId,
                                         final @NotNull SQSInfo modifiedSerever) throws IOException {
         removeIfExists(project, serverId);
-        addServer(modifiedSerever, project);
+        addServer(project, modifiedSerever);
     }
 
     private SQSInfo readInfoFile(final @NotNull File serverInfo) {
         FileInputStream inStream = null;
         try {
             inStream = new FileInputStream(serverInfo);
-            return SQSInfo.from(inStream);
+            return PropertiesBasedSQSInfo.from(inStream);
         } catch (Exception ignored) {
             /* ignored */
         } finally {
@@ -134,8 +134,7 @@ public class FileBasedSQSManagerImpl implements SQSManager {
         }
     }
 
-    public synchronized void addServer(@NotNull final SQSInfo newServer,
-                                       @NotNull final SProject toProject) throws IOException {
+    public synchronized void addServer(@NotNull final SProject toProject, @NotNull final SQSInfo newServer) throws IOException {
         final File pluginSettingsDir = getPluginDataDirectory(toProject);
         final String id = newServer.getId();
         if (id == null) {
@@ -151,7 +150,7 @@ public class FileBasedSQSManagerImpl implements SQSManager {
                 || !serverInfoFile.canWrite()) {
             throw new CannotWriteData("Cannot write to directory " + pluginSettingsDir.getAbsolutePath());
         }
-        newServer.storeTo(serverInfoFile);
+        new PropertiesBasedSQSInfo(newServer).storeTo(serverInfoFile);
     }
 
     private static File getPluginDataDirectory(final @NotNull SProject currentProject) {

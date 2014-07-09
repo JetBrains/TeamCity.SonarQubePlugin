@@ -5,7 +5,7 @@ import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.PropertiesBasedSQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -82,7 +82,7 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                                 final @NotNull SProject project,
                                 final @NotNull Element ajaxResponse) {
         try {
-            mySqsManager.editServer(project, getServerInfoId(request), SQSInfo.from(request.getParameterMap()));
+            mySqsManager.editServer(project, getServerInfoId(request), PropertiesBasedSQSInfo.from(request.getParameterMap()));
         } catch (IOException e) {
             ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
         }
@@ -107,13 +107,13 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     private void addServerInfo(final @NotNull HttpServletRequest request,
                                final @NotNull SProject project,
                                final @NotNull Element ajaxResponse) throws IOException {
-        final SQSInfo.ValidationError[] validationResult = SQSInfo.validate(request.getParameterMap());
+        final PropertiesBasedSQSInfo.ValidationError[] validationResult = PropertiesBasedSQSInfo.validate(request.getParameterMap());
         if (validationResult.length > 0) {
             ajaxResponse.setAttribute("error", Integer.toString(validationResult.length));
         } else {
-            final SQSInfo info = SQSInfo.from(request.getParameterMap());
+            final PropertiesBasedSQSInfo info = PropertiesBasedSQSInfo.from(request.getParameterMap());
             try {
-                mySqsManager.addServer(info, project);
+                mySqsManager.addServer(project, info);
             } catch (SQSManager.ServerInfoExists e) {
                 ajaxResponse.setAttribute("error", "Server with such name already exists");
             } catch (IOException e) {
@@ -128,7 +128,7 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     }
 
     private static String getServerInfoId(final @NotNull HttpServletRequest request) {
-        return request.getParameter(SQSInfo.SERVERINFO_ID);
+        return request.getParameter(PropertiesBasedSQSInfo.SERVERINFO_ID);
     }
 
 }

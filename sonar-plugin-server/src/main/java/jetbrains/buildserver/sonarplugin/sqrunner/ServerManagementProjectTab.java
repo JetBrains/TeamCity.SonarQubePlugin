@@ -4,7 +4,7 @@ import jetbrains.buildServer.controllers.admin.projects.EditProjectTab;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.PropertiesBasedSQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +43,7 @@ public class ServerManagementProjectTab extends EditProjectTab {
         if (currentProject == null) {
             return TAB_TITLE;
         }
-        final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(single(currentProject));
+        final List<PropertiesBasedSQSInfo> availableServers = mySqsManager.getAvailableServers(single(currentProject));
         if (availableServers.isEmpty()) {
             return TAB_TITLE;
         } else {
@@ -57,14 +57,14 @@ public class ServerManagementProjectTab extends EditProjectTab {
         if (currentProject == null) {
             return;
         }
-        Map<SProject, List<SQSInfo>> infoMap = getServersMap(currentProject);
+        Map<SProject, List<PropertiesBasedSQSInfo>> infoMap = getServersMap(currentProject);
         model.put("availableServersMap", infoMap);
         model.put("projectId", currentProject.getExternalId());
     }
 
-    private Map<SProject, List<SQSInfo>> getServersMap(@NotNull final SProject currentProject) {
+    private Map<SProject, List<PropertiesBasedSQSInfo>> getServersMap(@NotNull final SProject currentProject) {
         SProject project = currentProject;
-        Map<SProject, List<SQSInfo>> infoMap = new HashMap<SProject, List<SQSInfo>>();
+        Map<SProject, List<PropertiesBasedSQSInfo>> infoMap = new HashMap<SProject, List<PropertiesBasedSQSInfo>>();
         while (project != null) {
             if (infoMap.containsKey(project)) {
                 break;

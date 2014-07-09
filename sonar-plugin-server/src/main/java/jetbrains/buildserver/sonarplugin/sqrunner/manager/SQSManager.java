@@ -20,8 +20,7 @@ public interface SQSManager {
                     @NotNull String serverId,
                     @NotNull SQSInfo modifiedSerever) throws IOException;
 
-    void addServer(@NotNull SQSInfo newServer,
-                   @NotNull SProject toProject) throws IOException;
+    void addServer(@NotNull SProject toProject, @NotNull SQSInfo newServer) throws IOException;
 
     boolean removeIfExists(@NotNull SProject currentProject,
                            @NotNull String id) throws CannotDeleteData;
