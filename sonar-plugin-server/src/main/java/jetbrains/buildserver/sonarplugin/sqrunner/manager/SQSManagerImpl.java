@@ -51,8 +51,9 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
 
     public synchronized void editServer(final @NotNull SProject project,
                                         final @NotNull String serverId,
-                                        final @NotNull SQSInfo modifiedSerever) throws IOException {
-        getSettings(project).setInfo(serverId, modifiedSerever);
+                                        final @NotNull SQSInfo modifiedServer) throws IOException {
+        getSettings(project).setInfo(serverId, modifiedServer);
+        project.persist();
     }
 
     public synchronized void addServer(final @NotNull SProject project,
@@ -61,11 +62,17 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
             throw new ServerIdMissing();
         }
         getSettings(project).setInfo(serverInfo.getId(), serverInfo);
+        project.persist();
     }
 
     public boolean removeIfExists(final @NotNull SProject project,
                                   final @NotNull String id) throws CannotDeleteData {
-        return getSettings(project).remove(id);
+        if (getSettings(project).remove(id)) {
+            project.persist();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @NotNull
