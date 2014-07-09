@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
-import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.recurse;
+import static jetbrains.buildserver.sonarplugin.sqrunner.manager.FileBasedSQSManagerImpl.recurse;
 
 /**
  * Created by Andrey Titov on 5/29/14.

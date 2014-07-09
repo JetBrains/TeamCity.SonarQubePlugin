@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.single;
+import static jetbrains.buildserver.sonarplugin.sqrunner.manager.FileBasedSQSManagerImpl.single;
 
 /**
  * Created by Andrey Titov on 4/4/14.

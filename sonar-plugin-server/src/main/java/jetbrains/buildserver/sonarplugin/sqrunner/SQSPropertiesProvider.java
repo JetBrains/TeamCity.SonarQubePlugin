@@ -7,7 +7,7 @@ import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.recurse;
+import static jetbrains.buildserver.sonarplugin.sqrunner.manager.FileBasedSQSManagerImpl.recurse;
 
 /**
  * Created by Andrey Titov on 6/2/14.
