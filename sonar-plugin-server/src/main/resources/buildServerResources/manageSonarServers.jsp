@@ -7,6 +7,10 @@
     <h2 class="noBorder">SonarQube Server profiles</h2>
     <div class="grayNote">Profiles to connect to SonarQube Servers</div>
 
+    <div class="add">
+        <forms:addButton id="createNewServer" onclick="SonarPlugin.addServer('${projectId}'); return false">Add new server</forms:addButton>
+    </div>
+
     <bs:refreshable containerId="SQservers" pageUrl="${pageUrl}">
         <div class="sqsList">
             <c:choose>
@@ -66,10 +70,6 @@
             </c:choose>
         </div>
     </bs:refreshable>
-
-    <div class="add">
-        <forms:addButton id="createNewServer" onclick="SonarPlugin.addServer('${projectId}'); return false">Add new server</forms:addButton>
-    </div>
 
     <bs:dialog dialogId="serverInfoDialog"
                dialogClass="serverInfoDialog"
