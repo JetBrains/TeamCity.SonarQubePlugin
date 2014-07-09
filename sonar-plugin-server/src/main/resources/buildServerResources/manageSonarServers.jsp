@@ -64,7 +64,7 @@
                 </c:when>
                 <c:otherwise>
                     <div class="noSqsFound">
-                        No SonarQuve Servers registered yet. You can still select a server with additional SonarQube Runner parameters or use local installation.
+                        No SonarQube Servers registered yet. You can still select a server with additional SonarQube Runner parameters or use local installation.
                     </div>
                 </c:otherwise>
             </c:choose>
