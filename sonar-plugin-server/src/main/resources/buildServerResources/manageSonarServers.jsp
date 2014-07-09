@@ -82,7 +82,7 @@
 
             <table class="runnerFormTable">
                 <tr>
-                    <th>Name<l:star/></th>
+                    <th>Id<l:star/></th>
                     <td>
                         <div><input type="text" id="serverinfo.id" name="serverinfo.id"/></div>
                     </td>
