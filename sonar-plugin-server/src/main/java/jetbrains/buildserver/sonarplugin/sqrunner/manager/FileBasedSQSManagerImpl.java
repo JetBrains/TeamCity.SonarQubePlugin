@@ -21,9 +21,9 @@ public class FileBasedSQSManagerImpl implements SQSManager {
     public static final String PROPERTIES_FILE_EXTENSION = ".properties";
 
     public synchronized List<SQSInfo> getAvailableServers(final @NotNull ProjectAccessor accessor) {
-        SProject currentProject = null;
+        SProject currentProject;
         final List<SQSInfo> res = new LinkedList<SQSInfo>();
-        while((currentProject = accessor.get(currentProject)) != null) {
+        while((currentProject = accessor.next()) != null) {
             processAvailableServers(currentProject, new SQSInfoProcessor() {
                 @Override
                 public State process(SQSInfo sqsInfo) {
@@ -74,8 +74,8 @@ public class FileBasedSQSManagerImpl implements SQSManager {
 
     @Nullable
     public synchronized SQSInfo findServer(final @NotNull ProjectAccessor accessor, final @NotNull String serverId) {
-        SProject project = null;
-        while ((project = accessor.get(project)) != null) {
+        SProject project;
+        while ((project = accessor.next()) != null) {
             final SQSInfo infoContainer[] = new SQSInfo[] {null};
 
             processAvailableServers(project, new SQSInfoProcessor() {
@@ -181,18 +181,25 @@ public class FileBasedSQSManagerImpl implements SQSManager {
     }
 
     public static ProjectAccessor recurse(@NotNull final SProject project) {
-        return new ProjectAccessor() {
-            public SProject get(SProject p) {
-                return p == null ? project : p.getParentProject();
+        return new ProjectAccessor(project) {
+            public SProject next() {
+                if (myProject == null) {
+                    return null;
+                }
+                SProject t = myProject;
+                myProject = myProject.getParentProject();
+                return t;
             }
         };
     }
 
     public static ProjectAccessor single(@NotNull final SProject project) {
-        return new ProjectAccessor() {
+        return new ProjectAccessor(project) {
             @Override
-            public SProject get(SProject p) {
-                return p == null ? project : null;
+            public SProject next() {
+                SProject t = myProject;
+                myProject = null;
+                return t;
             }
         };
     }

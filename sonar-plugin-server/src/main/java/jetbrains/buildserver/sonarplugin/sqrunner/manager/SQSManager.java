@@ -45,6 +45,13 @@ public interface SQSManager {
     }
 
     public static abstract class ProjectAccessor {
-        public abstract SProject get(SProject project);
+        @Nullable
+        protected SProject myProject;
+
+        public ProjectAccessor(final @Nullable SProject firstProject) {
+            myProject = firstProject;
+        }
+
+        public abstract SProject next();
     }
 }
