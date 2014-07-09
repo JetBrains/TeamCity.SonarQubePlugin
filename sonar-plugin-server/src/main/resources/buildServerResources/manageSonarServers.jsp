@@ -13,7 +13,7 @@
                 <c:when test="${fn:length(availableServersMap) > 0}">
                     <table class="sqsTable parametersTable">
                         <tr>
-                            <th class="id">Name</th>
+                            <th class="id">Id</th>
                             <th class="host">Server</th>
                             <th class="db">Database</th>
                             <th class="actions" colspan="2">Manage</th>
