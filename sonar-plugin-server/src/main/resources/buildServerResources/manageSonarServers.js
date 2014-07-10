@@ -15,28 +15,28 @@ SonarPlugin = {
             }
         });
     },
-    editServer: function(id, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
-        SonarPlugin.ServerConnectionDialog.showDialog('editSqs', id, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId);
+    editServer: function(id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
+        SonarPlugin.ServerConnectionDialog.showDialog('editSqs', id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId);
         $j(".runnerFormTable input[id='serverinfo.id']").prop("disabled", true);
     },
     addServer: function(projectId) {
-        SonarPlugin.ServerConnectionDialog.showDialog('addSqs', '', '', '', '', '', projectId);
+        SonarPlugin.ServerConnectionDialog.showDialog('addSqs', '', '', '', '', '', '', projectId);
     },
     ServerConnectionDialog: OO.extend(BS.AbstractWebForm, OO.extend(BS.AbstractModalDialog, {
         getContainer: function () {
             return $('serverInfoDialog');
         },
 
-        showDialog: function (action, id, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
+        showDialog: function (action, id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
             $j("input[id='SQSaction']").val(action);
-            this.cleanFields(id, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId);
+            this.cleanFields(id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId);
             this.cleanErrors();
             this.showCentered();
         },
 
-        cleanFields: function (id, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
-            $j(".runnerFormTable input[id='serverinfo.id']").val(id);
-            $j(".runnerFormTable input[id='serverinfo.id']").prop("disabled", false);
+        cleanFields: function (id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
+            $j("input[id='serverinfo.id']").val(id);
+            $j(".runnerFormTable input[id='serverinfo.name']").val(name);
             $j(".runnerFormTable input[id='sonar.host.url']").val(url);
             $j(".runnerFormTable input[id='sonar.jdbc.url']").val(JDBCUrl);
             $j(".runnerFormTable input[id='sonar.jdbc.username']").val(JDBCUsername);
@@ -68,7 +68,7 @@ SonarPlugin = {
                 errorFound = true;
             }
 
-            var name = $j('input[id="serverinfo.id"]');
+            var name = $j('input[id="serverinfo.name"]');
             if (name.val() == "") {
                 this.error(name, "Please set the server name");
                 errorFound = true;

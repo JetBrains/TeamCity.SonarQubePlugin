@@ -4,7 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by linfar on 7/9/14.
+ * Created by Andrey Titov on 7/9/14.
+ *
+ * SonarQube Server definition.
  */
 public interface SQSInfo {
     @Nullable
@@ -19,16 +21,12 @@ public interface SQSInfo {
     @Nullable
     String getJDBCPassword();
 
-    @Nullable
+    @NotNull
     String getId();
 
-    public static class ValidationError {
-        public final String myError;
-        public final String myKey;
+    @Nullable
+    String getName();
 
-        public ValidationError(@NotNull final String myError, @NotNull final String myKey) {
-            this.myError = myError;
-            this.myKey = myKey;
-        }
-    }
+    @Nullable
+    String getDescription();
 }

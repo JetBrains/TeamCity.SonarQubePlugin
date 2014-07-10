@@ -13,9 +13,7 @@
                 <c:when test="${not empty servers}">
                     <forms:select name="sqsChooser" enableFilter="true" className="mediumField">
                         <c:forEach items="${servers}" var="server">
-                            <forms:option value="${server.id}"><c:if test="${not empty server.id}">
-                                <c:out value="${server.id}"/>: </c:if><c:out value="${server.url}"/>
-                            </forms:option>
+                            <forms:option value="${server.id}"><c:out value="${server.name}"/>: <c:out value="${server.url}"/></forms:option>
                         </c:forEach>
                     </forms:select>
                 </c:when>

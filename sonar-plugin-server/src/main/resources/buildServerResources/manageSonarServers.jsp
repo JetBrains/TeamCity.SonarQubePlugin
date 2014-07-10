@@ -17,7 +17,7 @@
                 <c:when test="${fn:length(availableServersMap) > 0}">
                     <table class="sqsTable parametersTable">
                         <tr>
-                            <th class="id">Id</th>
+                            <th class="id">Name</th>
                             <th class="host">Server</th>
                             <th class="db">Database</th>
                             <th class="actions" colspan="2">Manage</th>
@@ -25,7 +25,7 @@
                         <c:forEach items="${availableServersMap}" var="projectServersEntry">
                             <c:forEach items="${projectServersEntry.value}" var="server">
                                 <tr class="sqsInfo">
-                                    <td class="name"><c:out value="${server.id}"/>
+                                    <td class="name"><c:out value="${server.name}"/>
                                         <c:if test="${projectServersEntry.key.externalId != projectId}"> belongs to
                                             <admin:editProjectLink projectId="${projectServersEntry.key.externalId}">
                                                 <c:out value="${projectServersEntry.key.name}"/>
@@ -53,7 +53,7 @@
                                     </td>
                                     <td class="edit">
                                         <a id="editServer" href="#"
-                                           onclick="SonarPlugin.editServer('${server.id}', '${server.url}',
+                                           onclick="SonarPlugin.editServer('${server.id}', '${server.name}', '${server.url}',
                                                    '${server.JDBCUrl}', '${server.JDBCUsername}', '${server.JDBCPassword}',
                                                    '${projectServersEntry.key.externalId}'); return false">edit</a>
                                     </td>
@@ -82,9 +82,9 @@
 
             <table class="runnerFormTable">
                 <tr>
-                    <th>Id<l:star/></th>
+                    <th>Name<l:star/></th>
                     <td>
-                        <div><input type="text" id="serverinfo.id" name="serverinfo.id"/></div>
+                        <div><input type="text" id="serverinfo.name" name="serverinfo.name"/></div>
                     </td>
                 </tr>
                 <tr>
@@ -115,6 +115,7 @@
                     </td>
                 </tr>
             </table>
+            <input type="hidden" id="serverinfo.id" name="serverinfo.id"/>
             <input type="hidden" name="action" id="SQSaction" value="addSqs"/>
             <input type="hidden" name="projectId" id="projectId" value="${projectId}"/>
             <div class="popupSaveButtonsBlock">

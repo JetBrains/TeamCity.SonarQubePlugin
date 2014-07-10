@@ -2,6 +2,7 @@ package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
 import jetbrains.buildServer.XmlStorable;
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -15,8 +16,13 @@ class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
     public static final String JDBC_USERNAME = "jdbcUsername";
     public static final String JDBC_PASSWORD = "jdbcPassword";
     public static final String URL = "url";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
 
+    @NotNull
     private String myId;
+    private String myName;
+    private String myDescription;
     private String myUrl;
     private String myJdbcUrl;
     private String myJdbcUsername;
@@ -25,12 +31,18 @@ class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
     public XMLBasedSQSInfo() {
     }
 
-    public XMLBasedSQSInfo(String myId, String myUrl, String myJdbcUrl, String myJdbcUsername, String myJdbcPassword) {
-        this.myId = myId;
-        this.myUrl = myUrl;
-        this.myJdbcUrl = myJdbcUrl;
-        this.myJdbcUsername = myJdbcUsername;
-        this.myJdbcPassword = myJdbcPassword;
+    public XMLBasedSQSInfo(final @NotNull String id,
+                           String name,
+                           String url,
+                           String jdbcUrl,
+                           String jdbcUsername,
+                           String jdbcPassword) {
+        myId = id;
+        myName = name;
+        myUrl = url;
+        myJdbcUrl = jdbcUrl;
+        myJdbcUsername = jdbcUsername;
+        myJdbcPassword = jdbcPassword;
     }
 
     @Nullable
@@ -53,13 +65,25 @@ class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
         return myJdbcPassword;
     }
 
-    @Nullable
+    @NotNull
     public String getId() {
         return myId;
     }
 
+    @Nullable
+    public String getName() {
+        return myName;
+    }
+
+    @Nullable
+    public String getDescription() {
+        return myDescription;
+    }
+
     public void readFrom(Element element) {
         myId = element.getAttributeValue(ID);
+        myName = element.getAttributeValue(NAME);
+        myDescription = element.getAttributeValue(DESCRIPTION);
         myUrl = element.getAttributeValue(URL);
         myJdbcUrl = element.getAttributeValue(JDBC_URL);
         myJdbcUsername = element.getAttributeValue(JDBC_USERNAME);
@@ -68,6 +92,8 @@ class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
 
     public void writeTo(Element serverElement) {
         addAttribute(serverElement, ID, myId);
+        addAttribute(serverElement, NAME, myName);
+        addAttribute(serverElement, DESCRIPTION, myDescription);
         addAttribute(serverElement, URL, myUrl);
         addAttribute(serverElement, JDBC_URL, myJdbcUrl);
         addAttribute(serverElement, JDBC_USERNAME, myJdbcUsername);

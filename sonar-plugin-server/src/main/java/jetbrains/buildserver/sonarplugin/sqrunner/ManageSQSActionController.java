@@ -5,7 +5,8 @@ import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.PropertiesBasedSQSInfo;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfoFactory;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,13 @@ import java.io.IOException;
  * Ajax controller for SonarQube Server management
  */
 public class ManageSQSActionController extends BaseAjaxActionController implements ControllerAction {
+
+    public static final String SERVERINFO_ID = "serverinfo.id";
+    public static final String SERVERINFO_NAME = "serverinfo.name";
+    public static final String SONAR_URL = "sonar.host.url";
+    public static final String SONAR_JDBC_URL = "sonar.jdbc.url";
+    public static final String SONAR_JDBC_USERNAME = "sonar.jdbc.username";
+    public static final String SONAR_JDBC_PASSWORD = "sonar.jdbc.password";
 
     public static final String ADD_SQS_ACTION = "addSqs";
     public static final String REMOVE_SQS_ACTION = "removeSqs";
@@ -81,39 +89,57 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     private void editServerInfo(final @NotNull HttpServletRequest request,
                                 final @NotNull SProject project,
                                 final @NotNull Element ajaxResponse) {
-        try {
-            mySqsManager.editServer(project, getServerInfoId(request), PropertiesBasedSQSInfo.from(request.getParameterMap()));
-        } catch (IOException e) {
-            ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
+        if (validate(request, ajaxResponse)) {
+            if (getServerInfoId(request) == null) {
+                ajaxResponse.setAttribute("error", "ID is not set");
+            } else {
+                final SQSInfo info = SQSInfoFactory.createServerInfo(getServerInfoId(request),
+                        request.getParameter(SERVERINFO_NAME),
+                        request.getParameter(SONAR_URL),
+                        request.getParameter(SONAR_JDBC_URL),
+                        request.getParameter(SONAR_JDBC_USERNAME),
+                        request.getParameter(SONAR_JDBC_PASSWORD));
+                try {
+                    mySqsManager.editServer(project, getServerInfoId(request), info);
+                } catch (IOException e) {
+                    ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
+                }
+            }
         }
     }
 
     private void removeServerInfo(final @NotNull HttpServletRequest request,
                                   final @NotNull SProject project,
                                   final @NotNull Element ajaxResponse) throws IOException {
-        try {
-            final String serverinfoId = getServerInfoId(request);
-            final boolean wasRemoved = mySqsManager.removeIfExists(project, serverinfoId);
-            if (wasRemoved) {
-                ajaxResponse.setAttribute("serverRemoved", serverinfoId + " was removed");
-            } else {
-                ajaxResponse.setAttribute("error", serverinfoId + " wasn't removed");
+        final String serverinfoId = getServerInfoId(request);
+        if (serverinfoId == null) {
+            ajaxResponse.setAttribute("error", "ID is not set");
+        } else {
+            try {
+                final boolean wasRemoved = mySqsManager.removeIfExists(project, serverinfoId);
+                if (wasRemoved) {
+                    ajaxResponse.setAttribute("serverRemoved", serverinfoId + " was removed");
+                } else {
+                    ajaxResponse.setAttribute("error", serverinfoId + " wasn't removed");
+                }
+            } catch (SQSManager.CannotDeleteData cannotDeleteData) {
+                ajaxResponse.setAttribute("error", "Cannot delete data - " + cannotDeleteData.getMessage());
             }
-        } catch (SQSManager.CannotDeleteData cannotDeleteData) {
-            ajaxResponse.setAttribute("error", "Cannot delete data - " + cannotDeleteData.getMessage());
         }
     }
 
     private void addServerInfo(final @NotNull HttpServletRequest request,
                                final @NotNull SProject project,
                                final @NotNull Element ajaxResponse) throws IOException {
-        final PropertiesBasedSQSInfo.ValidationError[] validationResult = PropertiesBasedSQSInfo.validate(request.getParameterMap());
-        if (validationResult.length > 0) {
-            ajaxResponse.setAttribute("error", Integer.toString(validationResult.length));
-        } else {
-            final PropertiesBasedSQSInfo info = PropertiesBasedSQSInfo.from(request.getParameterMap());
+        if (validate(request, ajaxResponse)) {
+            final SQSInfo serverInfo = SQSInfoFactory.createServerInfo(null,
+                    request.getParameter(SERVERINFO_NAME),
+                    request.getParameter(SONAR_URL),
+                    request.getParameter(SONAR_JDBC_URL),
+                    request.getParameter(SONAR_JDBC_USERNAME),
+                    request.getParameter(SONAR_JDBC_PASSWORD));
             try {
-                mySqsManager.addServer(project, info);
+                mySqsManager.addServer(project, serverInfo);
             } catch (SQSManager.ServerInfoExists e) {
                 ajaxResponse.setAttribute("error", "Server with such name already exists");
             } catch (IOException e) {
@@ -122,13 +148,25 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
         }
     }
 
+    private boolean validate(HttpServletRequest request, Element ajaxResponse) {
+        if (request.getParameter(SERVERINFO_NAME) == null) {
+            ajaxResponse.setAttribute("error", "Server name should be set");
+            return false;
+        }
+        if (request.getParameter(SONAR_URL) == null) {
+            ajaxResponse.setAttribute("error", "Server url should be explicitly set");
+            return false;
+        }
+        return true;
+    }
+
     @Nullable
     private SProject getProject(final @NotNull HttpServletRequest request) {
         return myProjectManager.findProjectByExternalId(request.getParameter("projectId"));
     }
 
     private static String getServerInfoId(final @NotNull HttpServletRequest request) {
-        return request.getParameter(PropertiesBasedSQSInfo.SERVERINFO_ID);
+        return request.getParameter(SERVERINFO_ID);
     }
 
 }

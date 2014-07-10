@@ -30,16 +30,8 @@ public final class Util {
         }
     }
 
-    /**
-     * <p>Checks whether directory exists. Tries to create it if the directory doesn't exist.</p>
-     * @param dir directory to check
-     * @return true when directory exists or was created
-     */
-    public static boolean assureDirExistence(final @NotNull File dir) {
-        return !dir.getParentFile().exists() && dir.getParentFile().mkdirs();
-    }
-
     static boolean isSonarRunner(final @NotNull String runType) {
         return Constants.RUNNER_TYPE.equals(runType);
     }
+
 }

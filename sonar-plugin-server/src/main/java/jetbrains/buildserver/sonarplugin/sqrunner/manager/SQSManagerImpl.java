@@ -57,10 +57,7 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
     }
 
     public synchronized void addServer(final @NotNull SProject project,
-                          final @NotNull SQSInfo serverInfo) throws IOException {
-        if (serverInfo.getId() == null) {
-            throw new ServerIdMissing();
-        }
+                                       final @NotNull SQSInfo serverInfo) throws IOException {
         getSettings(project).setInfo(serverInfo.getId(), serverInfo);
         project.persist();
     }

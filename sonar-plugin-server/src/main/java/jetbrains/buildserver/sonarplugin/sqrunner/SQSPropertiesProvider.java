@@ -7,7 +7,7 @@ import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jetbrains.buildserver.sonarplugin.sqrunner.manager.FileBasedSQSManagerImpl.recurse;
+import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.ProjectAccessor.recurse;
 
 /**
  * Created by Andrey Titov on 6/2/14.
@@ -31,13 +31,15 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
                 final String serverId = runnerContext.getParameters().get(Constants.SONAR_SERVER_ID);
                 if (serverId != null) {
                     final SProject project = myProjectManager.findProjectById(context.getBuild().getProjectId());
-                    final SQSInfo server = mySqsManager.findServer(recurse(project), serverId);
-                    if (server != null) {
-                        addIfNotNull(runnerContext, Constants.SONAR_HOST_URL, server.getUrl());
-                        addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_URL, server.getJDBCUrl());
-                        addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_USERNAME, server.getJDBCUsername());
-                        addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_PASSWORD, server.getJDBCPassword());
-                        break;
+                    if (project != null) {
+                        final SQSInfo server = mySqsManager.findServer(recurse(project), serverId);
+                        if (server != null) {
+                            addIfNotNull(runnerContext, Constants.SONAR_HOST_URL, server.getUrl());
+                            addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_URL, server.getJDBCUrl());
+                            addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_USERNAME, server.getJDBCUsername());
+                            addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_PASSWORD, server.getJDBCPassword());
+                            break;
+                        }
                     }
                 }
             }
