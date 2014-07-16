@@ -24,3 +24,18 @@
  =====
 
  Apache Lisence 2.0
+
+ 5. Key features
+ =====
+
+ a. Build step to run SonarQube Runner analysis
+
+ The most used properties could be configured from the TeamCity UI in a comfortable way. Maven test results and JaCoCo code coverage results will be sent to the SonarQube Server automatically.
+
+ b. Configuring SonarQube Server locations to send information from the SonarQube Runner to
+
+ Any number of SonarQube Server connections could be defined for a project. A connection could be used in any Build Configuration under the project including those from subprojects.
+
+ c. Build Breaker plugin integration
+
+ TeamCity will add build problems according to the results of the Build Breaker. TeamCity will look for the Build Breaker messages in the build log and parse them to produce TeamCity Build Problems.
