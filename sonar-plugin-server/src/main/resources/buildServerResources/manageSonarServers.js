@@ -27,6 +27,10 @@ SonarPlugin = {
             return $('serverInfoDialog');
         },
 
+        formElement: function () {
+            return $('serverInfoForm');
+        },
+
         showDialog: function (action, id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
             $j("input[id='SQSaction']").val(action);
             this.cleanFields(id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId);
