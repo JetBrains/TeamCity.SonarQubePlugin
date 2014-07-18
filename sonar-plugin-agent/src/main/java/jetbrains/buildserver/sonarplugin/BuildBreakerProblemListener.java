@@ -37,7 +37,7 @@ public class BuildBreakerProblemListener extends AgentLifeCycleAdapter {
     }
 
     @Override
-    public void buildFinished(final @NotNull AgentRunningBuild build, final @NotNull BuildFinishedStatus buildStatus) {
+    public void beforeBuildFinish(final @NotNull AgentRunningBuild build, final @NotNull BuildFinishedStatus buildStatus) {
         myBuildLogger = null;
     }
 

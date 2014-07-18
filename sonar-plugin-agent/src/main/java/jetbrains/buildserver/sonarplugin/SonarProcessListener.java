@@ -47,7 +47,7 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
     }
 
     @Override
-    public void buildFinished(@NotNull AgentRunningBuild build, @NotNull BuildFinishedStatus buildStatus) {
+    public void beforeBuildFinish(@NotNull AgentRunningBuild build, @NotNull BuildFinishedStatus buildStatus) {
         myCollectedReports.clear();
     }
 
