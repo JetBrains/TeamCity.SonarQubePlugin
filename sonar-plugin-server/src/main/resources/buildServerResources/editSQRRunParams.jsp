@@ -34,7 +34,11 @@
             };
 
             chooser.change(onSqsChooserChange);
-            chooser.val(sonarServer.val());
+            if (sonarServer.val()) {
+                chooser.val(sonarServer.val());
+            } else {
+                sonarServer.val(chooser.val());
+            }
         })();
     </script>
 

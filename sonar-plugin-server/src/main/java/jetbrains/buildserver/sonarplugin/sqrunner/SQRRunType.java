@@ -91,6 +91,6 @@ public class SQRRunType extends RunType {
     @NotNull
     @Override
     public String describeParameters(@NotNull Map<String, String> parameters) {
-        return "hi";
+        return "";
     }
 }
