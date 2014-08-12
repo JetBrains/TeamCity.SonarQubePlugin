@@ -11,6 +11,17 @@
   <properties>
       <maven.build.timestamp.format>yyyyddMMHHmmss</maven.build.timestamp.format>
   </properties>
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <sonar.plugin.version>snapshot-${maven.build.timestamp}</sonar.plugin.version>
+      </properties>
+    </profile>
+  </profiles>
   <dependencies>
       <dependency>
            <groupId>jetbrains.buildServer.sonarplugin</groupId>
@@ -48,7 +59,15 @@
                 <replacements>
                     <replacement>
                         <token>@Version@</token>
-                        <value>snapshot-${maven.build.timestamp}</value>
+                        <value>${sonar.plugin.version}</value>
+                    </replacement>
+                    <replacement>
+                        <token>@VendorName@</token>
+                        <value>${sonar.plugin.vendor}</value>
+                    </replacement>
+                    <replacement>
+                        <token>@VendorURL@</token>
+                        <value>${sonar.plugin.vendorUrl}</value>
                     </replacement>
                 </replacements>                        
             </configuration>

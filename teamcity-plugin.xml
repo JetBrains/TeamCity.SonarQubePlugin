@@ -4,13 +4,10 @@
     <name>sonar-plugin</name>
     <display-name>Sonar runner</display-name>
     <version>@Version@</version>
-    <description>Plugin description</description>
-    <download-url>Plugin download URL</download-url>
-    <email>Plugin author e-mail</email>
+    <description>Allows confguring and running SonarQube analysis in the TeamCity server</description>
     <vendor>
-      <name>Plugin vendor name</name>
-      <url>Plugin vendor URL</url>
-      <logo>Plugin vendor logo URL</logo>
+      <name>@VendorName@</name>
+      <url>@VendorURL@</url>
     </vendor>
   </info>
   <deployment use-separate-classloader="true" />
