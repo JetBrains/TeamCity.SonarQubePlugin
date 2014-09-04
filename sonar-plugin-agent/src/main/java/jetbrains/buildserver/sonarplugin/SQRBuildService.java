@@ -85,6 +85,8 @@ public class SQRBuildService extends CommandLineBuildService {
         addSQRArg(res, "-Dsonar.tests", accessor.getProjectTests());
         addSQRArg(res, "-Dsonar.binaries", accessor.getProjectBinaries());
         addSQRArg(res, "-Dsonar.modules", accessor.getProjectModules());
+        addSQRArg(res, "-Dsonar.password", accessor.getPassword());
+        addSQRArg(res, "-Dsonar.login", accessor.getLogin());
         final String additionalParameters = accessor.getAdditionalParameters();
         if (additionalParameters != null) {
             res.addAll(Arrays.asList(additionalParameters.split("\\n")));

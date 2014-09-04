@@ -27,6 +27,8 @@ public final class Constants {
     public static final String SONAR_SERVER_JDBC_URL = "sonar.jdbc.url";
     public static final String SONAR_SERVER_JDBC_USERNAME = "sonar.jdbc.username";
     public static final String SONAR_SERVER_JDBC_PASSWORD = "sonar.jdbc.password";
+    public static final String SONAR_LOGIN = "sonarLogin";
+    public static final String SONAR_PASSWORD = "sonarPassword";
     public static final String SONAR_PROJECT_MODULES = "sonarProjectModules";
     public static final String SONAR_PROJECT_SOURCES = "sonarProjectSources";
     public static final String SONAR_PROJECT_TESTS = "sonarProjectTests";

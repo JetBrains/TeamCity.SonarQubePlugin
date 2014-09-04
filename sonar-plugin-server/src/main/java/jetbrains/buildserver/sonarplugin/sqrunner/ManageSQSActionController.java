@@ -26,6 +26,8 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     public static final String SERVERINFO_ID = "serverinfo.id";
     public static final String SERVERINFO_NAME = "serverinfo.name";
     public static final String SONAR_URL = "sonar.host.url";
+    public static final String SONAR_LOGIN = "sonar.login";
+    public static final String SONAR_PASSWORD = "sonar.password";
     public static final String SONAR_JDBC_URL = "sonar.jdbc.url";
     public static final String SONAR_JDBC_USERNAME = "sonar.jdbc.username";
     public static final String SONAR_JDBC_PASSWORD = "sonar.jdbc.password";
@@ -96,6 +98,8 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                 final SQSInfo info = SQSInfoFactory.createServerInfo(getServerInfoId(request),
                         request.getParameter(SERVERINFO_NAME),
                         request.getParameter(SONAR_URL),
+                        request.getParameter(SONAR_LOGIN),
+                        request.getParameter(SONAR_PASSWORD),
                         request.getParameter(SONAR_JDBC_URL),
                         request.getParameter(SONAR_JDBC_USERNAME),
                         request.getParameter(SONAR_JDBC_PASSWORD));
@@ -135,6 +139,8 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
             final SQSInfo serverInfo = SQSInfoFactory.createServerInfo(null,
                     request.getParameter(SERVERINFO_NAME),
                     request.getParameter(SONAR_URL),
+                    request.getParameter(SONAR_LOGIN),
+                    request.getParameter(SONAR_PASSWORD),
                     request.getParameter(SONAR_JDBC_URL),
                     request.getParameter(SONAR_JDBC_USERNAME),
                     request.getParameter(SONAR_JDBC_PASSWORD));

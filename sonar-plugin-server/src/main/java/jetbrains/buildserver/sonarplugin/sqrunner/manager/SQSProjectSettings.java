@@ -66,7 +66,7 @@ public class SQSProjectSettings implements ProjectSettings {
         if (info instanceof XMLBasedSQSInfo) {
             return (XMLBasedSQSInfo) info;
         } else {
-            return new XMLBasedSQSInfo(info.getId(), info.getName(), info.getUrl(), info.getJDBCUrl(), info.getJDBCUsername(), info.getJDBCPassword());
+            return new XMLBasedSQSInfo(info.getId(), info.getName(), info.getUrl(), info.getLogin(), info.getPassword(), info.getJDBCUrl(), info.getJDBCUsername(), info.getJDBCPassword());
         }
     }
 

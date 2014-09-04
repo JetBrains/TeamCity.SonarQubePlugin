@@ -16,6 +16,8 @@ class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
     public static final String JDBC_USERNAME = "jdbcUsername";
     public static final String JDBC_PASSWORD = "jdbcPassword";
     public static final String URL = "url";
+    public static final String LOGIN = "login";
+    public static final String PASSWORD = "password";
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
 
@@ -24,6 +26,8 @@ class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
     private String myName;
     private String myDescription;
     private String myUrl;
+    private String myLogin;
+    private String myPassword;
     private String myJdbcUrl;
     private String myJdbcUsername;
     private String myJdbcPassword;
@@ -34,12 +38,16 @@ class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
     public XMLBasedSQSInfo(final @NotNull String id,
                            String name,
                            String url,
+                           String login,
+                           String password,
                            String jdbcUrl,
                            String jdbcUsername,
                            String jdbcPassword) {
         myId = id;
         myName = name;
         myUrl = url;
+        myLogin = login;
+        myPassword = password;
         myJdbcUrl = jdbcUrl;
         myJdbcUsername = jdbcUsername;
         myJdbcPassword = jdbcPassword;
@@ -48,6 +56,16 @@ class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
     @Nullable
     public String getUrl() {
         return myUrl;
+    }
+
+    @Nullable
+    public String getLogin() {
+        return myLogin;
+    }
+
+    @Nullable
+    public String getPassword() {
+        return myPassword;
     }
 
     @Nullable
@@ -85,6 +103,8 @@ class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
         myName = element.getAttributeValue(NAME);
         myDescription = element.getAttributeValue(DESCRIPTION);
         myUrl = element.getAttributeValue(URL);
+        myLogin = element.getAttributeValue(LOGIN);
+        myPassword = element.getAttributeValue(PASSWORD);
         myJdbcUrl = element.getAttributeValue(JDBC_URL);
         myJdbcUsername = element.getAttributeValue(JDBC_USERNAME);
         myJdbcPassword = element.getAttributeValue(JDBC_PASSWORD);
@@ -95,6 +115,8 @@ class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
         addAttribute(serverElement, NAME, myName);
         addAttribute(serverElement, DESCRIPTION, myDescription);
         addAttribute(serverElement, URL, myUrl);
+        addAttribute(serverElement, LOGIN, myLogin);
+        addAttribute(serverElement, PASSWORD, myPassword);
         addAttribute(serverElement, JDBC_URL, myJdbcUrl);
         addAttribute(serverElement, JDBC_USERNAME, myJdbcUsername);
         addAttribute(serverElement, JDBC_PASSWORD, myJdbcPassword);

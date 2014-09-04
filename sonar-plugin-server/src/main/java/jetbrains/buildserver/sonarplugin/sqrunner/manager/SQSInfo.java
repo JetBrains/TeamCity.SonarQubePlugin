@@ -12,6 +12,12 @@ public interface SQSInfo {
     @Nullable
     String getUrl();
 
+     @Nullable
+    String getLogin();
+
+     @Nullable
+    String getPassword();
+
     @Nullable
     String getJDBCUrl();
 

@@ -32,7 +32,18 @@
                                             </admin:editProjectLink>
                                         </c:if>
                                     </td>
-                                    <td class="url"><c:out value="${server.url}"/></td>
+                                    <td class="url">
+                                        <div class="url"><c:out value="${server.url}"/></div>
+                                        <c:choose>
+                                            <c:when test="${not empty server.login}">
+                                                <div class="login">Username: <c:out value="${server.login}"/></div>
+                                                <div class="password">Password: <c:out value="${server.password}"/></div>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <div class="authentication grayNote">Anonymous</div>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
                                     <td class="db">
                                         <c:choose>
                                             <c:when test="${not empty server.JDBCUrl}"><div class="url"><c:out value="${server.JDBCUrl}"/></div></c:when>
@@ -53,9 +64,9 @@
                                     </td>
                                     <td class="edit">
                                         <a id="editServer" href="#"
-                                           onclick="SonarPlugin.editServer('${server.id}', '${server.name}', '${server.url}',
-                                                   '${server.JDBCUrl}', '${server.JDBCUsername}', '${server.JDBCPassword}',
-                                                   '${projectServersEntry.key.externalId}'); return false">edit</a>
+                                           onclick="SonarPlugin.editServer({id: '${server.id}', name: '${server.name}', url: '${server.url}', login: '${server.login}',
+                                                   password: '${server.password}', JDBCUrl: '${server.JDBCUrl}', JDBCUsername: '${server.JDBCUsername}',
+                                                   JDBCPassword: '${server.JDBCPassword}', projectId: '${projectServersEntry.key.externalId}'}); return false">edit</a>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -91,6 +102,21 @@
                     <th>URL<l:star/></th>
                     <td>
                         <div><input type="text" id="sonar.host.url" name="sonar.host.url"/></div>
+                    </td>
+                </tr>
+                <tr class="groupingTitle">
+                    <td colspan="2">Authentication</td>
+                </tr>
+                <tr>
+                    <th>Login</th>
+                    <td>
+                        <div><input type="text" id="sonar.login" name="sonar.login"/></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Password</th>
+                    <td>
+                        <div><input type="text" id="sonar.password" name="sonar.password"/></div>
                     </td>
                 </tr>
                 <tr class="groupingTitle">

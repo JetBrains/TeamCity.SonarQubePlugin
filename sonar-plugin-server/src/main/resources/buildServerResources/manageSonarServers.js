@@ -15,12 +15,12 @@ SonarPlugin = {
             }
         });
     },
-    editServer: function(id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
-        SonarPlugin.ServerConnectionDialog.showDialog('editSqs', id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId);
+    editServer: function(data) {
+        SonarPlugin.ServerConnectionDialog.showDialog('editSqs', data);
         $j(".runnerFormTable input[id='serverinfo.id']").prop("disabled", true);
     },
     addServer: function(projectId) {
-        SonarPlugin.ServerConnectionDialog.showDialog('addSqs', '', '', '', '', '', '', projectId);
+        SonarPlugin.ServerConnectionDialog.showDialog('addSqs', {id: '', name: '', url: '', login: '', password: '', JDBCUsername: '', JDBCPassword: '', projectId: projectId});
     },
     ServerConnectionDialog: OO.extend(BS.AbstractWebForm, OO.extend(BS.AbstractModalDialog, {
         getContainer: function () {
@@ -31,21 +31,23 @@ SonarPlugin = {
             return $('serverInfoForm');
         },
 
-        showDialog: function (action, id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
+        showDialog: function (action, data) {
             $j("input[id='SQSaction']").val(action);
-            this.cleanFields(id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId);
+            this.cleanFields(data);
             this.cleanErrors();
             this.showCentered();
         },
 
-        cleanFields: function (id, name, url, JDBCUrl, JDBCUsername, JDBCPassword, projectId) {
-            $j("input[id='serverinfo.id']").val(id);
-            $j(".runnerFormTable input[id='serverinfo.name']").val(name);
-            $j(".runnerFormTable input[id='sonar.host.url']").val(url);
-            $j(".runnerFormTable input[id='sonar.jdbc.url']").val(JDBCUrl);
-            $j(".runnerFormTable input[id='sonar.jdbc.username']").val(JDBCUsername);
-            $j(".runnerFormTable input[id='sonar.jdbc.password']").val(JDBCPassword);
-            $j("#serverInfoForm input[id='projectId']").val(projectId);
+        cleanFields: function (data) {
+            $j("input[id='serverinfo.id']").val(data.id);
+            $j(".runnerFormTable input[id='serverinfo.name']").val(data.name);
+            $j(".runnerFormTable input[id='sonar.host.url']").val(data.url);
+            $j(".runnerFormTable input[id='sonar.login']").val(data.login);
+            $j(".runnerFormTable input[id='sonar.password']").val(data.password);
+            $j(".runnerFormTable input[id='sonar.jdbc.url']").val(data.JDBCUrl);
+            $j(".runnerFormTable input[id='sonar.jdbc.username']").val(data.JDBCUsername);
+            $j(".runnerFormTable input[id='sonar.jdbc.password']").val(data.JDBCPassword);
+            $j("#serverInfoForm input[id='projectId']").val(data.projectId);
 
             this.cleanErrors();
         },

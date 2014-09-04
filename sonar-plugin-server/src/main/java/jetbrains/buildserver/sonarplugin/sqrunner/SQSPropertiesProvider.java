@@ -35,6 +35,8 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
                         final SQSInfo server = mySqsManager.findServer(recurse(project), serverId);
                         if (server != null) {
                             addIfNotNull(runnerContext, Constants.SONAR_HOST_URL, server.getUrl());
+                            addIfNotNull(runnerContext, Constants.SONAR_LOGIN, server.getLogin());
+                            addIfNotNull(runnerContext, Constants.SONAR_PASSWORD, server.getPassword());
                             addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_URL, server.getJDBCUrl());
                             addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_USERNAME, server.getJDBCUsername());
                             addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_PASSWORD, server.getJDBCPassword());

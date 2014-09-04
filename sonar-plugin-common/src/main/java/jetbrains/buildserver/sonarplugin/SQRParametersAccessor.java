@@ -69,4 +69,12 @@ public class SQRParametersAccessor {
     public String getAdditionalParameters() {
         return myParameters.get(Constants.SONAR_ADDITIONAL_PARAMETERS);
     }
+
+    public String getLogin() {
+        return myParameters.get(Constants.SONAR_LOGIN);
+    }
+
+    public String getPassword() {
+        return myParameters.get(Constants.SONAR_PASSWORD);
+    }
 }
