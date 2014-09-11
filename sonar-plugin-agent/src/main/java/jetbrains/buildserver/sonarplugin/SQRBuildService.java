@@ -40,8 +40,8 @@ public class SQRBuildService extends CommandLineBuildService {
         builder.setJavaHome(getRunnerContext().getRunnerParameters().get(JavaRunnerConstants.TARGET_JDK_HOME));
         builder.setWorkingDir(getBuild().getCheckoutDirectory().getAbsolutePath());
 
-        builder.setSystemProperties(Collections.<String, String>emptyMap());
-        builder.setEnvVariables(Collections.<String, String>emptyMap());
+        builder.setEnvVariables(getRunnerContext().getBuildParameters().getEnvironmentVariables());
+        builder.setSystemProperties(getRunnerContext().getBuildParameters().getSystemProperties());
 
         builder.setJvmArgs(JavaRunnerUtil.extractJvmArgs(getRunnerContext().getRunnerParameters()));
         builder.setClassPath(getClasspath());
