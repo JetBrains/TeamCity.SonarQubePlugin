@@ -44,41 +44,56 @@
 
     <tr>
         <th class="noBorder"><label for="sonarProjectName">Project name: </label></th>
-        <td><props:textProperty name="sonarProjectName" className="longField"/>
+        <td>
+            <props:textProperty name="sonarProjectName" className="longField"/>
+            <span class="smallNote">Project name to show at the SonarQube Server.</span>
         </td>
     </tr>
     <tr>
         <th class="noBorder"><label for="sonarProjectKey">Project key: </label></th>
-        <td><props:textProperty name="sonarProjectKey" className="longField"/>
+        <td>
+            <props:textProperty name="sonarProjectKey" className="longField"/>
+            <span class="smallNote">Project key used at SonarQube Server to store data.</span>
         </td>
     </tr>
     <tr>
         <th class="noBorder"><label for="sonarProjectVersion">Project version: </label></th>
-        <td><props:textProperty name="sonarProjectVersion" className="longField"/></td>
+        <td>
+            <props:textProperty name="sonarProjectVersion" className="longField"/>
+            <span class="smallNote">Project version.</span>
+        </td>
     </tr>
 
     <tr>
         <th class="noBorder"><label for="sonarProjectSources">Sources location: </label></th>
-        <td><props:textProperty name="sonarProjectSources" className="longField"/>
+        <td>
+            <props:textProperty name="sonarProjectSources" className="longField"/>
             <bs:vcsTree fieldId="sonarProjectSources"/>
+            <span class="smallNote">Path to directory containing sources root.</span>
         </td>
     </tr>
     <tr class="advancedSetting">
         <th class="noBorder"><label for="sonarProjectTests">Tests location: </label></th>
-        <td><props:textProperty name="sonarProjectTests" className="longField"/>
-        <bs:vcsTree fieldId="sonarProjectTests"/>
+        <td>
+            <props:textProperty name="sonarProjectTests" className="longField"/>
+            <bs:vcsTree fieldId="sonarProjectTests"/>
+            <span class="smallNote">Path to directory containing tests root.</span>
         </td>
     </tr>
     <tr class="advancedSetting">
         <th class="noBorder"><label for="sonarProjectBinaries">Binaries location: </label></th>
-        <td><props:textProperty name="sonarProjectBinaries" className="longField"/>
-        <bs:vcsTree fieldId="sonarProjectBinaries"/>
+        <td>
+            <props:textProperty name="sonarProjectBinaries" className="longField"/>
+            <bs:vcsTree fieldId="sonarProjectBinaries"/>
+            <span class="smallNote">Path to directory containing binaries.</span>
         </td>
     </tr>
     <tr class="advancedSetting">
         <th class="noBorder"><label for="sonarProjectModules">Modules: </label></th>
-        <td><props:textProperty name="sonarProjectModules" className="longField"/>
+        <td>
+            <props:textProperty name="sonarProjectModules" className="longField"/>
             <bs:vcsTree fieldId="sonarProjectModules"/>
+            <span class="smallNote">Comma-separated list of modules in the project. Leave blank if project doesn't have module structure. </span>
         </td>
     </tr>
 </l:settingsGroup>
