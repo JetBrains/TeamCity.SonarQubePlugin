@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -30,8 +29,15 @@ public final class Util {
         }
     }
 
-    static boolean isSonarRunner(final @NotNull String runType) {
+    public static boolean isSonarRunner(final @NotNull String runType) {
         return Constants.RUNNER_TYPE.equals(runType);
     }
 
+    /**
+     * @param str String to check
+     * @return true if str is null or empty (zero length or spaces only)
+     */
+    public static boolean isEmpty(final @Nullable String str) {
+        return str == null || str.trim().isEmpty();
+    }
 }

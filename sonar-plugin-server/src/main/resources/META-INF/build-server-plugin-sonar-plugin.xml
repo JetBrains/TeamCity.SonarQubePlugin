@@ -8,4 +8,5 @@
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerImpl"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.EditSQRRunType"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQSPropertiesProvider"/>
+    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQRPasswordProvider"/>
 </beans>

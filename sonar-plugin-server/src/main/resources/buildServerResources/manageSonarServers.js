@@ -3,7 +3,13 @@
  */
 
 SonarPlugin = {
+    encryptPassword: function(pass) {
+        return BS.Encrypt.encryptData(pass, $j('#publicKey').val());
+    },
     removeServer: function(projectId, serverId) {
+        if (!confirm("The profile will be permanently deleted. Proceed?")) {
+            return;
+        }
         BS.ajaxRequest(window['base_uri'] + '/admin/manageSonarServers.html', {
             parameters: Object.toQueryString({
                 action: 'removeSqs',
@@ -44,9 +50,11 @@ SonarPlugin = {
             $j(".runnerFormTable input[id='sonar.host.url']").val(data.url);
             $j(".runnerFormTable input[id='sonar.login']").val(data.login);
             $j(".runnerFormTable input[id='sonar.password']").val(data.password);
+            $j(".runnerFormTable input[id='sonar.password_field']").val(data.password ? "*****" : "");
             $j(".runnerFormTable input[id='sonar.jdbc.url']").val(data.JDBCUrl);
             $j(".runnerFormTable input[id='sonar.jdbc.username']").val(data.JDBCUsername);
             $j(".runnerFormTable input[id='sonar.jdbc.password']").val(data.JDBCPassword);
+            $j(".runnerFormTable input[id='sonar.jdbc.password_field']").val(data.JDBCPassword ? "*****" : "" );
             $j("#serverInfoForm input[id='projectId']").val(data.projectId);
 
             this.cleanErrors();
@@ -90,7 +98,31 @@ SonarPlugin = {
                 return false;
             }
 
-            var parameters = this.serializeParameters();
+            var parameters = {
+                "serverinfo.name": $j(".runnerFormTable input[id='serverinfo.name']").val(),
+                "sonar.host.url" : $j(".runnerFormTable input[id='sonar.host.url']").val(),
+                "sonar.login": $j(".runnerFormTable input[id='sonar.login']").val(),
+                "sonar.jdbc.url": $j(".runnerFormTable input[id='sonar.jdbc.url']").val(),
+                "sonar.jdbc.username": $j(".runnerFormTable input[id='sonar.jdbc.username']").val(),
+                "projectId": $j("#serverInfoForm #projectId").val(),
+                action: $j("#serverInfoForm #SQSaction").val(),
+                "serverinfo.id": $j("#serverInfoForm input[id='serverinfo.id']").val(),
+                "publicKey" : $j("#serverInfoForm #publicKey").val()
+            };
+
+            var $field = $j(".runnerFormTable input[id='sonar.jdbc.password_field']");
+            if ($field.attr("data-modified") == "modified") {
+                parameters["sonar.jdbc.password"] = SonarPlugin.encryptPassword($field.val());
+            } else {
+                parameters["sonar.jdbc.password_preserve"] = "true";
+            }
+            $field = $j(".runnerFormTable input[id='sonar.password_field']");
+            if ($field.attr("data-modified") == "modified") {
+                parameters["sonar.password"] = SonarPlugin.encryptPassword($field.val());
+            } else {
+                parameters["sonar.password_preserve"] = "true";
+            }
+
             var dialog = this;
 
             BS.ajaxRequest(window['base_uri'] + '/admin/manageSonarServers.html', {
@@ -105,6 +137,12 @@ SonarPlugin = {
                             if (error != null) {
                                 shouldClose = false;
                                 alert(error);
+                            }
+                            if (responseTag.getAttribute("status") == "OK") {
+                                shouldClose = true;
+                            } else if (responseTag.firstChild == null) {
+                                shouldClose = false;
+                                alert("Error: empty response");
                             }
                         }
                     }

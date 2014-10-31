@@ -1,6 +1,5 @@
 package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -10,10 +9,10 @@ import java.util.UUID;
  */
 public class SQSInfoFactory {
     public static SQSInfo createServerInfo(final @Nullable String id,
-                                           final @NotNull String name,
-                                           final @NotNull String url,
-                                           final @NotNull String login,
-                                           final @NotNull String password,
+                                           final @Nullable String name,
+                                           final @Nullable String url,
+                                           final @Nullable String login,
+                                           final @Nullable String password,
                                            final @Nullable String dbUrl,
                                            final @Nullable String dbUsername,
                                            final @Nullable String dbPassword) {

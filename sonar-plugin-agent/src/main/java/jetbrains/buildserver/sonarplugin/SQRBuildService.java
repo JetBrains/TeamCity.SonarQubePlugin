@@ -73,7 +73,9 @@ public class SQRBuildService extends CommandLineBuildService {
     private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters,
                                         @NotNull final Map<String, String> sharedConfigParameters) {
         final List<String> res = new LinkedList<String>();
-        SQRParametersAccessor accessor = new SQRParametersAccessor(runnerParameters);
+        final Map<String, String> allParameters = new HashMap<String, String>(runnerParameters);
+        allParameters.putAll(sharedConfigParameters);
+        final SQRParametersAccessor accessor = new SQRParametersAccessor(allParameters);
         addSQRArg(res, "-Dsonar.host.url", accessor.getHostUrl());
         addSQRArg(res, "-Dsonar.jdbc.url", accessor.getJDBCUrl());
         addSQRArg(res, "-Dsonar.jdbc.username", accessor.getJDBCUsername());
@@ -139,7 +141,7 @@ public class SQRBuildService extends CommandLineBuildService {
      * @param value Argument value
      */
     protected static void addSQRArg(@NotNull final List<String> argList, @NotNull final String key, @Nullable final String value) {
-        if (value != null) {
+        if (!Util.isEmpty(value)) {
             argList.add(key + "=" + value);
         }
     }

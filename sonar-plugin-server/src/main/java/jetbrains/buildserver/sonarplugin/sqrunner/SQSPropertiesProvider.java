@@ -2,6 +2,7 @@ package jetbrains.buildserver.sonarplugin.sqrunner;
 
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildserver.sonarplugin.Constants;
+import jetbrains.buildserver.sonarplugin.Util;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
@@ -36,10 +37,14 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
                         if (server != null) {
                             addIfNotNull(runnerContext, Constants.SONAR_HOST_URL, server.getUrl());
                             addIfNotNull(runnerContext, Constants.SONAR_LOGIN, server.getLogin());
-                            addIfNotNull(runnerContext, Constants.SONAR_PASSWORD, server.getPassword());
                             addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_URL, server.getJDBCUrl());
                             addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_USERNAME, server.getJDBCUsername());
-                            addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_PASSWORD, server.getJDBCPassword());
+                            if (!Util.isEmpty(context.getSharedParameters().get(Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_PASSWORD))) {
+                                runnerContext.addRunnerParameter(Constants.SONAR_PASSWORD, "%" + Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_PASSWORD + "%");
+                            }
+                            if (!Util.isEmpty(context.getSharedParameters().get(Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_SERVER_JDBC_PASSWORD))) {
+                                runnerContext.addRunnerParameter(Constants.SONAR_SERVER_JDBC_PASSWORD, "%" + Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_SERVER_JDBC_PASSWORD + "%");
+                            }
                             break;
                         }
                     }
@@ -51,7 +56,7 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
     private static void addIfNotNull(final @NotNull SRunnerContext runnerContext,
                                      final @NotNull String key,
                                      final @Nullable String value) {
-        if (value != null && !value.trim().isEmpty()) {
+        if (!Util.isEmpty(value)) {
             runnerContext.addRunnerParameter(key, value);
         }
     }

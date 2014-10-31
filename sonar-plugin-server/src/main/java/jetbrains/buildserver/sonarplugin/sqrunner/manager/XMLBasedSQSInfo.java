@@ -1,6 +1,8 @@
 package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
 import jetbrains.buildServer.XmlStorable;
+import jetbrains.buildServer.controllers.BasePropertiesBean;
+import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * SQSInfo based on XML definition
  */
-class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
+class XMLBasedSQSInfo extends BasePropertiesBean implements SQSInfo, XmlStorable {
     public static final String ID = "id";
     public static final String JDBC_URL = "jdbcUrl";
     public static final String JDBC_USERNAME = "jdbcUsername";
@@ -20,111 +22,117 @@ class XMLBasedSQSInfo implements SQSInfo, XmlStorable {
     public static final String PASSWORD = "password";
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
+    private static final String[] OPEN_FIELDS = new String[] {ID, JDBC_URL, JDBC_USERNAME, URL, LOGIN, NAME, DESCRIPTION};
+    private static final String[] ENCRYPTED_FIELDS = new String[] {JDBC_PASSWORD, PASSWORD};
 
-    @NotNull
-    private String myId;
-    private String myName;
-    private String myDescription;
-    private String myUrl;
-    private String myLogin;
-    private String myPassword;
-    private String myJdbcUrl;
-    private String myJdbcUsername;
-    private String myJdbcPassword;
-
-    public XMLBasedSQSInfo() {
+    XMLBasedSQSInfo() {
+        super(null);
     }
 
     public XMLBasedSQSInfo(final @NotNull String id,
-                           String name,
-                           String url,
-                           String login,
-                           String password,
-                           String jdbcUrl,
-                           String jdbcUsername,
-                           String jdbcPassword) {
-        myId = id;
-        myName = name;
-        myUrl = url;
-        myLogin = login;
-        myPassword = password;
-        myJdbcUrl = jdbcUrl;
-        myJdbcUsername = jdbcUsername;
-        myJdbcPassword = jdbcPassword;
+                           final @Nullable String name,
+                           final @Nullable String url,
+                           final @Nullable String login,
+                           final @Nullable String password,
+                           final @Nullable String jdbcUrl,
+                           final @Nullable String jdbcUsername,
+                           final @Nullable String jdbcPassword) {
+        super(null);
+        setProperty(ID, id);
+        setProperty(NAME, name);
+        setProperty(URL, url);
+        setProperty(LOGIN, login);
+        setProperty(PASSWORD, password);
+        setProperty(JDBC_PASSWORD, jdbcPassword);
+        setProperty(JDBC_URL, jdbcUrl);
+        setProperty(JDBC_USERNAME, jdbcUsername);
+    }
+
+    private String get(final String key) {
+        return getProperties().get(key);
     }
 
     @Nullable
     public String getUrl() {
-        return myUrl;
+        return get(URL);
     }
 
     @Nullable
     public String getLogin() {
-        return myLogin;
+        return get(LOGIN);
     }
 
     @Nullable
     public String getPassword() {
-        return myPassword;
+        return get(PASSWORD);
     }
 
     @Nullable
     public String getJDBCUrl() {
-        return myJdbcUrl;
+        return get(JDBC_URL);
     }
 
     @Nullable
     public String getJDBCUsername() {
-        return myJdbcUsername;
+        return get(JDBC_USERNAME);
     }
 
     @Nullable
     public String getJDBCPassword() {
-        return myJdbcPassword;
+        return get(JDBC_PASSWORD);
     }
 
     @NotNull
     public String getId() {
-        return myId;
+        return get(ID);
     }
 
     @Nullable
     public String getName() {
-        return myName;
+        return get(NAME);
     }
 
     @Nullable
     public String getDescription() {
-        return myDescription;
+        return get(DESCRIPTION);
     }
 
-    public void readFrom(Element element) {
-        myId = element.getAttributeValue(ID);
-        myName = element.getAttributeValue(NAME);
-        myDescription = element.getAttributeValue(DESCRIPTION);
-        myUrl = element.getAttributeValue(URL);
-        myLogin = element.getAttributeValue(LOGIN);
-        myPassword = element.getAttributeValue(PASSWORD);
-        myJdbcUrl = element.getAttributeValue(JDBC_URL);
-        myJdbcUsername = element.getAttributeValue(JDBC_USERNAME);
-        myJdbcPassword = element.getAttributeValue(JDBC_PASSWORD);
+    public void readFrom(final Element element) {
+        for (final String key : OPEN_FIELDS) {
+            setProperty(key, element.getAttributeValue(key));
+        }
+        for (final String key : ENCRYPTED_FIELDS) {
+            final String value = element.getAttributeValue(key);
+            if (key != null) {
+                String unscrambled;
+                try {
+                    unscrambled = EncryptUtil.unscramble(value);
+                } catch (Exception ignored) {
+                    unscrambled = value;
+                }
+                setProperty(key, unscrambled);
+            }
+        }
     }
 
-    public void writeTo(Element serverElement) {
-        addAttribute(serverElement, ID, myId);
-        addAttribute(serverElement, NAME, myName);
-        addAttribute(serverElement, DESCRIPTION, myDescription);
-        addAttribute(serverElement, URL, myUrl);
-        addAttribute(serverElement, LOGIN, myLogin);
-        addAttribute(serverElement, PASSWORD, myPassword);
-        addAttribute(serverElement, JDBC_URL, myJdbcUrl);
-        addAttribute(serverElement, JDBC_USERNAME, myJdbcUsername);
-        addAttribute(serverElement, JDBC_PASSWORD, myJdbcPassword);
+    public void writeTo(final Element serverElement) {
+        for (final String key : OPEN_FIELDS) {
+            addAttribute(serverElement, key, get(key));
+        }
+        for (final String key : ENCRYPTED_FIELDS) {
+            addAttributeScrambled(serverElement, key, get(key));
+        }
     }
 
     private void addAttribute(Element serverElement, String key, String value) {
         if (value != null) {
             serverElement.setAttribute(key, value);
+        }
+    }
+
+    private void addAttributeScrambled(Element serverElement, String key, String value) {
+        if (value != null) {
+            serverElement.setAttribute(key, EncryptUtil.scramble(value));
         }
     }
 }

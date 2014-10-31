@@ -1,8 +1,20 @@
+<%@ page import="jetbrains.buildServer.serverSide.crypt.RSACipher" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ include file="/include-internal.jsp" %>
 <%--@elvariable id="availableServersMap" type="java.util.Map<jetbrains.buildServer.serverSide.SProject, java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
 <%--@elvariable id="projectId" type="java.lang.String"--%>
+
+<bs:linkScript>
+    <%-- Crypto stuff --%>
+    /js/crypt/md5.js
+    /js/crypt/rsa.js
+    /js/crypt/jsbn.js
+    /js/crypt/prng4.js
+    /js/crypt/rng.js
+    /js/bs/encrypt.js
+</bs:linkScript>
+
 <div class="manageSQS">
     <h2 class="noBorder">SonarQube Server profiles</h2>
     <div class="grayNote">Profiles to connect to SonarQube Servers</div>
@@ -37,7 +49,7 @@
                                         <c:choose>
                                             <c:when test="${not empty server.login}">
                                                 <div class="login">Username: <c:out value="${server.login}"/></div>
-                                                <div class="password">Password: <c:out value="${server.password}"/></div>
+                                                <div class="password">Password: *****</div>
                                             </c:when>
                                             <c:otherwise>
                                                 <div class="authentication grayNote">Anonymous</div>
@@ -54,19 +66,19 @@
                                             <c:otherwise><div class="defaultValue grayNote">Username: sonar</div></c:otherwise>
                                         </c:choose>
                                         <c:choose>
-                                            <c:when test="${not empty server.JDBCPassword}"><div class="dbPass">Password: <c:out value="${server.JDBCPassword}"/></div></c:when>
+                                            <c:when test="${not empty server.JDBCPassword}"><div class="dbPass">Password: *****</div></c:when>
                                             <c:otherwise><div class="defaultValue grayNote">Password: sonar</div></c:otherwise>
                                         </c:choose>
                                     </td>
                                     <td class="remove">
                                         <a id="removeNewServer" href="#"
-                                           onclick="SonarPlugin.removeServer('${projectServersEntry.key.externalId}', '${server.id}'); return false">remove</a>
+                                           onclick="SonarPlugin.removeServer('${projectServersEntry.key.externalId}', '${server.id}'); return false">remove...</a>
                                     </td>
                                     <td class="edit">
                                         <a id="editServer" href="#"
                                            onclick="SonarPlugin.editServer({id: '${server.id}', name: '${server.name}', url: '${server.url}', login: '${server.login}',
-                                                   password: '${server.password}', JDBCUrl: '${server.JDBCUrl}', JDBCUsername: '${server.JDBCUsername}',
-                                                   JDBCPassword: '${server.JDBCPassword}', projectId: '${projectServersEntry.key.externalId}'}); return false">edit</a>
+                                                   password: '${not empty server.login ? "*****" : ""}', JDBCUrl: '${server.JDBCUrl}', JDBCUsername: '${server.JDBCUsername}',
+                                                   JDBCPassword: '${not empty server.JDBCUsername ? "*****" : ""}', projectId: '${projectServersEntry.key.externalId}'}); return false">edit</a>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -81,6 +93,8 @@
             </c:choose>
         </div>
     </bs:refreshable>
+
+    <c:set var="publicKey" value="<%=RSACipher.getHexEncodedPublicKey()%>"/>
 
     <bs:dialog dialogId="serverInfoDialog"
                dialogClass="serverInfoDialog"
@@ -116,7 +130,10 @@
                 <tr>
                     <th>Password</th>
                     <td>
-                        <div><input type="text" id="sonar.password" name="sonar.password"/></div>
+                        <div>
+                            <input type="password" id="sonar.password_field" name="sonar.password_field"/>
+                            <input type="hidden" id="sonar.password" name="sonar.password"/>
+                        </div>
                     </td>
                 </tr>
                 <tr class="groupingTitle">
@@ -137,17 +154,35 @@
                 <tr>
                     <th>Password</th>
                     <td>
-                        <div><input type="text" id="sonar.jdbc.password" name="sonar.jdbc.password"/></div>
+                        <div>
+                            <input type="password" id="sonar.jdbc.password_field" name="sonar.jdbc.password_field"/>
+                            <input type="hidden" id="sonar.jdbc.password" name="sonar.jdbc.password"/>
+                        </div>
                     </td>
                 </tr>
             </table>
             <input type="hidden" id="serverinfo.id" name="serverinfo.id"/>
             <input type="hidden" name="action" id="SQSaction" value="addSqs"/>
             <input type="hidden" name="projectId" id="projectId" value="${projectId}"/>
+            <input type="hidden" name="publicKey" id="publicKey" value="${publicKey}"/>
             <div class="popupSaveButtonsBlock">
                 <forms:submit id="serverInfoDialogSubmit" label="Save"/>
                 <forms:cancel onclick="SonarPlugin.ServerConnectionDialog.close()"/>
             </div>
         </forms:multipartForm>
     </bs:dialog>
+    <script type="text/javascript">
+        $j(function() {
+            var $pf = $j(".runnerFormTable input[id='sonar.password_field']");
+            $pf.click(function() {
+                $pf.val("");
+                $pf.attr("data-modified",  "modified");
+            });
+            var $pjf = $j(".runnerFormTable input[id='sonar.jdbc.password_field']");
+            $pjf.click(function() {
+                $pjf.val("");
+                $pjf.attr("data-modified",  "modified");
+            });
+        });
+    </script>
 </div>

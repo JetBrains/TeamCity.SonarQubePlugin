@@ -1,8 +1,10 @@
 package jetbrains.buildserver.sonarplugin.sqrunner;
 
 import jetbrains.buildServer.controllers.BaseAjaxActionController;
+import jetbrains.buildServer.controllers.PublicKeyUtil;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SProject;
+import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
@@ -28,9 +30,11 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     public static final String SONAR_URL = "sonar.host.url";
     public static final String SONAR_LOGIN = "sonar.login";
     public static final String SONAR_PASSWORD = "sonar.password";
+    public static final String SONAR_PASSWORD_PRESERVE = "sonar.password_preserve";
     public static final String SONAR_JDBC_URL = "sonar.jdbc.url";
     public static final String SONAR_JDBC_USERNAME = "sonar.jdbc.username";
     public static final String SONAR_JDBC_PASSWORD = "sonar.jdbc.password";
+    public static final String SONAR_JDBC_PASSWORD_PRESERVE = "sonar.jdbc.password_preserve";
 
     public static final String ADD_SQS_ACTION = "addSqs";
     public static final String REMOVE_SQS_ACTION = "removeSqs";
@@ -92,24 +96,35 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                                 final @NotNull SProject project,
                                 final @NotNull Element ajaxResponse) {
         if (validate(request, ajaxResponse)) {
-            if (getServerInfoId(request) == null) {
+            final String serverInfoId = getServerInfoId(request);
+            if (serverInfoId == null) {
                 ajaxResponse.setAttribute("error", "ID is not set");
             } else {
-                final SQSInfo info = SQSInfoFactory.createServerInfo(getServerInfoId(request),
-                        request.getParameter(SERVERINFO_NAME),
-                        request.getParameter(SONAR_URL),
-                        request.getParameter(SONAR_LOGIN),
-                        request.getParameter(SONAR_PASSWORD),
-                        request.getParameter(SONAR_JDBC_URL),
-                        request.getParameter(SONAR_JDBC_USERNAME),
-                        request.getParameter(SONAR_JDBC_PASSWORD));
-                try {
-                    mySqsManager.editServer(project, getServerInfoId(request), info);
-                } catch (IOException e) {
-                    ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
+                final SQSInfo old = mySqsManager.findServer(SQSManager.ProjectAccessor.recurse(project), serverInfoId);
+                if (old != null) {
+                    final String pass = Boolean.parseBoolean(request.getParameter(SONAR_PASSWORD_PRESERVE)) ? old.getPassword() : decryptIfNeeded(request.getParameter(SONAR_PASSWORD));
+                    final String jdbcPass = Boolean.parseBoolean(request.getParameter(SONAR_JDBC_PASSWORD_PRESERVE)) ? old.getJDBCPassword() : decryptIfNeeded(request.getParameter(SONAR_JDBC_PASSWORD));
+                    final SQSInfo info = SQSInfoFactory.createServerInfo(serverInfoId,
+                            request.getParameter(SERVERINFO_NAME),
+                            request.getParameter(SONAR_URL),
+                            request.getParameter(SONAR_LOGIN),
+                            pass,
+                            request.getParameter(SONAR_JDBC_URL),
+                            request.getParameter(SONAR_JDBC_USERNAME),
+                            jdbcPass);
+                    try {
+                        mySqsManager.editServer(project, serverInfoId, info);
+                        ajaxResponse.setAttribute("status", "OK");
+                    } catch (IOException e) {
+                        ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
+                    }
                 }
             }
         }
+    }
+
+    private String decryptIfNeeded(final @Nullable String value) {
+        return value != null ? RSACipher.decryptWebRequestData(value) : null;
     }
 
     private void removeServerInfo(final @NotNull HttpServletRequest request,
@@ -122,7 +137,7 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
             try {
                 final boolean wasRemoved = mySqsManager.removeIfExists(project, serverinfoId);
                 if (wasRemoved) {
-                    ajaxResponse.setAttribute("serverRemoved", serverinfoId + " was removed");
+                    ajaxResponse.setAttribute("status", serverinfoId + " was removed");
                 } else {
                     ajaxResponse.setAttribute("error", serverinfoId + " wasn't removed");
                 }
@@ -146,6 +161,7 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                     request.getParameter(SONAR_JDBC_PASSWORD));
             try {
                 mySqsManager.addServer(project, serverInfo);
+                ajaxResponse.setAttribute("status", "OK");
             } catch (SQSManager.ServerInfoExists e) {
                 ajaxResponse.setAttribute("error", "Server with such name already exists");
             } catch (IOException e) {
@@ -155,6 +171,10 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     }
 
     private boolean validate(HttpServletRequest request, Element ajaxResponse) {
+        if (request.getParameter("publicKey") != null && PublicKeyUtil.isPublicKeyExpired(request)) {
+            PublicKeyUtil.writePublicKeyExpiredError(ajaxResponse);
+            return false;
+        }
         if (request.getParameter(SERVERINFO_NAME) == null) {
             ajaxResponse.setAttribute("error", "Server name should be set");
             return false;
