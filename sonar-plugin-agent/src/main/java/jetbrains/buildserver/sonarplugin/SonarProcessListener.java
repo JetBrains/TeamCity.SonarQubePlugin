@@ -91,7 +91,10 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
     private class ImportDataMessageProcessor extends AbstractTextMessageProcessor {
         public void processServiceMessage(@NotNull ServiceMessage serviceMessage, @NotNull BuildMessage1 buildMessage1) {
             if ("importData".equals(serviceMessage.getMessageName())) {
-                final String path = serviceMessage.getAttributes().get("path");
+                String path = serviceMessage.getAttributes().get("path");
+                if (path == null) {
+                    path = serviceMessage.getAttributes().get("file");
+                }
                 if (path != null) {
                     final String dir;
                     final File file = new File(path);
