@@ -10,7 +10,6 @@
   <packaging>pom</packaging>
   <properties>
       <maven.build.timestamp.format>yyyyddMMHHmmss</maven.build.timestamp.format>
-      <sonar.plugin.version>snapshot-${maven.build.timestamp}</sonar.plugin.version>
   </properties>
   <dependencies>
       <dependency>
