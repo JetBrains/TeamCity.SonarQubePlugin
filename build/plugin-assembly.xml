@@ -27,9 +27,9 @@
            <unpack>false</unpack>
            <dependencySets>
                <dependencySet>
-                    <includes>
-                         <include>*</include>
-                    </includes>
+                    <excludes>
+                         <exclude>*</exclude>
+                    </excludes>
                </dependencySet>
            </dependencySets>
        </binaries>
