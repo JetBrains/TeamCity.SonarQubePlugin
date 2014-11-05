@@ -10,18 +10,8 @@
   <packaging>pom</packaging>
   <properties>
       <maven.build.timestamp.format>yyyyddMMHHmmss</maven.build.timestamp.format>
+      <sonar.plugin.version>snapshot-${maven.build.timestamp}</sonar.plugin.version>
   </properties>
-  <profiles>
-    <profile>
-      <id>default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <sonar.plugin.version>snapshot-${maven.build.timestamp}</sonar.plugin.version>
-      </properties>
-    </profile>
-  </profiles>
   <dependencies>
       <dependency>
            <groupId>jetbrains.buildServer.sonarplugin</groupId>
