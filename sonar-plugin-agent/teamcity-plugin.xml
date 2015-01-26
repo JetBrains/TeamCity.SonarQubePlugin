@@ -3,8 +3,8 @@
     <plugin-deployment use-separate-classloader="true">
         <layout>
             <executable-files>
-                <include name='bin/sonar-runner'/>
-                <include name='bin/sonar-runner.bat'/>
+                <include name='sonar-qube-runner/bin/sonar-runner'/>
+                <include name='sonar-qube-runner/bin/sonar-runner.bat'/>
             </executable-files>
         </layout>
     </plugin-deployment>
