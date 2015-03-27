@@ -45,7 +45,7 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
                             if (!Util.isEmpty(context.getSharedParameters().get(Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_SERVER_JDBC_PASSWORD))) {
                                 runnerContext.addRunnerParameter(Constants.SONAR_SERVER_JDBC_PASSWORD, "%" + Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_SERVER_JDBC_PASSWORD + "%");
                             }
-                            break;
+//                            break;
                         }
                     }
                 }
