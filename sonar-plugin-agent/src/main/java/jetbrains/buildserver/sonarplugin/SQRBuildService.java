@@ -21,6 +21,7 @@ import java.util.*;
  */
 public class SQRBuildService extends CommandLineBuildService {
     private static final String BUNDLED_SQR_RUNNER_PATH = "sonar-qube-runner";
+    private static final String SQR_RUNNER_PATH_PROPERTY = "teamcity.tool.sonarquberunner";
 
     @NotNull
     private final PluginDescriptor myPluginDescriptor;
@@ -167,7 +168,14 @@ public class SQRBuildService extends CommandLineBuildService {
      */
     @NotNull
     private File[] getSQRJar(final @NotNull File sqrRoot) throws SQRJarException {
-        final File libPath = new File(sqrRoot, BUNDLED_SQR_RUNNER_PATH + File.separatorChar + "lib");
+        final String path = getRunnerContext().getConfigParameters().get(SQR_RUNNER_PATH_PROPERTY);
+        File baseDir;
+        if (path != null) {
+            baseDir = new File(path);
+        } else {
+            baseDir = new File(sqrRoot, BUNDLED_SQR_RUNNER_PATH);
+        }
+        final File libPath = new File(baseDir, "lib");
         if (!libPath.exists()) {
             throw new SQRJarException("SonarQube Runner lib path doesn't exist: " + libPath.getAbsolutePath());
         } else if (!libPath.isDirectory()) {
