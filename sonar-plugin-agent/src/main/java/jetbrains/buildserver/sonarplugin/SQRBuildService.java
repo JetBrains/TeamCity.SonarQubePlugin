@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.*;
 
 /**
@@ -19,8 +20,7 @@ import java.util.*;
  * SonarQube Runner wrapper process.
  */
 public class SQRBuildService extends CommandLineBuildService {
-    private static final String SQR_JAR_NAME = "sonar-runner-dist-2.3.jar";
-    private static final String SQR_JAR_PATH = "sonar-qube-runner" + File.separatorChar + "lib";
+    private static final String BUNDLED_SQR_RUNNER_PATH = "sonar-qube-runner";
 
     @NotNull
     private final PluginDescriptor myPluginDescriptor;
@@ -152,8 +152,12 @@ public class SQRBuildService extends CommandLineBuildService {
      */
     @NotNull
     private String getClasspath() throws SQRJarException {
-        File pluginJar = getSQRJar(myPluginDescriptor.getPluginRoot());
-        return pluginJar.getAbsolutePath();
+        final File pluginJar[] = getSQRJar(myPluginDescriptor.getPluginRoot());
+        final StringBuilder builder = new StringBuilder();
+        for (final File file : pluginJar) {
+            builder.append(file.getAbsolutePath()).append(File.pathSeparatorChar);
+        }
+        return builder.substring(0, builder.length() - 1);
     }
 
     /**
@@ -162,15 +166,23 @@ public class SQRBuildService extends CommandLineBuildService {
      * @throws SQRJarException
      */
     @NotNull
-    private File getSQRJar(final @NotNull File sqrRoot) throws SQRJarException {
-        File pluginJar = new File(sqrRoot, SQR_JAR_PATH + File.separatorChar + SQR_JAR_NAME);
-        if (!pluginJar.exists()) {
-            throw new SQRJarException("SonarQube Runner jar doesn't exist on path: " + pluginJar.getAbsolutePath());
-        } else if (!pluginJar.isFile()) {
-            throw new SQRJarException("SonarQube Runner jar is not a file on path: " + pluginJar.getAbsolutePath());
-        } else if (!pluginJar.canRead()) {
-            throw new SQRJarException("Cannot read SonarQube Runner jar on path: " + pluginJar.getAbsolutePath());
+    private File[] getSQRJar(final @NotNull File sqrRoot) throws SQRJarException {
+        final File libPath = new File(sqrRoot, BUNDLED_SQR_RUNNER_PATH + File.separatorChar + "lib");
+        if (!libPath.exists()) {
+            throw new SQRJarException("SonarQube Runner lib path doesn't exist: " + libPath.getAbsolutePath());
+        } else if (!libPath.isDirectory()) {
+            throw new SQRJarException("SonarQube Runner lib path is not a directory: " + libPath.getAbsolutePath());
+        } else if (!libPath.canRead()) {
+            throw new SQRJarException("Cannot read SonarQube Runner lib path: " + libPath.getAbsolutePath());
         }
-        return pluginJar;
+        final File[] jars = libPath.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith("jar");
+            }
+        });
+        if (jars.length == 0) {
+            throw new SQRJarException("No JAR files found in lib path: " + libPath);
+        }
+        return jars;
     }
 }
