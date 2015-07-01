@@ -1,6 +1,5 @@
 package jetbrains.buildserver.sonarplugin.sqrunner;
 
-import com.intellij.openapi.util.text.StringUtil;
 import jetbrains.buildServer.serverSide.Parameter;
 import jetbrains.buildServer.serverSide.SBuild;
 import jetbrains.buildServer.serverSide.SBuildRunnerDescriptor;
@@ -8,6 +7,7 @@ import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.parameters.ParameterFactory;
 import jetbrains.buildServer.serverSide.parameters.types.PasswordsProvider;
 import jetbrains.buildserver.sonarplugin.Constants;
+import jetbrains.buildserver.sonarplugin.Util;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
@@ -64,7 +64,7 @@ public class SQRPasswordProvider implements PasswordsProvider {
                                       final @NotNull String id,
                                       final @Nullable String parameterValue,
                                       final @NotNull String parameterName) {
-        if (!StringUtil.isEmpty(parameterValue)) {
+        if (!Util.isEmpty(parameterValue)) {
             list.add(myFactory.createTypedParameter(id + "." + parameterName, parameterValue, PASSWORD_PARAMETER_TYPE));
         }
     }
@@ -81,7 +81,7 @@ public class SQRPasswordProvider implements PasswordsProvider {
         final List<SQSInfo> res = new LinkedList<SQSInfo>();
         for (final SBuildRunnerDescriptor r : buildType.getBuildRunners()) {
             final String serverId = r.getParameters().get(Constants.SONAR_SERVER_ID);
-            if (!StringUtil.isEmpty(serverId)) {
+            if (!Util.isEmpty(serverId)) {
                 final SQSInfo server = mySqsManager.findServer(recurse(buildType.getProject()), serverId);
                 if (server != null) {
                     res.add(server);

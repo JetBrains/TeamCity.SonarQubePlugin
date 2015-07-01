@@ -1,7 +1,6 @@
 package jetbrains.buildserver.sonarplugin.sqrunner;
 
 import jetbrains.buildServer.serverSide.*;
-import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildserver.sonarplugin.Constants;
 import jetbrains.buildserver.sonarplugin.Util;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
@@ -40,10 +39,10 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
                             addIfNotNull(runnerContext, Constants.SONAR_LOGIN, server.getLogin());
                             addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_URL, server.getJDBCUrl());
                             addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_USERNAME, server.getJDBCUsername());
-                            if (!StringUtil.isEmpty(server.getPassword())) {
+                            if (!Util.isEmpty(server.getPassword())) {
                                 runnerContext.addRunnerParameter(Constants.SONAR_PASSWORD, "%" + getSecuredPropertyName(server, Constants.SONAR_PASSWORD) + "%");
                             }
-                            if (!StringUtil.isEmpty(server.getJDBCPassword())) {
+                            if (!Util.isEmpty(server.getJDBCPassword())) {
                                 runnerContext.addRunnerParameter(Constants.SONAR_SERVER_JDBC_PASSWORD, "%" + getSecuredPropertyName(server, Constants.SONAR_SERVER_JDBC_PASSWORD) + "%");
                             }
 //                            break;
