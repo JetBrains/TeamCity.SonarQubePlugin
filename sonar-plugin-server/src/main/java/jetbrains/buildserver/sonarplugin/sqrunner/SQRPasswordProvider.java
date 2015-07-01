@@ -13,9 +13,7 @@ import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.ProjectAccessor.recurse;
 
@@ -44,14 +42,13 @@ public class SQRPasswordProvider implements PasswordsProvider {
 
     @NotNull
     public Collection<Parameter> getPasswordParameters(@NotNull final SBuild build) {
-        final SQSInfo server = findSQSInfo(build.getBuildType());
-        if (server != null) {
-            final ArrayList<Parameter> list = new ArrayList<Parameter>();
-            addParameterIfNeeded(list, server.getPassword(), Constants.SONAR_PASSWORD);
-            addParameterIfNeeded(list, server.getJDBCPassword(), Constants.SONAR_SERVER_JDBC_PASSWORD);
-            return list;
+        final List<SQSInfo> servers = findSQSInfos(build.getBuildType());
+        final ArrayList<Parameter> list = new ArrayList<Parameter>();
+        for (final SQSInfo server : servers) {
+            addParameterIfNeeded(list, server.getId(),  server.getPassword(), Constants.SONAR_PASSWORD);
+            addParameterIfNeeded(list, server.getId(), server.getJDBCPassword(), Constants.SONAR_SERVER_JDBC_PASSWORD);
         }
-        return Collections.emptyList();
+        return list;
     }
 
     /**
@@ -59,14 +56,16 @@ public class SQRPasswordProvider implements PasswordsProvider {
      *     Adds a parameter to the parameter list if it's value is not empty
      * </p>
      * @param list List to add parameter to.
+     * @param id Server ID
      * @param parameterValue Parameter value. The parameter will not be added if the value is null or empty.
      * @param parameterName Parameter name. NB: resulting Parameter will have name in form "secure:teamcity.password.&lt;parameterName&gt;".
      */
     private void addParameterIfNeeded(final @NotNull ArrayList<Parameter> list,
+                                      final @NotNull String id,
                                       final @Nullable String parameterValue,
                                       final @NotNull String parameterName) {
         if (!StringUtil.isEmpty(parameterValue)) {
-            list.add(myFactory.createTypedParameter(parameterName, parameterValue, PASSWORD_PARAMETER_TYPE));
+            list.add(myFactory.createTypedParameter(id + "." + parameterName, parameterValue, PASSWORD_PARAMETER_TYPE));
         }
     }
 
@@ -74,19 +73,21 @@ public class SQRPasswordProvider implements PasswordsProvider {
      * @param buildType Build Configuration
      * @return SQSInfo in the Build Configuration or null
      */
-    private SQSInfo findSQSInfo(final @Nullable SBuildType buildType) {
+    @NotNull
+    private List<SQSInfo> findSQSInfos(final @Nullable SBuildType buildType) {
         if (buildType == null) {
-            return null;
+            return Collections.emptyList();
         }
+        final List<SQSInfo> res = new LinkedList<SQSInfo>();
         for (final SBuildRunnerDescriptor r : buildType.getBuildRunners()) {
             final String serverId = r.getParameters().get(Constants.SONAR_SERVER_ID);
             if (!StringUtil.isEmpty(serverId)) {
                 final SQSInfo server = mySqsManager.findServer(recurse(buildType.getProject()), serverId);
                 if (server != null) {
-                    return server;
+                    res.add(server);
                 }
             }
         }
-        return null;
+        return res;
     }
 }

@@ -40,11 +40,11 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
                             addIfNotNull(runnerContext, Constants.SONAR_LOGIN, server.getLogin());
                             addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_URL, server.getJDBCUrl());
                             addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_USERNAME, server.getJDBCUsername());
-                            if (!StringUtil.isEmpty(context.getSharedParameters().get(getSecuredPropertyName(Constants.SONAR_PASSWORD)))) {
-                                runnerContext.addRunnerParameter(Constants.SONAR_PASSWORD, "%" + getSecuredPropertyName(Constants.SONAR_PASSWORD) + "%");
+                            if (!StringUtil.isEmpty(server.getPassword())) {
+                                runnerContext.addRunnerParameter(Constants.SONAR_PASSWORD, "%" + getSecuredPropertyName(server, Constants.SONAR_PASSWORD) + "%");
                             }
-                            if (!StringUtil.isEmpty(context.getSharedParameters().get(getSecuredPropertyName(Constants.SONAR_SERVER_JDBC_PASSWORD)))) {
-                                runnerContext.addRunnerParameter(Constants.SONAR_SERVER_JDBC_PASSWORD, "%" + getSecuredPropertyName(Constants.SONAR_SERVER_JDBC_PASSWORD) + "%");
+                            if (!StringUtil.isEmpty(server.getJDBCPassword())) {
+                                runnerContext.addRunnerParameter(Constants.SONAR_SERVER_JDBC_PASSWORD, "%" + getSecuredPropertyName(server, Constants.SONAR_SERVER_JDBC_PASSWORD) + "%");
                             }
 //                            break;
                         }
@@ -55,8 +55,8 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
     }
 
     @NotNull
-    private String getSecuredPropertyName(final @NotNull String key) {
-        return Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + key;
+    private String getSecuredPropertyName(final @NotNull SQSInfo server, final @NotNull String key) {
+        return Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + server.getId() + "." + key;
     }
 
     private static void addIfNotNull(final @NotNull SRunnerContext runnerContext,
