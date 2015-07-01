@@ -1,5 +1,6 @@
 package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
+import com.intellij.openapi.util.text.StringUtil;
 import jetbrains.buildServer.XmlStorable;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
@@ -125,13 +126,13 @@ class XMLBasedSQSInfo extends BasePropertiesBean implements SQSInfo, XmlStorable
     }
 
     private void addAttribute(Element serverElement, String key, String value) {
-        if (value != null) {
+        if (!StringUtil.isEmpty(value)) {
             serverElement.setAttribute(key, value);
         }
     }
 
     private void addAttributeScrambled(Element serverElement, String key, String value) {
-        if (value != null) {
+        if (!StringUtil.isEmpty(value)) {
             serverElement.setAttribute(key, EncryptUtil.scramble(value));
         }
     }
