@@ -1,6 +1,7 @@
 package jetbrains.buildserver.sonarplugin.sqrunner;
 
 import jetbrains.buildServer.serverSide.*;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildserver.sonarplugin.Constants;
 import jetbrains.buildserver.sonarplugin.Util;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
@@ -39,10 +40,10 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
                             addIfNotNull(runnerContext, Constants.SONAR_LOGIN, server.getLogin());
                             addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_URL, server.getJDBCUrl());
                             addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_USERNAME, server.getJDBCUsername());
-                            if (!Util.isEmpty(context.getSharedParameters().get(Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_PASSWORD))) {
+                            if (!StringUtil.isEmpty(context.getSharedParameters().get(Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_PASSWORD))) {
                                 runnerContext.addRunnerParameter(Constants.SONAR_PASSWORD, "%" + Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_PASSWORD + "%");
                             }
-                            if (!Util.isEmpty(context.getSharedParameters().get(Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_SERVER_JDBC_PASSWORD))) {
+                            if (!StringUtil.isEmpty(context.getSharedParameters().get(Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_SERVER_JDBC_PASSWORD))) {
                                 runnerContext.addRunnerParameter(Constants.SONAR_SERVER_JDBC_PASSWORD, "%" + Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + Constants.SONAR_SERVER_JDBC_PASSWORD + "%");
                             }
 //                            break;
