@@ -4,18 +4,23 @@ import jetbrains.buildServer.controllers.BaseAjaxActionController;
 import jetbrains.buildServer.controllers.PublicKeyUtil;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SProject;
+import jetbrains.buildServer.serverSide.auth.AuthUtil;
+import jetbrains.buildServer.serverSide.auth.Permission;
+import jetbrains.buildServer.serverSide.auth.SecurityContext;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfoFactory;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
+
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 /**
@@ -44,16 +49,20 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     private final SQSManager mySqsManager;
     @NotNull
     private final ProjectManager myProjectManager;
+    @NotNull
+    private final SecurityContext securityContext;
 
     public ManageSQSActionController(@NotNull final WebControllerManager controllerManager,
                                      @NotNull final SQSManager sqsManager,
-                                     @NotNull final ProjectManager projectManager) {
+                                     @NotNull final ProjectManager projectManager,
+                                     @NotNull final SecurityContext securityContext) {
         super(controllerManager);
         controllerManager.registerController("/admin/manageSonarServers.html", this);
         registerAction(this);
 
         mySqsManager = sqsManager;
         myProjectManager = projectManager;
+        this.securityContext = securityContext;
     }
 
     public boolean canProcess(@NotNull final HttpServletRequest request) {
@@ -70,14 +79,17 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     public void process(final @NotNull HttpServletRequest request,
                         final @NotNull HttpServletResponse response,
                         final @Nullable Element ajaxResponse) {
-        if (ajaxResponse == null) {
+        final SProject project = getProject(request);
+        if (ajaxResponse == null || project == null) {
             return;
         }
 
-        final SProject project = getProject(request);
-        if (project == null) {
+        // Security test (user without management permission could access this controller)
+        if (!AuthUtil.hasPermissionToManageProject(securityContext.getAuthorityHolder(), project.getExternalId())){
+            ajaxResponse.setAttribute("error", "User has not the management permission");
             return;
         }
+
         final String action = getAction(request);
         try {
             if (ADD_SQS_ACTION.equals(action)) {
