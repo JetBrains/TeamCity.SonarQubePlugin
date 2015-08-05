@@ -1,9 +1,11 @@
 <%@ page import="jetbrains.buildServer.serverSide.crypt.RSACipher" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="afn" uri="/WEB-INF/functions/authz" %>
 <%@ include file="/include-internal.jsp" %>
 <%--@elvariable id="availableServersMap" type="java.util.Map<jetbrains.buildServer.serverSide.SProject, java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
 <%--@elvariable id="projectId" type="java.lang.String"--%>
+<%--@elvariable id="userHasPermissionManagement" type="java.lang.Boolean"--%>
 
 <bs:linkScript>
     <%-- Crypto stuff --%>
@@ -50,7 +52,7 @@
                                     </td>
                                     <td class="url">
                                         <div class="url"><c:out value="${server.url}"/></div>
-                                        <c:if test="${userHasPermissionManagement}">
+                                        <c:if test="${userHasPermissionManagement && afn:permissionGrantedForProject(projectServersEntry.key, 'EDIT_PROJECT')}">
                                             <c:choose>
                                                 <c:when test="${not empty server.login}">
                                                     <div class="login">Username: <c:out value="${server.login}"/></div>
@@ -67,7 +69,7 @@
                                             <c:when test="${not empty server.JDBCUrl}"><div class="url"><c:out value="${server.JDBCUrl}"/></div></c:when>
                                             <c:otherwise><div class="defaultValue grayNote">jdbc:h2:tcp://localhost:9092/sonar</div></c:otherwise>
                                         </c:choose>
-                                        <c:if test="${userHasPermissionManagement}">
+                                        <c:if test="${userHasPermissionManagement && afn:permissionGrantedForProject(projectServersEntry.key, 'EDIT_PROJECT')}">
                                             <c:choose>
                                                 <c:when test="${not empty server.JDBCUsername}"><div class="dbUser">Username: <c:out value="${server.JDBCUsername}"/></div></c:when>
                                                 <c:otherwise><div class="defaultValue grayNote">Username: sonar</div></c:otherwise>
@@ -78,7 +80,7 @@
                                             </c:choose>
                                         </c:if>
                                     </td>
-                                    <c:if test="${userHasPermissionManagement}">
+                                    <c:if test="${userHasPermissionManagement && afn:permissionGrantedForProject(projectServersEntry.key, 'EDIT_PROJECT')}">
                                         <td class="remove">
                                             <a id="removeNewServer" href="#"
                                             onclick="SonarPlugin.removeServer('${projectServersEntry.key.externalId}', '${server.id}'); return false">remove...</a>
@@ -89,6 +91,9 @@
                                                     password: '${not empty server.login ? "*****" : ""}', JDBCUrl: '${server.JDBCUrl}', JDBCUsername: '${server.JDBCUsername}',
                                                     JDBCPassword: '${not empty server.JDBCUsername ? "*****" : ""}', projectId: '${projectServersEntry.key.externalId}'}); return false">edit</a>
                                         </td>
+                                    </c:if>
+                                    <c:if test="${userHasPermissionManagement && not afn:permissionGrantedForProject(projectServersEntry.key, 'EDIT_PROJECT')}">
+                                        <td colspan="2" class="grayNote"></td>
                                     </c:if>
                                 </tr>
                             </c:forEach>
