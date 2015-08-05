@@ -3,16 +3,16 @@
 
  This plugin allows confguring and running SonarQube analysis in the TeamCity server.
 
- 1. Downloading binaries 
+ 1. Downloading binaries
  =====
 
- The latest build of the plugin is available on public TeamCity server and could be downloaded from: 
+ The latest build of the plugin is available on public TeamCity server and could be downloaded from:
  http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build/.lastPinned/sonar-plugin.zip
 
  2. Building sources
  =====
 
- Run the following command in the root of checked out repository: 
+ Run the following command in the root of checked out repository:
  mvn clean package
 
  3. Installing
@@ -35,6 +35,8 @@
  b. Configuring SonarQube Server locations to send information from the SonarQube Runner to
 
  Any number of SonarQube Server connections could be defined for a project. A connection could be used in any Build Configuration under the project including those from subprojects.
+
+ The permission 'Edit project' is required to manage SonarQube servers (add/edit/remove, and view account).
 
  c. Build Breaker plugin integration
 
