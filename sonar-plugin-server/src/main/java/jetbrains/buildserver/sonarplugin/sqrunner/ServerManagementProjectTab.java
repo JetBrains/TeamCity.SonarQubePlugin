@@ -68,7 +68,7 @@ public class ServerManagementProjectTab extends EditProjectTab {
         Map<SProject, List<SQSInfo>> infoMap = getServersMap(currentProject);
         model.put("availableServersMap", infoMap);
         model.put("projectId", currentProject.getExternalId());
-        model.put("userHasPermissionManagement", AuthUtil.hasPermissionToManageProject(securityContext.getAuthorityHolder(), currentProject.getExternalId()));
+        model.put("userHasPermissionManagement", AuthUtil.hasPermissionToManageProject(securityContext.getAuthorityHolder(), currentProject.getProjectId()));
     }
 
     private Map<SProject, List<SQSInfo>> getServersMap(@NotNull final SProject currentProject) {
