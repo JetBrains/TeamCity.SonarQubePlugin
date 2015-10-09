@@ -101,7 +101,8 @@ public class SonarProcessListener extends AgentLifeCycleAdapter {
                     if (file.exists() && file.isDirectory()) {
                         dir = path;
                     } else {
-                        dir = path.substring(0, path.lastIndexOf(File.separatorChar));
+                        final int endIndex = path.lastIndexOf(File.separatorChar);
+                        dir = endIndex >= 0 ? path.substring(0, endIndex) : path;
                     }
                     myCollectedReports.add(dir);
                 }
