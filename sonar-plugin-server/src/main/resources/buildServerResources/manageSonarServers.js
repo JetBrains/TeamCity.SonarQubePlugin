@@ -110,15 +110,16 @@ SonarPlugin = {
                 "publicKey" : $j("#serverInfoForm #publicKey").val()
             };
 
-            var $field = $j(".runnerFormTable input[id='sonar.jdbc.password_field']");
-            if ($field.attr("data-modified") == "modified") {
-                parameters["sonar.jdbc.password"] = SonarPlugin.encryptPassword($field.val());
+            var $jdbcPasswordField = $j(".runnerFormTable input[id='sonar.jdbc.password_field']");
+            if ($jdbcPasswordField.attr("data-modified") == "modified") {
+                parameters["sonar.jdbc.password"] = SonarPlugin.encryptPassword($jdbcPasswordField.val());
             } else {
                 parameters["sonar.jdbc.password_preserve"] = "true";
             }
-            $field = $j(".runnerFormTable input[id='sonar.password_field']");
-            if ($field.attr("data-modified") == "modified") {
-                parameters["sonar.password"] = SonarPlugin.encryptPassword($field.val());
+
+            var $passwordField = $j(".runnerFormTable input[id='sonar.password_field']");
+            if ($passwordField.attr("data-modified") == "modified") {
+                parameters["sonar.password"] = SonarPlugin.encryptPassword($passwordField.val());
             } else {
                 parameters["sonar.password_preserve"] = "true";
             }
