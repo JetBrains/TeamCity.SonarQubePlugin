@@ -27,6 +27,8 @@ SonarPlugin = {
     },
     addServer: function(projectId) {
         SonarPlugin.ServerConnectionDialog.showDialog('addSqs', {id: '', name: '', url: '', login: '', password: '', JDBCUsername: '', JDBCPassword: '', projectId: projectId});
+        $j(".runnerFormTable input[id='sonar.password_field']").attr("data-modified",  "modified");
+        $j(".runnerFormTable input[id='sonar.jdbc.password_field']").attr("data-modified",  "modified");
     },
     ServerConnectionDialog: OO.extend(BS.AbstractWebForm, OO.extend(BS.AbstractModalDialog, {
         getContainer: function () {
@@ -49,8 +51,8 @@ SonarPlugin = {
             $j(".runnerFormTable input[id='serverinfo.name']").val(data.name);
             $j(".runnerFormTable input[id='sonar.host.url']").val(data.url);
             $j(".runnerFormTable input[id='sonar.login']").val(data.login);
-            $j(".runnerFormTable input[id='sonar.password']").val(data.password);
-            $j(".runnerFormTable input[id='sonar.password_field']").val(data.password ? "*****" : "");
+            $j(".runnerFormTable input[id='sonar.password']").val(data.password).removeAttr("data-modified");
+            $j(".runnerFormTable input[id='sonar.password_field']").val(data.password ? "*****" : "").removeAttr("data-modified");
             $j(".runnerFormTable input[id='sonar.jdbc.url']").val(data.JDBCUrl);
             $j(".runnerFormTable input[id='sonar.jdbc.username']").val(data.JDBCUsername);
             $j(".runnerFormTable input[id='sonar.jdbc.password']").val(data.JDBCPassword);
