@@ -164,10 +164,10 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                     request.getParameter(SERVERINFO_NAME),
                     request.getParameter(SONAR_URL),
                     request.getParameter(SONAR_LOGIN),
-                    request.getParameter(SONAR_PASSWORD),
+                    decryptIfNeeded(request.getParameter(SONAR_PASSWORD)),
                     request.getParameter(SONAR_JDBC_URL),
                     request.getParameter(SONAR_JDBC_USERNAME),
-                    request.getParameter(SONAR_JDBC_PASSWORD));
+                    decryptIfNeeded(request.getParameter(SONAR_JDBC_PASSWORD)));
             try {
                 mySqsManager.addServer(project, serverInfo);
                 ajaxResponse.setAttribute("status", "OK");
