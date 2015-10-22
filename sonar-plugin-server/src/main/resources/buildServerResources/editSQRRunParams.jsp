@@ -3,7 +3,9 @@
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="forms" tagdir="/WEB-INF/tags/forms" %>
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
+<%--@elvariable id="showUnknownServer" type="java.lang.Boolean"--%>
 
 <l:settingsGroup title="SonarQube Runner Parameters" className="advancedSetting">
     <tr><th class="noBorder"><label for="sqsChooser">SonarQube Server: </label></th>
@@ -11,37 +13,23 @@
             <c:choose>
                 <%--@elvariable id="servers" type="java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
                 <c:when test="${not empty servers}">
-                    <forms:select name="sqsChooser" enableFilter="true" className="mediumField">
+                    <props:selectProperty name="sqsChooser" enableFilter="true" className="sqsChooser mediumField">
+                        <c:if test="${showUnknownServer}">
+                            <props:option value="" selected="true">Unknown server</props:option>
+                        </c:if>
                         <c:forEach items="${servers}" var="server">
-                            <forms:option value="${server.id}"><c:out value="${server.name}"/>: <c:out value="${server.url}"/></forms:option>
+                            <props:option value="${server.id}"><c:out value="${server.name}"/>: <c:out value="${server.url}"/></props:option>
                         </c:forEach>
-                    </forms:select>
+                    </props:selectProperty>
                 </c:when>
                 <c:otherwise>
                     <span class="smallNote">No SonarQube Server registered yet for this project</span>
                 </c:otherwise>
             </c:choose>
+            <span id="error_sonarServer" class="error"></span>
         </td>
     </tr>
     <tr style="display: none;"><th></th><td><props:textProperty name="sonarServer"/></td></tr>
-    <script type="application/javascript">
-        (function () {
-            var sonarServer = $j('#sonarServer');
-            var chooser = $j('#sqsChooser');
-
-            var onSqsChooserChange = function() {
-                sonarServer.val($j('#sqsChooser option:selected').val());
-            };
-
-            chooser.change(onSqsChooserChange);
-            if (sonarServer.val()) {
-                chooser.val(sonarServer.val());
-            } else {
-                sonarServer.val(chooser.val());
-            }
-        })();
-    </script>
-
     <tr>
         <th class="noBorder"><label for="sonarProjectName">Project name: </label></th>
         <td>
@@ -104,3 +92,28 @@
 </tr>
 
 <props:javaSettings/>
+
+<script type="text/javascript">
+    $j(function () {
+        var sonarServer = $j('#sonarServer');
+        var chooser = $j('.sqsChooser');
+
+        chooser.click(function() {$j("#error_sonarServer").text("");});
+        chooser.change(function() {sonarServer.val($j('#sqsChooser option:selected').val());});
+
+        if (sonarServer.val()) {
+            var ids = [];
+            chooser.find('option').map(function() {
+                ids.push($j(this).attr('value'));
+            });
+            if (ids.indexOf(sonarServer.val) >= 0) {
+                chooser.val(sonarServer.val());
+            } else {
+                sonarServer.val("");
+                chooser.val("Unknown");
+            }
+        } else {
+            sonarServer.val(chooser.val());
+        }
+    });
+</script>

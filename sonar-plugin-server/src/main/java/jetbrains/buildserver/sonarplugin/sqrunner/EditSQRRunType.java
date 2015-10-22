@@ -5,9 +5,11 @@ import jetbrains.buildServer.controllers.StatefulObject;
 import jetbrains.buildServer.controllers.admin.projects.BuildTypeForm;
 import jetbrains.buildServer.controllers.admin.projects.EditRunTypeControllerExtension;
 import jetbrains.buildServer.serverSide.BuildTypeSettings;
+import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildserver.sonarplugin.Constants;
+import jetbrains.buildserver.sonarplugin.Util;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +43,11 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
         SProject project = form.getProject();
         final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(recurse(project));
         model.put("servers", availableServers);
+        final String sonarServer = getSonarServer(form);
+
+        if (Util.isEmpty(sonarServer) || mySqsManager.findServer(recurse(form.getProject()), sonarServer) == null) {
+            model.put("showUnknownServer", Boolean.TRUE);
+        }
     }
 
     public void updateState(final @NotNull HttpServletRequest request, final @NotNull BuildTypeForm form) {
@@ -52,9 +59,19 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
         return null;
     }
 
-    final @NotNull
+    @NotNull
     public ActionErrors validate(final @NotNull HttpServletRequest request, final @NotNull BuildTypeForm form) {
-        return new ActionErrors();
+        final ActionErrors errors = new ActionErrors();
+        final String sonarServer = getSonarServer(form);
+        if (Util.isEmpty(sonarServer)) {
+            errors.addError("sonarServer", "SonarQube server should be set");
+        } else {
+            final SQSInfo server = mySqsManager.findServer(recurse(form.getProject()), sonarServer);
+            if (server == null) {
+                errors.addError("sonarServer", "This SonarQube server doesn't exist");
+            }
+        }
+        return errors;
     }
 
     public void updateBuildType(final @NotNull HttpServletRequest request,
@@ -62,5 +79,9 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
                                 final @NotNull BuildTypeSettings buildTypeSettings,
                                 final @NotNull ActionErrors errors) {
         // do nothing
+    }
+
+    private String getSonarServer(@NotNull BuildTypeForm form) {
+        return form.getBuildRunnerBean().getPropertiesBean().getProperties().get("sonarServer");
     }
 }
