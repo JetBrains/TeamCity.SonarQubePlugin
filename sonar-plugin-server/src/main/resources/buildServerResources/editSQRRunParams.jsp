@@ -52,6 +52,10 @@
         </td>
     </tr>
 
+    <tr class="advancedSetting">
+        <forms:workingDirectory />
+    </tr>
+
     <tr>
         <th class="noBorder"><label for="sonarProjectSources">Sources location: </label></th>
         <td>

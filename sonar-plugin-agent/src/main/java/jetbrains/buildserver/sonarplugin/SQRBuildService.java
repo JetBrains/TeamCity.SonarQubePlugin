@@ -39,7 +39,6 @@ public class SQRBuildService extends CommandLineBuildService {
     public ProgramCommandLine makeProgramCommandLine() throws RunBuildException {
         JavaCommandLineBuilder builder = new JavaCommandLineBuilder();
         builder.setJavaHome(getRunnerContext().getRunnerParameters().get(JavaRunnerConstants.TARGET_JDK_HOME));
-        builder.setWorkingDir(getBuild().getCheckoutDirectory().getAbsolutePath());
 
         builder.setEnvVariables(getRunnerContext().getBuildParameters().getEnvironmentVariables());
         builder.setSystemProperties(getRunnerContext().getBuildParameters().getSystemProperties());
