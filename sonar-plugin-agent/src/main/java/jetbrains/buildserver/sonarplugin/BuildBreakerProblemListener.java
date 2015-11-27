@@ -48,14 +48,12 @@ public class BuildBreakerProblemListener extends AgentLifeCycleAdapter {
 
     @Override
     public void messageLogged(@NotNull final BuildMessage1 buildMessage) {
-        if (mySonarIsWorking) {
-            if (buildMessage.getValue() instanceof String) {
-                final String message = (String)buildMessage.getValue();
-                final int idx = message.indexOf(BUILD_BREAKER_MESSAGE);
-                if (idx > 0) {
-                    final String cause = message.substring(idx + BUILD_BREAKER_MESSAGE.length(), message.length());
-                    myBuildProblems.add(cause);
-                }
+        if (mySonarIsWorking && buildMessage.getValue() instanceof String) {
+            final String message = (String) buildMessage.getValue();
+            final int idx = message.indexOf(BUILD_BREAKER_MESSAGE);
+            if (idx > 0) {
+                final String cause = message.substring(idx + BUILD_BREAKER_MESSAGE.length(), message.length());
+                myBuildProblems.add(cause);
             }
         }
     }

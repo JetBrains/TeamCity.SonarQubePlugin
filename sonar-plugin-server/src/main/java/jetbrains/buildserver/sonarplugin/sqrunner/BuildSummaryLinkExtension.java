@@ -44,28 +44,38 @@ public class BuildSummaryLinkExtension extends SimplePageExtension {
     public void fillModel(final @NotNull Map<String, Object> model,
                           final @NotNull HttpServletRequest request) {
         final SBuild build = BuildDataExtensionUtil.retrieveBuild(request, myServer);
-        if (build != null) {
-            final BuildArtifact artifact = build.getArtifacts(BuildArtifactsViewMode.VIEW_HIDDEN_ONLY).getArtifact(Constants.SONAR_SERVER_URL_ARTIF_LOCATION_FULL);
-            if (artifact != null) {
-                if (artifact.getSize() > ABSOLUTE_FILESIZE_THRESHOLD) {
-                    model.put("sonar_bigUrlFile", artifact.getSize());
-                } else {
-                    InputStream inputStream = null;
-                    try {
-                        inputStream = artifact.getInputStream();
-                        String url = readUrlFromStream(inputStream);
-                        model.put("sonar_url", url);
-                    } catch (IOException e) {
-                        model.put("sonar_IOException", e);
-                    } finally {
-                        Util.close(inputStream);
-                    }
-                }
-            } else {
-                model.put("sonar_noArtifact", Boolean.TRUE);
+        if (build == null) {
+            return;
+        }
+
+        final BuildArtifact artifact = build.getArtifacts(BuildArtifactsViewMode.VIEW_HIDDEN_ONLY).getArtifact(Constants.SONAR_SERVER_URL_ARTIF_LOCATION_FULL);
+        if (artifact == null) {
+            model.put("sonar_noArtifact", Boolean.TRUE);
+            return;
+        }
+
+        if (artifact.getSize() > ABSOLUTE_FILESIZE_THRESHOLD) {
+            model.put("sonar_bigUrlFile", artifact.getSize());
+        } else {
+            try {
+                model.put("sonar_url", readUrl(artifact));
+            } catch (IOException e) {
+                model.put("sonar_IOException", e);
             }
         }
         super.fillModel(model, request);
+    }
+
+    @NotNull
+    private String readUrl(BuildArtifact artifact) throws IOException {
+        String url;InputStream inputStream = null;
+        try {
+            inputStream = artifact.getInputStream();
+            url = readUrlFromStream(inputStream);
+        } finally {
+            Util.close(inputStream);
+        }
+        return url;
     }
 
     @NotNull

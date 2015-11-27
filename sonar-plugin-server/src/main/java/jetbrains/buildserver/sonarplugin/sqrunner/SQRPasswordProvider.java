@@ -43,7 +43,7 @@ public class SQRPasswordProvider implements PasswordsProvider {
     @NotNull
     public Collection<Parameter> getPasswordParameters(@NotNull final SBuild build) {
         final List<SQSInfo> servers = findSQSInfos(build.getBuildType());
-        final ArrayList<Parameter> list = new ArrayList<Parameter>();
+        final List<Parameter> list = new ArrayList<Parameter>();
         for (final SQSInfo server : servers) {
             addParameterIfNeeded(list, server.getId(), server.getPassword(), Constants.SONAR_PASSWORD);
             addParameterIfNeeded(list, server.getId(), server.getJDBCPassword(), Constants.SONAR_SERVER_JDBC_PASSWORD);
@@ -60,7 +60,7 @@ public class SQRPasswordProvider implements PasswordsProvider {
      * @param parameterValue Parameter value. The parameter will not be added if the value is null or empty.
      * @param parameterName Parameter name. NB: resulting Parameter will have name in form "secure:teamcity.password.&lt;parameterName&gt;".
      */
-    private void addParameterIfNeeded(final @NotNull ArrayList<Parameter> list,
+    private void addParameterIfNeeded(final @NotNull List<Parameter> list,
                                       final @NotNull String id,
                                       final @Nullable String parameterValue,
                                       final @NotNull String parameterName) {
