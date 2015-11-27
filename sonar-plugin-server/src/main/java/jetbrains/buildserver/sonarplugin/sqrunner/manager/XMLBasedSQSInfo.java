@@ -30,14 +30,14 @@ class XMLBasedSQSInfo extends BasePropertiesBean implements SQSInfo, XmlStorable
         super(null);
     }
 
-    public XMLBasedSQSInfo(final @NotNull String id,
-                           final @Nullable String name,
-                           final @Nullable String url,
-                           final @Nullable String login,
-                           final @Nullable String password,
-                           final @Nullable String jdbcUrl,
-                           final @Nullable String jdbcUsername,
-                           final @Nullable String jdbcPassword) {
+    public XMLBasedSQSInfo(@NotNull final String id,
+                           @Nullable final String name,
+                           @Nullable final String url,
+                           @Nullable final String login,
+                           @Nullable final String password,
+                           @Nullable final String jdbcUrl,
+                           @Nullable final String jdbcUsername,
+                           @Nullable final String jdbcPassword) {
         super(null);
         setProperty(ID, id);
         setProperty(NAME, name);

@@ -69,13 +69,13 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                REMOVE_SQS_ACTION.equals(action);
     }
 
-    private static String getAction(final @NotNull HttpServletRequest request) {
+    private static String getAction(@NotNull final HttpServletRequest request) {
         return request.getParameter(SQS_ACTION);
     }
 
-    public void process(final @NotNull HttpServletRequest request,
-                        final @NotNull HttpServletResponse response,
-                        final @Nullable Element ajaxResponse) {
+    public void process(@NotNull final HttpServletRequest request,
+                        @NotNull final HttpServletResponse response,
+                        @Nullable final Element ajaxResponse) {
         final SProject project = getProject(request);
         if (ajaxResponse == null || project == null) {
             return;
@@ -101,9 +101,9 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
         }
     }
 
-    private void editServerInfo(final @NotNull HttpServletRequest request,
-                                final @NotNull SProject project,
-                                final @NotNull Element ajaxResponse) {
+    private void editServerInfo(@NotNull final HttpServletRequest request,
+                                @NotNull final SProject project,
+                                @NotNull final Element ajaxResponse) {
         if (!validate(request, ajaxResponse)) {
             return;
         }
@@ -131,12 +131,12 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     }
 
     @Nullable
-    private String getJDBCPassword(@NotNull HttpServletRequest request, SQSInfo old) {
+    private String getJDBCPassword(@NotNull final HttpServletRequest request, @NotNull final SQSInfo old) {
         return Boolean.parseBoolean(request.getParameter(SONAR_JDBC_PASSWORD_PRESERVE)) ? old.getJDBCPassword() : decryptIfNeeded(request.getParameter(SONAR_JDBC_PASSWORD));
     }
 
     @Nullable
-    private String getPassword(@NotNull HttpServletRequest request, SQSInfo old) {
+    private String getPassword(@NotNull HttpServletRequest request, @NotNull final SQSInfo old) {
         return Boolean.parseBoolean(request.getParameter(SONAR_PASSWORD_PRESERVE)) ? old.getPassword() : decryptIfNeeded(request.getParameter(SONAR_PASSWORD));
     }
 
@@ -152,13 +152,13 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                 jdbcPass);
     }
 
-    private String decryptIfNeeded(final @Nullable String value) {
+    private String decryptIfNeeded(@Nullable final String value) {
         return value != null ? RSACipher.decryptWebRequestData(value) : null;
     }
 
-    private void removeServerInfo(final @NotNull HttpServletRequest request,
-                                  final @NotNull SProject project,
-                                  final @NotNull Element ajaxResponse) throws IOException {
+    private void removeServerInfo(@NotNull final HttpServletRequest request,
+                                  @NotNull final SProject project,
+                                  @NotNull final Element ajaxResponse) throws IOException {
         final String serverinfoId = getServerInfoId(request);
         if (serverinfoId == null) {
             ajaxResponse.setAttribute("error", "ID is not set");
@@ -176,9 +176,9 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
         }
     }
 
-    private void addServerInfo(final @NotNull HttpServletRequest request,
-                               final @NotNull SProject project,
-                               final @NotNull Element ajaxResponse) throws IOException {
+    private void addServerInfo(@NotNull final HttpServletRequest request,
+                               @NotNull final SProject project,
+                               @NotNull final Element ajaxResponse) throws IOException {
         if (validate(request, ajaxResponse)) {
             final SQSInfo serverInfo = getServerInfo(request, null, decryptIfNeeded(request.getParameter(SONAR_PASSWORD)), decryptIfNeeded(request.getParameter(SONAR_JDBC_PASSWORD)));
             try {
@@ -209,11 +209,11 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     }
 
     @Nullable
-    private SProject getProject(final @NotNull HttpServletRequest request) {
+    private SProject getProject(@NotNull final HttpServletRequest request) {
         return myProjectManager.findProjectByExternalId(request.getParameter("projectId"));
     }
 
-    private static String getServerInfoId(final @NotNull HttpServletRequest request) {
+    private static String getServerInfoId(@NotNull final HttpServletRequest request) {
         return request.getParameter(SERVERINFO_ID);
     }
 

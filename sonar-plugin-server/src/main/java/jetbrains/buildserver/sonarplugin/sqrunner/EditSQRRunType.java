@@ -30,16 +30,16 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
     @NotNull
     private final SQSManager mySqsManager;
 
-    public EditSQRRunType(final @NotNull SBuildServer server,
-                          final @NotNull SQSManager mySqsManager) {
+    public EditSQRRunType(@NotNull final SBuildServer server,
+                          @NotNull final SQSManager mySqsManager) {
         this.mySqsManager = mySqsManager;
         server.registerExtension(EditRunTypeControllerExtension.class, Constants.RUNNER_TYPE, this);
     }
 
     @SuppressWarnings("unchecked")
-    public void fillModel(final @NotNull HttpServletRequest request,
-                          final @NotNull BuildTypeForm form,
-                          final @NotNull Map model) {
+    public void fillModel(@NotNull final HttpServletRequest request,
+                          @NotNull final BuildTypeForm form,
+                          @NotNull final Map model) {
         SProject project = form.getProject();
         final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(recurse(project));
         model.put("servers", availableServers);
@@ -52,17 +52,17 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
         }
     }
 
-    public void updateState(final @NotNull HttpServletRequest request, final @NotNull BuildTypeForm form) {
+    public void updateState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
         // do nothing
     }
 
     @Nullable
-    public StatefulObject getState(final @NotNull HttpServletRequest request, final @NotNull BuildTypeForm form) {
+    public StatefulObject getState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
         return null;
     }
 
     @NotNull
-    public ActionErrors validate(final @NotNull HttpServletRequest request, final @NotNull BuildTypeForm form) {
+    public ActionErrors validate(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
         final ActionErrors errors = new ActionErrors();
         final String sonarServer = getSonarServer(form);
         if (Util.isEmpty(sonarServer)) {
@@ -76,10 +76,10 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
         return errors;
     }
 
-    public void updateBuildType(final @NotNull HttpServletRequest request,
-                                final @NotNull BuildTypeForm form,
-                                final @NotNull BuildTypeSettings buildTypeSettings,
-                                final @NotNull ActionErrors errors) {
+    public void updateBuildType(@NotNull final HttpServletRequest request,
+                                @NotNull final BuildTypeForm form,
+                                @NotNull final BuildTypeSettings buildTypeSettings,
+                                @NotNull final ActionErrors errors) {
         // do nothing
     }
 

@@ -13,7 +13,7 @@ public class SQRParametersAccessor {
     @NotNull
     private final Map<String, String> myParameters;
 
-    public SQRParametersAccessor(final @NotNull Map<String, String> parameters) {
+    public SQRParametersAccessor(@NotNull final Map<String, String> parameters) {
         myParameters = parameters;
     }
 

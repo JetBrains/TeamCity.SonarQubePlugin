@@ -32,17 +32,17 @@ public class BuildSummaryLinkExtension extends SimplePageExtension {
     @NotNull
     private final SBuildServer myServer;
 
-    public BuildSummaryLinkExtension(final @NotNull WebControllerManager manager,
-                                     final @NotNull PluginDescriptor pluginDescriptor,
-                                     final @NotNull SBuildServer server) {
+    public BuildSummaryLinkExtension(@NotNull final WebControllerManager manager,
+                                     @NotNull final PluginDescriptor pluginDescriptor,
+                                     @NotNull final SBuildServer server) {
         super(manager, PlaceId.BUILD_SUMMARY, pluginDescriptor.getPluginName(), "buildSummary.jsp");
         myServer = server;
         register();
     }
 
     @Override
-    public void fillModel(final @NotNull Map<String, Object> model,
-                          final @NotNull HttpServletRequest request) {
+    public void fillModel(@NotNull final Map<String, Object> model,
+                          @NotNull final HttpServletRequest request) {
         final SBuild build = BuildDataExtensionUtil.retrieveBuild(request, myServer);
         if (build == null) {
             return;

@@ -19,11 +19,11 @@ public class SQSProjectSettings implements ProjectSettings {
     private Map<String, XMLBasedSQSInfo> mySQSInfos = null;
 
     @Nullable
-    public SQSInfo getInfo(final @NotNull String serverId) {
+    public SQSInfo getInfo(@NotNull final String serverId) {
         return mySQSInfos != null ? mySQSInfos.get(serverId) : null;
     }
 
-    public void setInfo(final @NotNull String serverId, final @NotNull SQSInfo modifiedSerever) {
+    public void setInfo(@NotNull final String serverId, @NotNull final SQSInfo modifiedSerever) {
         if (mySQSInfos == null) {
             mySQSInfos = new HashMap<String, XMLBasedSQSInfo>();
         }
@@ -62,7 +62,7 @@ public class SQSProjectSettings implements ProjectSettings {
     }
 
     @NotNull
-    private XMLBasedSQSInfo cast(final @NotNull SQSInfo info) {
+    private XMLBasedSQSInfo cast(@NotNull final SQSInfo info) {
         if (info instanceof XMLBasedSQSInfo) {
             return (XMLBasedSQSInfo) info;
         } else {

@@ -166,7 +166,7 @@ public class SQRBuildService extends CommandLineBuildService {
      * @throws SQRJarException
      */
     @NotNull
-    private File[] getSQRJar(final @NotNull File sqrRoot) throws SQRJarException {
+    private File[] getSQRJar(@NotNull final File sqrRoot) throws SQRJarException {
         final String path = getRunnerContext().getConfigParameters().get(SQR_RUNNER_PATH_PROPERTY);
         File baseDir;
         if (path != null) {

@@ -31,8 +31,8 @@ import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.Proj
 public class SQRPasswordProvider implements PasswordsProvider {
     private static final String PASSWORD_PARAMETER_TYPE = "password";
 
-    private final @NotNull SQSManager mySqsManager;
-    private final @NotNull ParameterFactory myFactory;
+     @NotNull private final SQSManager mySqsManager;
+     @NotNull private final ParameterFactory myFactory;
 
     public SQRPasswordProvider(@NotNull final SQSManager sqsManager,
                                @NotNull final ParameterFactory factory) {
@@ -60,10 +60,10 @@ public class SQRPasswordProvider implements PasswordsProvider {
      * @param parameterValue Parameter value. The parameter will not be added if the value is null or empty.
      * @param parameterName Parameter name. NB: resulting Parameter will have name in form "secure:teamcity.password.&lt;parameterName&gt;".
      */
-    private void addParameterIfNeeded(final @NotNull List<Parameter> list,
-                                      final @NotNull String id,
-                                      final @Nullable String parameterValue,
-                                      final @NotNull String parameterName) {
+    private void addParameterIfNeeded(@NotNull final List<Parameter> list,
+                                      @NotNull final String id,
+                                      @Nullable final String parameterValue,
+                                      @NotNull final String parameterName) {
         if (!Util.isEmpty(parameterValue)) {
             list.add(myFactory.createTypedParameter(id + "." + parameterName, parameterValue, PASSWORD_PARAMETER_TYPE));
         }
@@ -74,7 +74,7 @@ public class SQRPasswordProvider implements PasswordsProvider {
      * @return SQSInfo in the Build Configuration or null
      */
     @NotNull
-    private List<SQSInfo> findSQSInfos(final @Nullable SBuildType buildType) {
+    private List<SQSInfo> findSQSInfos(@Nullable final SBuildType buildType) {
         if (buildType == null) {
             return Collections.emptyList();
         }

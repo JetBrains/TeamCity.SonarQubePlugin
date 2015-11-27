@@ -14,34 +14,34 @@ import java.util.List;
  */
 public interface SQSManager {
     @NotNull
-    public List<SQSInfo> getAvailableServers(@NotNull ProjectAccessor accessor);
+    List<SQSInfo> getAvailableServers(@NotNull ProjectAccessor accessor);
 
     @Nullable
-    public SQSInfo findServer(@NotNull ProjectAccessor accessor, @NotNull String serverId);
+    SQSInfo findServer(@NotNull ProjectAccessor accessor, @NotNull String serverId);
 
-    public void editServer(final @NotNull SProject project,
-                           final @NotNull String serverId,
-                           final @NotNull SQSInfo modifiedServer) throws IOException;
+    void editServer(@NotNull final SProject project,
+                    @NotNull final String serverId,
+                    @NotNull final SQSInfo modifiedServer) throws IOException;
 
-    public void addServer(final @NotNull SProject toProject, final @NotNull SQSInfo newServer) throws IOException;
+    void addServer(@NotNull final SProject toProject, @NotNull final SQSInfo newServer) throws IOException;
 
-    public boolean removeIfExists(@NotNull SProject currentProject,
+    boolean removeIfExists(@NotNull SProject currentProject,
                            @NotNull String id) throws CannotDeleteData;
 
-    public static class ServerInfoExists extends IOException {
+    class ServerInfoExists extends IOException {
     }
 
-    public static class CannotDeleteData extends IOException {
-        public CannotDeleteData(final @NotNull String message) {
+    class CannotDeleteData extends IOException {
+        public CannotDeleteData(@NotNull final String message) {
             super(message);
         }
     }
 
-    public static abstract class ProjectAccessor {
+    abstract class ProjectAccessor {
         @Nullable
         protected SProject myProject;
 
-        public ProjectAccessor(final @Nullable SProject firstProject) {
+        public ProjectAccessor(@Nullable final SProject firstProject) {
             myProject = firstProject;
         }
 

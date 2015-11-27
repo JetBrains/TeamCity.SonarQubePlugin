@@ -26,7 +26,7 @@ public class SQRRunType extends RunType {
     public static final String DEFAULT_PROJECT_VERSION = "%build.number%";
     public static final String DEFAULT_SOURCE_PATH = "src";
 
-    public SQRRunType(final @NotNull RunTypeRegistry runTypeRegistry) {
+    public SQRRunType(@NotNull final RunTypeRegistry runTypeRegistry) {
         runTypeRegistry.registerRunType(this);
     }
 
@@ -90,7 +90,7 @@ public class SQRRunType extends RunType {
 
     @NotNull
     @Override
-    public String describeParameters(@NotNull Map<String, String> parameters) {
+    public String describeParameters(@NotNull final Map<String, String> parameters) {
         return "";
     }
 }

@@ -29,7 +29,7 @@ public final class Util {
         }
     }
 
-    public static boolean isSonarRunner(final @NotNull String runType) {
+    public static boolean isSonarRunner(@NotNull final String runType) {
         return Constants.RUNNER_TYPE.equals(runType);
     }
 
@@ -37,7 +37,7 @@ public final class Util {
      * @param str String to check
      * @return true if str is null or empty (zero length or spaces only)
      */
-    public static boolean isEmpty(final @Nullable String str) {
+    public static boolean isEmpty(@Nullable final String str) {
         return str == null || str.trim().isEmpty();
     }
 }

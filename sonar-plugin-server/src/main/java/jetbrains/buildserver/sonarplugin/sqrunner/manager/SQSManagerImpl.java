@@ -22,13 +22,13 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
     @NotNull
     private final ProjectSettingsManager mySettingsManager;
 
-    public SQSManagerImpl(final @NotNull ProjectSettingsManager settingsManager) {
+    public SQSManagerImpl(@NotNull final ProjectSettingsManager settingsManager) {
         mySettingsManager = settingsManager;
         mySettingsManager.registerSettingsFactory(SQS_MANAGER_KEY, this);
     }
 
     @NotNull
-    public List<SQSInfo> getAvailableServers(final @NotNull ProjectAccessor accessor) {
+    public List<SQSInfo> getAvailableServers(@NotNull final ProjectAccessor accessor) {
         SProject project;
         List<SQSInfo> res = new LinkedList<SQSInfo>();
         while ((project = accessor.next()) != null) {
@@ -38,7 +38,7 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
     }
 
     @Nullable
-    public synchronized SQSInfo findServer(final @NotNull ProjectAccessor accessor, final @NotNull String serverId) {
+    public synchronized SQSInfo findServer(@NotNull final ProjectAccessor accessor, @NotNull final String serverId) {
         SProject project;
         while ((project = accessor.next()) != null) {
             final SQSInfo info = getSettings(project).getInfo(serverId);
@@ -49,21 +49,21 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
         return null;
     }
 
-    public synchronized void editServer(final @NotNull SProject project,
-                                        final @NotNull String serverId,
-                                        final @NotNull SQSInfo modifiedServer) throws IOException {
+    public synchronized void editServer(@NotNull final SProject project,
+                                        @NotNull final String serverId,
+                                        @NotNull final SQSInfo modifiedServer) throws IOException {
         getSettings(project).setInfo(serverId, modifiedServer);
         project.persist();
     }
 
-    public synchronized void addServer(final @NotNull SProject project,
-                                       final @NotNull SQSInfo serverInfo) throws IOException {
+    public synchronized void addServer(@NotNull final SProject project,
+                                       @NotNull final SQSInfo serverInfo) throws IOException {
         getSettings(project).setInfo(serverInfo.getId(), serverInfo);
         project.persist();
     }
 
-    public boolean removeIfExists(final @NotNull SProject project,
-                                  final @NotNull String id) throws CannotDeleteData {
+    public boolean removeIfExists(@NotNull final SProject project,
+                                  @NotNull final String id) throws CannotDeleteData {
         if (getSettings(project).remove(id)) {
             project.persist();
             return true;
@@ -73,7 +73,7 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
     }
 
     @NotNull
-    private SQSProjectSettings getSettings(final @NotNull SProject project) {
+    private SQSProjectSettings getSettings(@NotNull final SProject project) {
         final ProjectSettings settings = mySettingsManager.getSettings(project.getProjectId(), SQS_MANAGER_KEY);
         if (!(settings instanceof SQSProjectSettings)) {
             // TODO log error
