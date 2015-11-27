@@ -76,6 +76,7 @@ public class SQRBuildService extends CommandLineBuildService {
         final Map<String, String> allParameters = new HashMap<String, String>(runnerParameters);
         allParameters.putAll(sharedConfigParameters);
         final SQRParametersAccessor accessor = new SQRParametersAccessor(allParameters);
+        addSQRArg(res, "-Dproject.home", ".");
         addSQRArg(res, "-Dsonar.host.url", accessor.getHostUrl());
         addSQRArg(res, "-Dsonar.jdbc.url", accessor.getJDBCUrl());
         addSQRArg(res, "-Dsonar.jdbc.username", accessor.getJDBCUsername());

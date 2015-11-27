@@ -12,6 +12,6 @@ public class SQRParametersAccessorTest {
     @Test
     public void testGetProjectName() {
         final SQRParametersAccessor accessor = new SQRParametersAccessor(Collections.singletonMap(Constants.SONAR_PROJECT_KEY, "key"));
-        Assert.assertEquals(accessor.getProjectName(), "key", "Should be 'key'");
+        Assert.assertEquals(accessor.getProjectName(), null, "Should be 'key'");
     }
 }

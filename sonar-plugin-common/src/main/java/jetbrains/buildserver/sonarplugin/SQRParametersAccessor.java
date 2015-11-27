@@ -18,12 +18,7 @@ public class SQRParametersAccessor {
     }
 
     public String getProjectName() {
-        final String name = myParameters.get(Constants.SONAR_PROJECT_NAME);
-        if (name != null) {
-            return name;
-        } else {
-            return getProjectKey();
-        }
+        return myParameters.get(Constants.SONAR_PROJECT_NAME);
     }
 
     public String getProjectKey() {
