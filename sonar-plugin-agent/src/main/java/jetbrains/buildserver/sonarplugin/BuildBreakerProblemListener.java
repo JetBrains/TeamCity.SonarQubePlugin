@@ -27,27 +27,27 @@ public class BuildBreakerProblemListener extends AgentLifeCycleAdapter {
     @Nullable
     private BuildProgressLogger myBuildLogger;
 
-    public BuildBreakerProblemListener(final @NotNull EventDispatcher<AgentLifeCycleListener> agentDispatcher) {
+    public BuildBreakerProblemListener(@NotNull final EventDispatcher<AgentLifeCycleListener> agentDispatcher) {
         agentDispatcher.addListener(this);
     }
 
     @Override
-    public void buildStarted(final @NotNull AgentRunningBuild runningBuild) {
+    public void buildStarted(@NotNull final AgentRunningBuild runningBuild) {
         myBuildLogger = runningBuild.getBuildLogger();
     }
 
     @Override
-    public void beforeBuildFinish(final @NotNull AgentRunningBuild build, final @NotNull BuildFinishedStatus buildStatus) {
+    public void beforeBuildFinish(@NotNull final AgentRunningBuild build, @NotNull final BuildFinishedStatus buildStatus) {
         myBuildLogger = null;
     }
 
     @Override
-    public void beforeRunnerStart(final @NotNull BuildRunnerContext runner) {
+    public void beforeRunnerStart(@NotNull final BuildRunnerContext runner) {
         mySonarIsWorking = Util.isSonarRunner(runner.getRunType());
     }
 
     @Override
-    public void messageLogged(final @NotNull BuildMessage1 buildMessage) {
+    public void messageLogged(@NotNull final BuildMessage1 buildMessage) {
         if (mySonarIsWorking) {
             if (buildMessage.getValue() instanceof String) {
                 final String message = (String)buildMessage.getValue();
@@ -61,7 +61,7 @@ public class BuildBreakerProblemListener extends AgentLifeCycleAdapter {
     }
 
     @Override
-    public void runnerFinished(final @NotNull BuildRunnerContext runner, final @NotNull BuildFinishedStatus status) {
+    public void runnerFinished(@NotNull final BuildRunnerContext runner, @NotNull final BuildFinishedStatus status) {
         if (mySonarIsWorking) {
             for (final String cause : myBuildProblems) {
                 logError(new SonarBuildBreakerMessage(cause).asString());
@@ -71,18 +71,18 @@ public class BuildBreakerProblemListener extends AgentLifeCycleAdapter {
         mySonarIsWorking = false;
     }
 
-    private void logError(final @NotNull String message) {
+    private void logError(@NotNull final String message) {
         if (myBuildLogger != null) {
             myBuildLogger.error(message);
         }
     }
 
     private static class SonarBuildBreakerMessage extends MessageWithAttributes {
-        public SonarBuildBreakerMessage(final @NotNull String description) {
+        public SonarBuildBreakerMessage(@NotNull final String description) {
             super(ServiceMessageTypes.BUILD_PORBLEM, attributesMap(description));
         }
 
-        private static Map<String, String> attributesMap(final @NotNull String description) {
+        private static Map<String, String> attributesMap(@NotNull final String description) {
             final Map<String, String> attributes = new HashMap<String, String>();
             attributes.put("type", "sonar-build-breaker");
             attributes.put("identity", Integer.toString(("sonar-build-breaker" + description).hashCode()));
