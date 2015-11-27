@@ -6,6 +6,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <%--@elvariable id="showUnknownServer" type="java.lang.Boolean"--%>
+<%--@elvariable id="showSelectServer" type="java.lang.Boolean"--%>
 
 <l:settingsGroup title="SonarQube Runner Parameters" className="advancedSetting">
     <tr><th class="noBorder"><label for="sqsChooser">SonarQube Server: </label></th>
@@ -13,9 +14,12 @@
             <c:choose>
                 <%--@elvariable id="servers" type="java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
                 <c:when test="${not empty servers}">
-                    <props:selectProperty name="sqsChooser" enableFilter="true" className="sqsChooser mediumField">
+                    <props:selectProperty name="sonarServer" enableFilter="true" className="sqsChooser mediumField">
                         <c:if test="${showUnknownServer}">
                             <props:option value="" selected="true">Unknown server</props:option>
+                        </c:if>
+                        <c:if test="${showSelectServer}">
+                            <props:option value="" selected="true">Choose server</props:option>
                         </c:if>
                         <c:forEach items="${servers}" var="server">
                             <props:option value="${server.id}"><c:out value="${server.name}"/>: <c:out value="${server.url}"/></props:option>
@@ -29,7 +33,7 @@
             <span id="error_sonarServer" class="error"></span>
         </td>
     </tr>
-    <tr style="display: none;"><th></th><td><props:textProperty name="sonarServer"/></td></tr>
+    <%--<tr style="display: none;"><th></th><td><props:textProperty name="sonarServer"/></td></tr>--%>
     <tr>
         <th class="noBorder"><label for="sonarProjectName">Project name: </label></th>
         <td>
@@ -99,25 +103,6 @@
 
 <script type="text/javascript">
     $j(function () {
-        var sonarServer = $j('#sonarServer');
-        var chooser = $j('.sqsChooser');
-
-        chooser.click(function() {$j("#error_sonarServer").text("");});
-        chooser.change(function() {sonarServer.val($j('#sqsChooser option:selected').val());});
-
-        if (sonarServer.val()) {
-            var ids = [];
-            chooser.find('option').map(function() {
-                ids.push($j(this).attr('value'));
-            });
-            if (ids.indexOf(sonarServer.val) >= 0) {
-                chooser.val(sonarServer.val());
-            } else {
-                sonarServer.val("");
-                chooser.val("Unknown");
-            }
-        } else {
-            sonarServer.val(chooser.val());
-        }
+        $j('.sonarServer').click(function() {$j("#error_sonarServer").text("");});
     });
 </script>

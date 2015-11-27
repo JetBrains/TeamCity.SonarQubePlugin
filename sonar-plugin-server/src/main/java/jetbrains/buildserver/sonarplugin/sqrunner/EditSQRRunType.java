@@ -45,7 +45,9 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
         model.put("servers", availableServers);
         final String sonarServer = getSonarServer(form);
 
-        if (Util.isEmpty(sonarServer) || mySqsManager.findServer(recurse(form.getProject()), sonarServer) == null) {
+        if (Util.isEmpty(sonarServer)) {
+            model.put("showSelectServer", Boolean.TRUE);
+        } else if (mySqsManager.findServer(recurse(form.getProject()), sonarServer) == null) {
             model.put("showUnknownServer", Boolean.TRUE);
         }
     }

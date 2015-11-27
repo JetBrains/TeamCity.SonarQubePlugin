@@ -38,7 +38,7 @@ public final class Constants {
     public static final String SONAR_PROJECT_NAME = "sonarProjectName";
     public static final String SONAR_ADDITIONAL_PARAMETERS = "additionalParameters";
     public static final String SONAR_SERVER_ID = "sonarServer";
-    public static final String SQS_CHOOSER = "sqsChooser";
+    public static final String SQS_CHOOSER = "sonarServer";
     public static final String SECURE_TEAMCITY_PASSWORD_PREFIX = "secure:teamcity.password.";
 
     private Constants() {
