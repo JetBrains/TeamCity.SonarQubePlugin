@@ -61,16 +61,11 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
         addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_URL, server.getJDBCUrl());
         addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_USERNAME, server.getJDBCUsername());
         if (!Util.isEmpty(server.getPassword())) {
-            runnerContext.addRunnerParameter(Constants.SONAR_PASSWORD, "%" + getSecuredPropertyName(server, Constants.SONAR_PASSWORD) + "%");
+            runnerContext.addRunnerParameter(Constants.SONAR_PASSWORD, server.getPassword());
         }
         if (!Util.isEmpty(server.getJDBCPassword())) {
-            runnerContext.addRunnerParameter(Constants.SONAR_SERVER_JDBC_PASSWORD, "%" + getSecuredPropertyName(server, Constants.SONAR_SERVER_JDBC_PASSWORD) + "%");
+            runnerContext.addRunnerParameter(Constants.SONAR_SERVER_JDBC_PASSWORD, server.getJDBCPassword());
         }
-    }
-
-    @NotNull
-    private String getSecuredPropertyName(@NotNull final SQSInfo server, @NotNull final String key) {
-        return Constants.SECURE_TEAMCITY_PASSWORD_PREFIX + server.getId() + "." + key;
     }
 
     private static void addIfNotNull(@NotNull final SRunnerContext runnerContext,
