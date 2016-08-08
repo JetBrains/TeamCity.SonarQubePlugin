@@ -2,10 +2,7 @@ package jetbrains.buildserver.sonarplugin;
 
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.plugins.beans.PluginDescriptor;
-import jetbrains.buildServer.agent.runner.CommandLineBuildService;
-import jetbrains.buildServer.agent.runner.JavaCommandLineBuilder;
-import jetbrains.buildServer.agent.runner.JavaRunnerUtil;
-import jetbrains.buildServer.agent.runner.ProgramCommandLine;
+import jetbrains.buildServer.agent.runner.*;
 import jetbrains.buildServer.runner.JavaRunnerConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,26 +34,17 @@ public class SQRBuildService extends CommandLineBuildService {
     @NotNull
     @Override
     public ProgramCommandLine makeProgramCommandLine() throws RunBuildException {
-        JavaCommandLineBuilder builder = new JavaCommandLineBuilder();
-        builder.setJavaHome(getRunnerContext().getRunnerParameters().get(JavaRunnerConstants.TARGET_JDK_HOME));
+        final List<String> programArgs = composeSQRArgs(
+                getRunnerContext().getRunnerParameters(),
+                getBuild().getSharedConfigParameters()
+        );
 
-        builder.setEnvVariables(getRunnerContext().getBuildParameters().getEnvironmentVariables());
-        builder.setSystemProperties(getRunnerContext().getBuildParameters().getSystemProperties());
+        getRunnerContext().addEnvironmentVariable("JAVA_HOME", getRunnerContext().getRunnerParameters().get(JavaRunnerConstants.TARGET_JDK_HOME));
 
-        builder.setJvmArgs(JavaRunnerUtil.extractJvmArgs(getRunnerContext().getRunnerParameters()));
-        builder.setClassPath(getClasspath());
+        final String executablePath = getExecutablePath();
+        final SimpleProgramCommandLine cmd = new SimpleProgramCommandLine(getRunnerContext(), executablePath, programArgs);
 
-        builder.setMainClass("org.sonar.runner.Main");
-        builder.setProgramArgs(
-                composeSQRArgs(
-                        getRunnerContext().getRunnerParameters(),
-                        getBuild().getSharedConfigParameters()
-                ));
-        builder.setWorkingDir(getRunnerContext().getWorkingDirectory().getAbsolutePath());
-
-        final ProgramCommandLine cmd = builder.build();
-
-        getLogger().message("Starting SQR");
+        getLogger().message("Starting SQR in " + executablePath);
         for (String str : cmd.getArguments()) {
             getLogger().message(str);
         }
@@ -159,6 +147,25 @@ public class SQRBuildService extends CommandLineBuildService {
             builder.append(file.getAbsolutePath()).append(File.pathSeparatorChar);
         }
         return builder.substring(0, builder.length() - 1);
+    }
+
+    @NotNull
+    private String getExecutablePath() throws RunBuildException {
+        File sqrRoot = myPluginDescriptor.getPluginRoot();
+        final String path = getRunnerContext().getConfigParameters().get(SQR_RUNNER_PATH_PROPERTY);
+        File exec;
+        if (path != null) {
+            exec = new File(path + File.separatorChar + "bin" + File.separatorChar + "sonar-runner");
+        } else {
+            exec = new File(sqrRoot, BUNDLED_SQR_RUNNER_PATH + File.separatorChar + "bin" + File.separatorChar + "sonar-runner");
+        }
+        if (!exec.exists()) {
+            throw new RunBuildException("SonarQube executable doesn't exist: " + exec.getAbsolutePath());
+        }
+        if (!exec.isFile()) {
+            throw new RunBuildException("SonarQube executable is not a file: " + exec.getAbsolutePath());
+        }
+        return exec.getAbsolutePath();
     }
 
     /**
