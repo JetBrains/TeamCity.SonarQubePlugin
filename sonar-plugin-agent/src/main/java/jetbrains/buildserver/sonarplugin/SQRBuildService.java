@@ -1,16 +1,18 @@
 package jetbrains.buildserver.sonarplugin;
 
-import com.intellij.openapi.util.SystemInfo;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.plugins.beans.PluginDescriptor;
 import jetbrains.buildServer.agent.runner.*;
 import jetbrains.buildServer.runner.JavaRunnerConstants;
+import jetbrains.buildServer.util.OSType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.*;
+
+import static jetbrains.buildServer.util.OSType.WINDOWS;
 
 /**
  * Created by Andrey Titov on 4/3/14.
@@ -25,11 +27,15 @@ public class SQRBuildService extends CommandLineBuildService {
     private final PluginDescriptor myPluginDescriptor;
     @NotNull
     private final SonarProcessListener mySonarProcessListener;
+    @NotNull
+    private final OSType myOsType;
 
     public SQRBuildService(@NotNull final PluginDescriptor pluginDescriptor,
-                           @NotNull final SonarProcessListener sonarProcessListener) {
+                           @NotNull final SonarProcessListener sonarProcessListener,
+                           @NotNull final OSType osType) {
         myPluginDescriptor = pluginDescriptor;
         mySonarProcessListener = sonarProcessListener;
+        myOsType = osType;
     }
 
     @NotNull
@@ -160,7 +166,7 @@ public class SQRBuildService extends CommandLineBuildService {
         final String path = getRunnerContext().getConfigParameters().get(SQR_RUNNER_PATH_PROPERTY);
         File exec;
 
-        String execName = SystemInfo.isWindows ? "sonar-runner.bat" : "sonar-runner";
+        String execName = myOsType == WINDOWS ? "sonar-runner.bat" : "sonar-runner";
 
         if (path != null) {
             exec = new File(path + File.separatorChar + "bin" + File.separatorChar + execName);
