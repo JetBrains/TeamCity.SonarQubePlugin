@@ -39,7 +39,10 @@ public class SQRBuildService extends CommandLineBuildService {
                 getBuild().getSharedConfigParameters()
         );
 
-        getRunnerContext().addEnvironmentVariable("JAVA_HOME", getRunnerContext().getRunnerParameters().get(JavaRunnerConstants.TARGET_JDK_HOME));
+        final String jdkHome = getRunnerContext().getRunnerParameters().get(JavaRunnerConstants.TARGET_JDK_HOME);
+        if (jdkHome != null) {
+            getRunnerContext().addEnvironmentVariable("JAVA_HOME", jdkHome);
+        }
 
         final String executablePath = getExecutablePath();
         final SimpleProgramCommandLine cmd = new SimpleProgramCommandLine(getRunnerContext(), executablePath, programArgs);
