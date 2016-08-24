@@ -1,5 +1,6 @@
 package jetbrains.buildserver.sonarplugin;
 
+import com.intellij.openapi.util.SystemInfo;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.plugins.beans.PluginDescriptor;
 import jetbrains.buildServer.agent.runner.*;
@@ -158,10 +159,13 @@ public class SQRBuildService extends CommandLineBuildService {
         File sqrRoot = myPluginDescriptor.getPluginRoot();
         final String path = getRunnerContext().getConfigParameters().get(SQR_RUNNER_PATH_PROPERTY);
         File exec;
+
+        String execName = SystemInfo.isWindows ? "sonar-runner.bat" : "sonar-runner";
+
         if (path != null) {
-            exec = new File(path + File.separatorChar + "bin" + File.separatorChar + "sonar-runner");
+            exec = new File(path + File.separatorChar + "bin" + File.separatorChar + execName);
         } else {
-            exec = new File(sqrRoot, BUNDLED_SQR_RUNNER_PATH + File.separatorChar + "bin" + File.separatorChar + "sonar-runner");
+            exec = new File(sqrRoot, BUNDLED_SQR_RUNNER_PATH + File.separatorChar + "bin" + File.separatorChar + execName);
         }
         if (!exec.exists()) {
             throw new RunBuildException("SonarQube executable doesn't exist: " + exec.getAbsolutePath());
