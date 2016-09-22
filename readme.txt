@@ -19,7 +19,7 @@
  3. Installing
  =====
 
- Install the plugin as described in: http://confluence.jetbrains.com/display/TCD8/Installing+Additional+Plugins
+ Install the plugin as described in: http://confluence.jetbrains.com/display/TCDL/Installing+Additional+Plugins
 
  4. License
  =====
