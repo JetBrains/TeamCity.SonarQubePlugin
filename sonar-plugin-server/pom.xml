@@ -1,41 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>sonar-plugin</artifactId>
-    <groupId>jetbrains.buildServer.sonarplugin</groupId>
-    <version>1.0-SNAPSHOT</version>
-  </parent>
-  <artifactId>sonar-plugin-server</artifactId>
-  <packaging>jar</packaging>
-  <dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.17</version>
+                    <configuration>
+                        <reportFormat>xml</reportFormat>
+                        <suiteXmlFiles>
+                            <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+                        </suiteXmlFiles>
+                    </configuration>
+                </plugin>
 
-    <dependency>
-      <groupId>jetbrains.buildServer.sonarplugin</groupId>
-      <artifactId>sonar-plugin-common</artifactId>
-      <version>1.0-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <parent>
+        <artifactId>sonar-plugin</artifactId>
+        <groupId>jetbrains.buildServer.sonarplugin</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>sonar-plugin-server</artifactId>
+    <packaging>jar</packaging>
+    <dependencies>
 
-    <dependency>
-      <groupId>org.jetbrains.teamcity</groupId>
-      <artifactId>server-api</artifactId>
-      <version>${teamcity-version}</version>
-      <scope>provided</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.8</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.3.0</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.jetbrains.teamcity</groupId>
-      <artifactId>tests-support</artifactId>
-      <version>${teamcity-version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>jetbrains.buildServer.sonarplugin</groupId>
+            <artifactId>sonar-plugin-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.jetbrains.teamcity.internal</groupId>
-      <artifactId>server</artifactId>
-      <version>${teamcity-version}</version>
-    </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity</groupId>
+            <artifactId>server-api</artifactId>
+            <version>${teamcity-version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-  </dependencies>
+        <dependency>
+            <groupId>org.jetbrains.teamcity</groupId>
+            <artifactId>tests-support</artifactId>
+            <version>${teamcity-version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains.teamcity.internal</groupId>
+            <artifactId>server</artifactId>
+            <version>${teamcity-version}</version>
+        </dependency>
+
+    </dependencies>
 </project>
