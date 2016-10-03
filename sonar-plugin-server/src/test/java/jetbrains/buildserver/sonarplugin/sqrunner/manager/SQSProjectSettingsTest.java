@@ -23,6 +23,7 @@ public class SQSProjectSettingsTest {
         BDDAssertions.then(holder.getInfo("serverId2")).isNotNull();
 
         holder.remove("serverId");
+        holder.remove("serverId2");
         BDDAssertions.then(holder.getInfo("serverId")).isNull();
         BDDAssertions.then(holder.getInfo("serverId2")).isNull();
     }
