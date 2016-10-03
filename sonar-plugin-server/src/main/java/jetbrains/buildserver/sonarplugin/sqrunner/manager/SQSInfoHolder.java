@@ -10,7 +10,7 @@ public interface SQSInfoHolder {
     @Nullable
     SQSInfo getInfo(@NotNull String serverId);
 
-    void setInfo(@NotNull String serverId, @NotNull SQSInfo modifiedSerever);
+    void setInfo(@NotNull String serverId, @NotNull SQSInfo modifiedServer);
 
     boolean remove(String serverId);
 }

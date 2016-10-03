@@ -25,11 +25,11 @@ public class SQSProjectSettings implements ProjectSettings, SQSInfoHolder {
     }
 
     @Override
-    public void setInfo(@NotNull final String serverId, @NotNull final SQSInfo modifiedSerever) {
+    public void setInfo(@NotNull final String serverId, @NotNull final SQSInfo modifiedServer) {
         if (mySQSInfos == null) {
-            mySQSInfos = new HashMap<String, XMLBasedSQSInfo>();
+            mySQSInfos = new HashMap<>();
         }
-        mySQSInfos.put(serverId, cast(modifiedSerever));
+        mySQSInfos.put(serverId, cast(modifiedServer));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class SQSProjectSettings implements ProjectSettings, SQSInfoHolder {
     public void readFrom(Element element) {
         final List children = element.getChildren(SONARQUBE_SERVER);
         if (mySQSInfos == null && !children.isEmpty()) {
-            mySQSInfos = new HashMap<String, XMLBasedSQSInfo>(children.size());
+            mySQSInfos = new HashMap<>(children.size());
         }
         for (Object o : children) {
             Element child = (Element)o;
