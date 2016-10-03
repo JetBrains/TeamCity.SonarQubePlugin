@@ -8,8 +8,6 @@ import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.ProjectAccessor.recurse;
-
 /**
  * Created by Andrey Titov on 6/2/14.
  * <p>
@@ -52,7 +50,7 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
             return null;
         }
 
-        return mySqsManager.findServer(recurse(project), serverId);
+        return mySqsManager.getServer(project, serverId);
     }
 
     private void doUpdateParameters(@NotNull final SRunnerContext runnerContext, @NotNull final SQSInfo server) {

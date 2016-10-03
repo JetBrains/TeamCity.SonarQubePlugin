@@ -14,6 +14,26 @@ import java.util.List;
  */
 public interface SQSManager {
     @NotNull
+    default List<SQSInfo> getAvailableServers(@NotNull final SProject project) {
+        return getAvailableServers(ProjectAccessor.recurse(project));
+    }
+
+    @NotNull
+    default List<SQSInfo> getOwnAvailableServers(@NotNull final SProject project) {
+        return getAvailableServers(ProjectAccessor.single(project));
+    }
+
+    @Nullable
+    default SQSInfo getServer(@NotNull final SProject project, @NotNull String serverId) {
+        return findServer(ProjectAccessor.recurse(project), serverId);
+    }
+
+    @Nullable
+    default SQSInfo getOwnServer(@NotNull final SProject project, @NotNull String serverId) {
+        return findServer(ProjectAccessor.single(project), serverId);
+    }
+
+    @NotNull
     List<SQSInfo> getAvailableServers(@NotNull ProjectAccessor accessor);
 
     @Nullable

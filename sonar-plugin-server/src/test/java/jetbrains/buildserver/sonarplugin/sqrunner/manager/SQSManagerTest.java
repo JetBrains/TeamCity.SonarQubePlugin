@@ -53,40 +53,40 @@ public class SQSManagerTest {
     public void test_own() {
         final SQSManager sqsManager = new SQSManagerImpl(mySettingsManager);
 
-        then(sqsManager.getAvailableServers(SQSManager.ProjectAccessor.single(myProject)))
+        then(sqsManager.getOwnAvailableServers(myProject))
                 .hasSize(1)
                 .areExactly(1, new Condition<>(sqsInfo -> sqsInfo.getId().equals(myServerId), "Should be one " + myServerId));
-        then(sqsManager.getAvailableServers(SQSManager.ProjectAccessor.single(myRoot)))
+        then(sqsManager.getOwnAvailableServers(myRoot))
                 .hasSize(1)
                 .areExactly(1, new Condition<>(sqsInfo -> sqsInfo.getId().equals(myRootServerId), "Should be one " + myRootServerId));
 
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.single(myProject), myServerId)).isNotNull().isSameAs(myServerInfo);
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.single(myProject), "nonExisting")).isNull();
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.single(myProject), myRootServerId)).isNull();
+        then(sqsManager.getOwnServer(myProject, myServerId)).isNotNull().isSameAs(myServerInfo);
+        then(sqsManager.getOwnServer(myProject, "nonExisting")).isNull();
+        then(sqsManager.getOwnServer(myProject, myRootServerId)).isNull();
 
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.single(myRoot), myServerId)).isNull();
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.single(myRoot), "nonExisting")).isNull();
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.single(myRoot), myRootServerId)).isNotNull().isSameAs(myRootServerInfo);
+        then(sqsManager.getOwnServer(myRoot, myServerId)).isNull();
+        then(sqsManager.getOwnServer(myRoot, "nonExisting")).isNull();
+        then(sqsManager.getOwnServer(myRoot, myRootServerId)).isNotNull().isSameAs(myRootServerInfo);
     }
 
     public void test_recurse() {
         final SQSManager sqsManager = new SQSManagerImpl(mySettingsManager);
 
-        then(sqsManager.getAvailableServers(SQSManager.ProjectAccessor.recurse(myProject)))
+        then(sqsManager.getAvailableServers(myProject))
                 .hasSize(2)
                 .areExactly(1, new Condition<>(sqsInfo -> sqsInfo.getId().equals(myServerId), "Should be one " + myServerId))
                 .areExactly(1, new Condition<>(sqsInfo -> sqsInfo.getId().equals(myRootServerId), "Should be one " + myServerId));
-        then(sqsManager.getAvailableServers(SQSManager.ProjectAccessor.single(myRoot)))
+        then(sqsManager.getAvailableServers(myRoot))
                 .hasSize(1)
                 .areExactly(1, new Condition<>(sqsInfo -> sqsInfo.getId().equals(myRootServerId), "containing %s", myRootServerId));
 
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.recurse(myProject), myServerId)).isNotNull().isSameAs(myServerInfo);
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.recurse(myProject), "nonExisting")).isNull();
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.recurse(myProject), myRootServerId)).isNotNull().isSameAs(myRootServerInfo);
+        then(sqsManager.getServer(myProject, myServerId)).isNotNull().isSameAs(myServerInfo);
+        then(sqsManager.getServer(myProject, "nonExisting")).isNull();
+        then(sqsManager.getServer(myProject, myRootServerId)).isNotNull().isSameAs(myRootServerInfo);
 
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.recurse(myRoot), myServerId)).isNull();
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.recurse(myRoot), "nonExisting")).isNull();
-        then(sqsManager.findServer(SQSManager.ProjectAccessor.recurse(myRoot), myRootServerId)).isNotNull().isSameAs(myRootServerInfo);
+        then(sqsManager.getServer(myRoot, myServerId)).isNull();
+        then(sqsManager.getServer(myRoot, "nonExisting")).isNull();
+        then(sqsManager.getServer(myRoot, myRootServerId)).isNotNull().isSameAs(myRootServerInfo);
     }
 
     @NotNull
