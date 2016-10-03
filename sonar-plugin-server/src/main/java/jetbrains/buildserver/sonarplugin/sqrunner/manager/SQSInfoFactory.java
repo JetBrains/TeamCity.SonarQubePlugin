@@ -21,4 +21,8 @@ public class SQSInfoFactory {
                                            @Nullable final String dbPassword) {
         return new XMLBasedSQSInfo(id == null ? UUID.randomUUID().toString() : id, name, url, login, password, dbUrl, dbUsername, dbPassword);
     }
+
+    public static SQSInfo createServerInfo(@Nullable final String id) {
+        return new XMLBasedSQSInfo(id == null ? UUID.randomUUID().toString() : id, null, null, null, null, null, null, null);
+    }
 }

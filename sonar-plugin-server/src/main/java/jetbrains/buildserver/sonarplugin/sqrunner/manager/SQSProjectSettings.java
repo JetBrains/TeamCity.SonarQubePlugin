@@ -12,17 +12,19 @@ import java.util.*;
  *
  * Class encapsulating several SQSInfos belonging to one SProject
  */
-public class SQSProjectSettings implements ProjectSettings {
+public class SQSProjectSettings implements ProjectSettings, SQSInfoHolder {
     public static final String SONARQUBE_SERVER = "sonarqube-server";
 
     @Nullable
     private Map<String, XMLBasedSQSInfo> mySQSInfos = null;
 
+    @Override
     @Nullable
     public SQSInfo getInfo(@NotNull final String serverId) {
         return mySQSInfos != null ? mySQSInfos.get(serverId) : null;
     }
 
+    @Override
     public void setInfo(@NotNull final String serverId, @NotNull final SQSInfo modifiedSerever) {
         if (mySQSInfos == null) {
             mySQSInfos = new HashMap<String, XMLBasedSQSInfo>();
@@ -30,6 +32,7 @@ public class SQSProjectSettings implements ProjectSettings {
         mySQSInfos.put(serverId, cast(modifiedSerever));
     }
 
+    @Override
     public boolean remove(String serverId) {
         return mySQSInfos != null && mySQSInfos.remove(serverId) != null;
     }
