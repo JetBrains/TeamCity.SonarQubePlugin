@@ -10,8 +10,8 @@ import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.factories.SQSInfoFactory;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.factories.SQSInfoFactory;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -114,7 +114,7 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
             return;
         }
 
-        final SQSInfo old = mySqsManager.findServer(SQSManager.ProjectAccessor.recurse(project), serverInfoId);
+        final SQSInfo old = mySqsManager.getServer(project, serverInfoId);
         if (old == null) {
             return;
         }
