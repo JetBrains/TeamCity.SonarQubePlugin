@@ -9,11 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by Anndrey Titov on 7/9/14.
+ * Created by Andrey Titov on 7/9/14.
  *
  * SQSInfo based on XML definition
  */
-class XMLBasedSQSInfo extends BasePropertiesBean implements SQSInfo, XmlStorable {
+public class XMLBasedSQSInfo extends BasePropertiesBean implements SQSInfo, XmlStorable {
     public static final String ID = "id";
     public static final String JDBC_URL = "jdbcUrl";
     public static final String JDBC_USERNAME = "jdbcUsername";
@@ -26,7 +26,7 @@ class XMLBasedSQSInfo extends BasePropertiesBean implements SQSInfo, XmlStorable
     private static final String[] OPEN_FIELDS = new String[] {ID, JDBC_URL, JDBC_USERNAME, URL, LOGIN, NAME, DESCRIPTION};
     private static final String[] ENCRYPTED_FIELDS = new String[] {JDBC_PASSWORD, PASSWORD};
 
-    XMLBasedSQSInfo() {
+    public XMLBasedSQSInfo() {
         super(null);
     }
 

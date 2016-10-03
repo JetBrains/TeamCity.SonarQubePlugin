@@ -2,7 +2,7 @@
 <suite name="Sonar server">
     <test name="Sonar server">
         <classes>
-            <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerImplTest"/>
+            <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerTest"/>
         </classes>
     </test>
 </suite>

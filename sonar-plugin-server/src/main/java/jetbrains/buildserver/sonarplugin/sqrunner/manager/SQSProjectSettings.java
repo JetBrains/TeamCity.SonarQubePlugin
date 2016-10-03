@@ -1,6 +1,7 @@
 package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
 import jetbrains.buildServer.serverSide.settings.ProjectSettings;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.factories.SQSInfoHolder;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

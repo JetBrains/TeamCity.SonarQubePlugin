@@ -15,16 +15,20 @@ import static org.mockito.Mockito.when;
  * Created by Andrey Titov on 30.09.16.
  */
 @Test
-public class SQSManagerImplTest {
+public class SQSManagerTest {
     private SProject myRoot;
     private SProject myProject;
-    private XMLBasedSQSInfo myRootServerInfo;
-    private XMLBasedSQSInfo myServerInfo;
+    private SQSInfo myRootServerInfo;
+    private SQSInfo myServerInfo;
     private ProjectSettingsManager mySettingsManager;
-    @NotNull private final String myProjectId = "projectId";
-    @NotNull private final String myRootProjectId = "_Root";
-    @NotNull private final String myRootServerId= "rootServerId";
-    @NotNull private final String myServerId = "serverId";
+    @NotNull
+    private final String myProjectId = "projectId";
+    @NotNull
+    private final String myRootProjectId = "_Root";
+    @NotNull
+    private final String myRootServerId = "rootServerId";
+    @NotNull
+    private final String myServerId = "serverId";
 
     @BeforeMethod(alwaysRun = true)
     public void setUp() throws Exception {
@@ -44,7 +48,7 @@ public class SQSManagerImplTest {
     }
 
     public void test_own() {
-        final SQSManagerImpl sqsManager = new SQSManagerImpl(mySettingsManager);
+        final SQSManager sqsManager = new SQSManagerImpl(mySettingsManager);
 
         then(sqsManager.getAvailableServers(SQSManager.ProjectAccessor.single(myProject)))
                 .hasSize(1)
@@ -63,7 +67,7 @@ public class SQSManagerImplTest {
     }
 
     public void test_recurse() {
-        final SQSManagerImpl sqsManager = new SQSManagerImpl(mySettingsManager);
+        final SQSManager sqsManager = new SQSManagerImpl(mySettingsManager);
 
         then(sqsManager.getAvailableServers(SQSManager.ProjectAccessor.recurse(myProject)))
                 .hasSize(2)
@@ -83,11 +87,11 @@ public class SQSManagerImplTest {
     }
 
     @NotNull
-    private static XMLBasedSQSInfo mockSQSInfo(@NotNull final ProjectSettingsManager settingsManager,
-                                               @NotNull final String serverId,
-                                               @NotNull final String inProject) {
+    private static SQSInfo mockSQSInfo(@NotNull final ProjectSettingsManager settingsManager,
+                                       @NotNull final String serverId,
+                                       @NotNull final String inProject) {
         final SQSProjectSettings t = new SQSProjectSettings();
-        final XMLBasedSQSInfo modifiedServer = new XMLBasedSQSInfo(serverId, null, null, null, null, null, null, null);
+        final SQSInfo modifiedServer = new XMLBasedSQSInfo(serverId, null, null, null, null, null, null, null);
         t.setInfo(serverId, modifiedServer);
         when(settingsManager.getSettings(inProject, SQSManagerImpl.SQS_MANAGER_KEY)).thenReturn(t);
         return modifiedServer;

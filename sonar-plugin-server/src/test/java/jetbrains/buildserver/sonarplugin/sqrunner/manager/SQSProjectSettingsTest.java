@@ -1,5 +1,6 @@
 package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.factories.SQSInfoHolder;
 import org.assertj.core.api.BDDAssertions;
 
 /**
