@@ -14,30 +14,16 @@ import java.util.List;
  */
 public interface SQSManager {
     @NotNull
-    default List<SQSInfo> getAvailableServers(@NotNull final SProject project) {
-        return getAvailableServers(ProjectAccessor.recurse(project));
-    }
+    List<SQSInfo> getAvailableServers(@NotNull final SProject project);
 
     @NotNull
-    default List<SQSInfo> getOwnAvailableServers(@NotNull final SProject project) {
-        return getAvailableServers(ProjectAccessor.single(project));
-    }
+    List<SQSInfo> getOwnAvailableServers(@NotNull final SProject project);
 
     @Nullable
-    default SQSInfo getServer(@NotNull final SProject project, @NotNull String serverId) {
-        return findServer(ProjectAccessor.recurse(project), serverId);
-    }
+    SQSInfo getServer(@NotNull final SProject project, @NotNull String serverId);
 
     @Nullable
-    default SQSInfo getOwnServer(@NotNull final SProject project, @NotNull String serverId) {
-        return findServer(ProjectAccessor.single(project), serverId);
-    }
-
-    @NotNull
-    List<SQSInfo> getAvailableServers(@NotNull ProjectAccessor accessor);
-
-    @Nullable
-    SQSInfo findServer(@NotNull ProjectAccessor accessor, @NotNull String serverId);
+    SQSInfo getOwnServer(@NotNull final SProject project, @NotNull String serverId);
 
     void editServer(@NotNull final SProject project,
                     @NotNull final String serverId,
@@ -55,40 +41,5 @@ public interface SQSManager {
         public CannotDeleteData(@NotNull final String message) {
             super(message);
         }
-    }
-
-    abstract class ProjectAccessor {
-        @Nullable
-        protected SProject myProject;
-
-        public ProjectAccessor(@Nullable final SProject firstProject) {
-            myProject = firstProject;
-        }
-
-        public static ProjectAccessor recurse(@NotNull final SProject project) {
-            return new ProjectAccessor(project) {
-                public SProject next() {
-                    if (myProject == null) {
-                        return null;
-                    }
-                    SProject t = myProject;
-                    myProject = myProject.getParentProject();
-                    return t;
-                }
-            };
-        }
-
-        public static ProjectAccessor single(@NotNull final SProject project) {
-            return new ProjectAccessor(project) {
-                @Override
-                public SProject next() {
-                    SProject t = myProject;
-                    myProject = null;
-                    return t;
-                }
-            };
-        }
-
-        public abstract SProject next();
     }
 }

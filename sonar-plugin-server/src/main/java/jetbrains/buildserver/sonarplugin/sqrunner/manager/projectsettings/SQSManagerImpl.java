@@ -30,17 +30,31 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
     }
 
     @NotNull
-    public List<SQSInfo> getAvailableServers(@NotNull final ProjectAccessor accessor) {
-        SProject project;
-        List<SQSInfo> res = new LinkedList<>();
-        while ((project = accessor.next()) != null) {
-            res.addAll(getSettings(project).getAll());
-        }
-        return res;
+    @Override
+    public List<SQSInfo> getAvailableServers(@NotNull final SProject project) {
+        return getAvailableServers(ProjectAccessor.recurse(project));
+    }
+
+    @NotNull
+    @Override
+    public List<SQSInfo> getOwnAvailableServers(@NotNull final SProject project) {
+        return getAvailableServers(ProjectAccessor.single(project));
     }
 
     @Nullable
-    public synchronized SQSInfo findServer(@NotNull final ProjectAccessor accessor, @NotNull final String serverId) {
+    @Override
+    public SQSInfo getServer(@NotNull final SProject project, @NotNull String serverId) {
+        return findServer(ProjectAccessor.recurse(project), serverId);
+    }
+
+    @Nullable
+    @Override
+    public SQSInfo getOwnServer(@NotNull final SProject project, @NotNull String serverId) {
+        return findServer(ProjectAccessor.single(project), serverId);
+    }
+
+    @Nullable
+    private synchronized SQSInfo findServer(@NotNull final ProjectAccessor accessor, @NotNull final String serverId) {
         SProject project;
         while ((project = accessor.next()) != null) {
             final SQSInfo info = getSettings(project).getInfo(serverId);
@@ -49,6 +63,16 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
             }
         }
         return null;
+    }
+
+    @NotNull
+    private List<SQSInfo> getAvailableServers(@NotNull final ProjectAccessor accessor) {
+        SProject project;
+        List<SQSInfo> res = new LinkedList<>();
+        while ((project = accessor.next()) != null) {
+            res.addAll(getSettings(project).getAll());
+        }
+        return res;
     }
 
     public synchronized void editServer(@NotNull final SProject project,
@@ -90,4 +114,39 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
         return new SQSProjectSettings();
     }
 
+
+    private static abstract class ProjectAccessor {
+        @Nullable
+        SProject myProject;
+
+        ProjectAccessor(@Nullable final SProject firstProject) {
+            myProject = firstProject;
+        }
+
+        static ProjectAccessor recurse(@NotNull final SProject project) {
+            return new ProjectAccessor(project) {
+                public SProject next() {
+                    if (myProject == null) {
+                        return null;
+                    }
+                    SProject t = myProject;
+                    myProject = myProject.getParentProject();
+                    return t;
+                }
+            };
+        }
+
+        static ProjectAccessor single(@NotNull final SProject project) {
+            return new ProjectAccessor(project) {
+                @Override
+                public SProject next() {
+                    SProject t = myProject;
+                    myProject = null;
+                    return t;
+                }
+            };
+        }
+
+        public abstract SProject next();
+    }
 }
