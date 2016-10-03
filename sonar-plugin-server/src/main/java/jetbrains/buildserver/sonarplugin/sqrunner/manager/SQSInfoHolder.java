@@ -1,4 +1,4 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager.factories;
+package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import org.jetbrains.annotations.NotNull;

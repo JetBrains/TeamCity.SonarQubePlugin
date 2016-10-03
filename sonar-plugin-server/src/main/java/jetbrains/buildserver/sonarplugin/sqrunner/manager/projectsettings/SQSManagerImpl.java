@@ -1,9 +1,11 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager;
+package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings;
 
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.settings.ProjectSettings;
 import jetbrains.buildServer.serverSide.settings.ProjectSettingsFactory;
 import jetbrains.buildServer.serverSide.settings.ProjectSettingsManager;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +32,7 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
     @NotNull
     public List<SQSInfo> getAvailableServers(@NotNull final ProjectAccessor accessor) {
         SProject project;
-        List<SQSInfo> res = new LinkedList<SQSInfo>();
+        List<SQSInfo> res = new LinkedList<>();
         while ((project = accessor.next()) != null) {
             res.addAll(getSettings(project).getAll());
         }

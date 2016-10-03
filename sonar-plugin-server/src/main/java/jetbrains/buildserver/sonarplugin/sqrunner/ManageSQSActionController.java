@@ -10,7 +10,7 @@ import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfoFactory;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.factories.SQSInfoFactory;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;

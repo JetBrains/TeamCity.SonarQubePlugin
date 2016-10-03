@@ -2,6 +2,9 @@ package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.settings.ProjectSettingsManager;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSManagerImpl;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSProjectSettings;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.XMLBasedSQSInfo;
 import org.assertj.core.api.Condition;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeMethod;

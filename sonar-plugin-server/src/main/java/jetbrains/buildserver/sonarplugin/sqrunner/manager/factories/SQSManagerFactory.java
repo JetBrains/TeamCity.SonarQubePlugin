@@ -2,7 +2,7 @@ package jetbrains.buildserver.sonarplugin.sqrunner.manager.factories;
 
 import jetbrains.buildServer.serverSide.settings.ProjectSettingsManager;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerImpl;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSManagerImpl;
 import org.jetbrains.annotations.NotNull;
 
 /**

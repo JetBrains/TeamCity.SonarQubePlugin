@@ -1,6 +1,7 @@
 package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.factories.SQSInfoHolder;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.factories.SQSInfoFactory;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSProjectSettings;
 import org.assertj.core.api.BDDAssertions;
 import org.testng.annotations.Test;
 
