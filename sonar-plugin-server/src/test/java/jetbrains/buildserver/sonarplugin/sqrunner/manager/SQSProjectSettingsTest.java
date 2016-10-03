@@ -2,10 +2,12 @@ package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.factories.SQSInfoHolder;
 import org.assertj.core.api.BDDAssertions;
+import org.testng.annotations.Test;
 
 /**
  * Created by linfar on 03.10.16.
  */
+@Test
 public class SQSProjectSettingsTest {
     public void test() {
         final SQSInfoHolder holder = new SQSProjectSettings();
