@@ -3,6 +3,7 @@
     <test name="Sonar server">
         <classes>
             <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerTest"/>
+            <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSProjectSettingsTest"/>
         </classes>
     </test>
 </suite>
