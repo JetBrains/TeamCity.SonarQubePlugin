@@ -3,6 +3,8 @@ package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 /**
  * Created by Andrey Titov on 7/9/14.
  *
@@ -35,4 +37,7 @@ public interface SQSInfo {
 
     @Nullable
     String getDescription();
+
+    @NotNull
+    Map<String, String> getParameters();
 }

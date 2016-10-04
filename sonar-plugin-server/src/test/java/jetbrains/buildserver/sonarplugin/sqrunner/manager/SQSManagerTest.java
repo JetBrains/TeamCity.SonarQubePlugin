@@ -51,7 +51,7 @@ public class SQSManagerTest {
     }
 
     public void test_own() {
-        final SQSManager sqsManager = new SQSManagerImpl(mySettingsManager);
+        final SQSManager sqsManager = getSQSManager(mySettingsManager);
 
         then(sqsManager.getOwnAvailableServers(myProject))
                 .hasSize(1)
@@ -69,8 +69,13 @@ public class SQSManagerTest {
         then(sqsManager.getOwnServer(myRoot, myRootServerId)).isNotNull().isSameAs(myRootServerInfo);
     }
 
+    @NotNull
+    public static SQSManagerImpl getSQSManager(ProjectSettingsManager settingsManager) {
+        return new SQSManagerImpl(settingsManager);
+    }
+
     public void test_recurse() {
-        final SQSManager sqsManager = new SQSManagerImpl(mySettingsManager);
+        final SQSManager sqsManager = getSQSManager(mySettingsManager);
 
         then(sqsManager.getAvailableServers(myProject))
                 .hasSize(2)
@@ -90,7 +95,7 @@ public class SQSManagerTest {
     }
 
     @NotNull
-    private static SQSInfo mockSQSInfo(@NotNull final ProjectSettingsManager settingsManager,
+    public static SQSInfo mockSQSInfo(@NotNull final ProjectSettingsManager settingsManager,
                                        @NotNull final String serverId,
                                        @NotNull final String inProject) {
         final SQSProjectSettings t = new SQSProjectSettings();

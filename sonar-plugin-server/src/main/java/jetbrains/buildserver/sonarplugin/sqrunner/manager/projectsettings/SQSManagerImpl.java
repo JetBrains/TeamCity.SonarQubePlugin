@@ -77,25 +77,24 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
 
     public synchronized void editServer(@NotNull final SProject project,
                                         @NotNull final String serverId,
-                                        @NotNull final SQSInfo modifiedServer) throws IOException {
-        getSettings(project).setInfo(serverId, modifiedServer);
-        project.persist();
+                                        @NotNull final SQSInfo sqsInfo) throws IOException {
+        getSettings(project).setInfo(serverId, sqsInfo);
     }
 
     public synchronized void addServer(@NotNull final SProject project,
-                                       @NotNull final SQSInfo serverInfo) throws IOException {
-        getSettings(project).setInfo(serverInfo.getId(), serverInfo);
-        project.persist();
+                                       @NotNull final SQSInfo sqsInfo) throws IOException {
+        getSettings(project).setInfo(sqsInfo.getId(), sqsInfo);
     }
 
-    public boolean removeIfExists(@NotNull final SProject project,
-                                  @NotNull final String id) throws CannotDeleteData {
-        if (getSettings(project).remove(id)) {
-            project.persist();
-            return true;
-        } else {
-            return false;
+    public SQSInfo removeIfExists(@NotNull final SProject project,
+                                  @NotNull final String serverId) throws CannotDeleteData {
+        final SQSProjectSettings settings = getSettings(project);
+        final SQSInfo info = settings.getInfo(serverId);
+        if (info != null) {
+            settings.remove(serverId);
+            return info;
         }
+        return null;
     }
 
     @NotNull

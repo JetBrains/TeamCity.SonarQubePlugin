@@ -1,6 +1,6 @@
 package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.factories.SQSInfoFactory;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.XMLBasedSQSInfoHelper;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSProjectSettings;
 import org.assertj.core.api.BDDAssertions;
 import org.testng.annotations.Test;
@@ -11,14 +11,14 @@ import org.testng.annotations.Test;
 @Test
 public class SQSProjectSettingsTest {
     public void test() {
-        final SQSInfoHolder holder = new SQSProjectSettings();
+        final SQSProjectSettings holder = new SQSProjectSettings();
         BDDAssertions.then(holder.getInfo("serverId")).isNull();
 
-        holder.setInfo("serverId", SQSInfoFactory.createServerInfo("serverId"));
+        holder.setInfo("serverId", XMLBasedSQSInfoHelper.createServerInfo("serverId"));
         BDDAssertions.then(holder.getInfo("serverId")).isNotNull();
         BDDAssertions.then(holder.getInfo("serverId2")).isNull();
 
-        holder.setInfo("serverId2", SQSInfoFactory.createServerInfo("serverId2"));
+        holder.setInfo("serverId2", XMLBasedSQSInfoHelper.createServerInfo("serverId2"));
         BDDAssertions.then(holder.getInfo("serverId")).isNotNull();
         BDDAssertions.then(holder.getInfo("serverId2")).isNotNull();
 

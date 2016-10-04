@@ -2,16 +2,19 @@ package jetbrains.buildserver.sonarplugin.sqrunner;
 
 import jetbrains.buildServer.controllers.BaseAjaxActionController;
 import jetbrains.buildServer.controllers.PublicKeyUtil;
+import jetbrains.buildServer.serverSide.ConfigAction;
+import jetbrains.buildServer.serverSide.ConfigActionFactory;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.auth.AuthUtil;
 import jetbrains.buildServer.serverSide.auth.SecurityContext;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfoFactory;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.factories.SQSInfoFactory;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,12 +51,20 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     private final ProjectManager myProjectManager;
     @NotNull
     private final SecurityContext securityContext;
+    @NotNull
+    private final SQSInfoFactory mySQSInfoFactory;
+    @NotNull
+    private final ConfigActionFactory myConfigActionFactory;
 
     public ManageSQSActionController(@NotNull final WebControllerManager controllerManager,
                                      @NotNull final SQSManager sqsManager,
                                      @NotNull final ProjectManager projectManager,
-                                     @NotNull final SecurityContext securityContext) {
+                                     @NotNull final SecurityContext securityContext,
+                                     @NotNull final SQSInfoFactory sqsInfoFactory,
+                                     @NotNull final ConfigActionFactory configActionFactory) {
         super(controllerManager);
+        mySQSInfoFactory = sqsInfoFactory;
+        myConfigActionFactory = configActionFactory;
         controllerManager.registerController("/admin/manageSonarServers.html", this);
         registerAction(this);
 
@@ -89,45 +100,60 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
 
         final String action = getAction(request);
         try {
+            ConfigAction configAction = null;
             if (ADD_SQS_ACTION.equals(action)) {
-                addServerInfo(request, project, ajaxResponse);
+                final SQSInfo sqsInfo = addServerInfo(request, project, ajaxResponse);
+                if (sqsInfo != null) {
+                    configAction = myConfigActionFactory.createAction(project, "SonarQube Server '" + sqsInfo.getName() + "' was added");
+                }
             } else if (REMOVE_SQS_ACTION.equals(action)) {
-                removeServerInfo(request, project, ajaxResponse);
+                final SQSInfo sqsInfo = removeServerInfo(request, project, ajaxResponse);
+                if (sqsInfo != null) {
+                    configAction = myConfigActionFactory.createAction(project, "SonarQube Server '" + sqsInfo.getName() + "' was removed");
+                }
             } else if (EDIT_SQS_ACTION.equals(action)) {
-                editServerInfo(request, project, ajaxResponse);
+                final SQSInfo sqsInfo = editServerInfo(request, project, ajaxResponse);
+                if (sqsInfo != null) {
+                    configAction = myConfigActionFactory.createAction(project, "parameters of SonarQube Server '" + sqsInfo.getName() + "' were changed");
+                }
+            }
+            if (configAction != null) {
+                project.persist(configAction);
             }
         } catch (IOException e) {
             ajaxResponse.setAttribute("error", "Exception occurred: " + e.getMessage());
         }
     }
 
-    private void editServerInfo(@NotNull final HttpServletRequest request,
+    private SQSInfo editServerInfo(@NotNull final HttpServletRequest request,
                                 @NotNull final SProject project,
                                 @NotNull final Element ajaxResponse) {
         if (!validate(request, ajaxResponse)) {
-            return;
+            return null;
         }
 
         final String serverInfoId = getServerInfoId(request);
         if (serverInfoId == null) {
             ajaxResponse.setAttribute("error", "ID is not set");
-            return;
+            return null;
         }
 
         final SQSInfo old = mySqsManager.getServer(project, serverInfoId);
         if (old == null) {
-            return;
+            return null;
         }
 
         final String pass = getPassword(request, old);
         final String jdbcPass = getJDBCPassword(request, old);
-        final SQSInfo info = getServerInfo(request, serverInfoId, pass, jdbcPass);
+        final SQSInfo info = createServerInfo(request, serverInfoId, pass, jdbcPass);
         try {
             mySqsManager.editServer(project, serverInfoId, info);
             ajaxResponse.setAttribute("status", "OK");
+            return info;
         } catch (IOException e) {
             ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
         }
+        return null;
     }
 
     @Nullable
@@ -141,22 +167,22 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     }
 
     @NotNull
-    private SQSInfo getServerInfo(@NotNull HttpServletRequest request, String serverInfoId, String pass, String jdbcPass) {
-        return SQSInfoFactory.createServerInfo(serverInfoId,
-                request.getParameter(SERVERINFO_NAME),
-                request.getParameter(SONAR_URL),
-                request.getParameter(SONAR_LOGIN),
-                pass,
-                request.getParameter(SONAR_JDBC_URL),
-                request.getParameter(SONAR_JDBC_USERNAME),
-                jdbcPass);
+    private SQSInfo createServerInfo(@NotNull HttpServletRequest request, String serverInfoId, String pass, String jdbcPass) {
+        return mySQSInfoFactory.create(serverInfoId,
+                StringUtil.nullIfEmpty(request.getParameter(SERVERINFO_NAME)),
+                StringUtil.nullIfEmpty(request.getParameter(SONAR_URL)),
+                StringUtil.nullIfEmpty(request.getParameter(SONAR_LOGIN)),
+                StringUtil.nullIfEmpty(pass),
+                StringUtil.nullIfEmpty(request.getParameter(SONAR_JDBC_URL)),
+                StringUtil.nullIfEmpty(request.getParameter(SONAR_JDBC_USERNAME)),
+                StringUtil.nullIfEmpty(jdbcPass));
     }
 
     private String decryptIfNeeded(@Nullable final String value) {
         return value != null ? RSACipher.decryptWebRequestData(value) : null;
     }
 
-    private void removeServerInfo(@NotNull final HttpServletRequest request,
+    private SQSInfo removeServerInfo(@NotNull final HttpServletRequest request,
                                   @NotNull final SProject project,
                                   @NotNull final Element ajaxResponse) throws IOException {
         final String serverinfoId = getServerInfoId(request);
@@ -164,9 +190,10 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
             ajaxResponse.setAttribute("error", "ID is not set");
         } else {
             try {
-                final boolean wasRemoved = mySqsManager.removeIfExists(project, serverinfoId);
-                if (wasRemoved) {
+                final SQSInfo wasRemoved = mySqsManager.removeIfExists(project, serverinfoId);
+                if (wasRemoved != null) {
                     ajaxResponse.setAttribute("status", serverinfoId + " was removed");
+                    return wasRemoved;
                 } else {
                     ajaxResponse.setAttribute("error", serverinfoId + " wasn't removed");
                 }
@@ -174,22 +201,25 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                 ajaxResponse.setAttribute("error", "Cannot delete data - " + cannotDeleteData.getMessage());
             }
         }
+        return null;
     }
 
-    private void addServerInfo(@NotNull final HttpServletRequest request,
-                               @NotNull final SProject project,
-                               @NotNull final Element ajaxResponse) throws IOException {
+    private SQSInfo addServerInfo(@NotNull final HttpServletRequest request,
+                                  @NotNull final SProject project,
+                                  @NotNull final Element ajaxResponse) throws IOException {
         if (validate(request, ajaxResponse)) {
-            final SQSInfo serverInfo = getServerInfo(request, null, decryptIfNeeded(request.getParameter(SONAR_PASSWORD)), decryptIfNeeded(request.getParameter(SONAR_JDBC_PASSWORD)));
+            final SQSInfo serverInfo = createServerInfo(request, null, decryptIfNeeded(request.getParameter(SONAR_PASSWORD)), decryptIfNeeded(request.getParameter(SONAR_JDBC_PASSWORD)));
             try {
                 mySqsManager.addServer(project, serverInfo);
                 ajaxResponse.setAttribute("status", "OK");
+                return serverInfo;
             } catch (SQSManager.ServerInfoExists e) {
                 ajaxResponse.setAttribute("error", "Server with such name already exists");
             } catch (IOException e) {
                 ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
             }
         }
+        return null;
     }
 
     private boolean validate(HttpServletRequest request, Element ajaxResponse) {

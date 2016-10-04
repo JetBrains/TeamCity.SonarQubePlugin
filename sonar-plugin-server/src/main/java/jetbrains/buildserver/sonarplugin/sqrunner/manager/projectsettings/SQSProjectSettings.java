@@ -2,7 +2,6 @@ package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings;
 
 import jetbrains.buildServer.serverSide.settings.ProjectSettings;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfoHolder;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,19 +13,17 @@ import java.util.*;
  *
  * Class encapsulating several SQSInfos belonging to one SProject
  */
-public class SQSProjectSettings implements ProjectSettings, SQSInfoHolder {
+public class SQSProjectSettings implements ProjectSettings {
     public static final String SONARQUBE_SERVER = "sonarqube-server";
 
     @Nullable
     private Map<String, XMLBasedSQSInfo> mySQSInfos = null;
 
-    @Override
     @Nullable
     public SQSInfo getInfo(@NotNull final String serverId) {
         return mySQSInfos != null ? mySQSInfos.get(serverId) : null;
     }
 
-    @Override
     public void setInfo(@NotNull final String serverId, @NotNull final SQSInfo modifiedServer) {
         if (mySQSInfos == null) {
             mySQSInfos = new HashMap<>();
@@ -34,7 +31,6 @@ public class SQSProjectSettings implements ProjectSettings, SQSInfoHolder {
         mySQSInfos.put(serverId, cast(modifiedServer));
     }
 
-    @Override
     public boolean remove(String serverId) {
         return mySQSInfos != null && mySQSInfos.remove(serverId) != null;
     }

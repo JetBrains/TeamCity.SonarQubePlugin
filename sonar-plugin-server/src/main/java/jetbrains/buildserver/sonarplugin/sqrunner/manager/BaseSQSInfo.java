@@ -1,7 +1,6 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings;
+package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
 import jetbrains.buildServer.controllers.BasePropertiesBean;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,10 +19,10 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
     public static final String PASSWORD = "password";
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
-    protected static final String[] OPEN_FIELDS = new String[] {ID, JDBC_URL, JDBC_USERNAME, URL, LOGIN, NAME, DESCRIPTION};
-    protected static final String[] ENCRYPTED_FIELDS = new String[] {JDBC_PASSWORD, PASSWORD};
+    public static final String[] OPEN_FIELDS = new String[] {ID, JDBC_URL, JDBC_USERNAME, URL, LOGIN, NAME, DESCRIPTION};
+    public static final String[] ENCRYPTED_FIELDS = new String[] {JDBC_PASSWORD, PASSWORD};
 
-    public BaseSQSInfo(Map<String, String> properties) {
+    public BaseSQSInfo(@Nullable final Map<String, String> properties) {
         super(properties);
     }
 
@@ -46,7 +45,18 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
         setProperty(JDBC_USERNAME, jdbcUsername);
     }
 
-    protected String get(final String key) {
+    public BaseSQSInfo(@NotNull final String id) {
+        super(null);
+        setProperty(ID, id);
+    }
+
+    @Override
+    public synchronized void setProperty(String name, String value) {
+        if (value == null) getProperties().remove(name);
+        else super.setProperty(name, value);
+    }
+
+    protected String get(@NotNull final String key) {
         return getProperties().get(key);
     }
 
@@ -93,5 +103,27 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
     @Nullable
     public String getDescription() {
         return get(DESCRIPTION);
+    }
+
+    @NotNull
+    @Override
+    public Map<String, String> getParameters() {
+        return getProperties();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BaseSQSInfo)) return false;
+
+        BaseSQSInfo that = (BaseSQSInfo) o;
+
+        return getId().equals(that.getId());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
     }
 }

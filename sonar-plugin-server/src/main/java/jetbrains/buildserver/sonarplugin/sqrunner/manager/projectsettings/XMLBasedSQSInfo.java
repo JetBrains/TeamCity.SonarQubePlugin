@@ -3,9 +3,12 @@ package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings;
 import jetbrains.buildServer.XmlStorable;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import jetbrains.buildserver.sonarplugin.Util;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.BaseSQSInfo;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
 
 /**
  * Created by Andrey Titov on 7/9/14.
@@ -14,8 +17,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class XMLBasedSQSInfo extends BaseSQSInfo implements XmlStorable {
 
-    public XMLBasedSQSInfo() {
-        super(null);
+    XMLBasedSQSInfo() {
+        super((Map<String, String>)null);
     }
 
     public XMLBasedSQSInfo(@NotNull final String id,

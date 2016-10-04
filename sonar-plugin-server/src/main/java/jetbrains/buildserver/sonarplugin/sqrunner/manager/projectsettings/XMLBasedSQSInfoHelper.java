@@ -1,4 +1,4 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager.factories;
+package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings;
 
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.XMLBasedSQSInfo;
@@ -9,8 +9,8 @@ import java.util.UUID;
 /**
  * Created by Andrey Titov on 7/10/14.
  */
-public class SQSInfoFactory {
-    private SQSInfoFactory() {
+public class XMLBasedSQSInfoHelper {
+    private XMLBasedSQSInfoHelper() {
     }
 
     public static SQSInfo createServerInfo(@Nullable final String id,
