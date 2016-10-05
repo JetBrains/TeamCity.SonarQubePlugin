@@ -4,6 +4,7 @@
         <classes>
             <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerTest"/>
             <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSProjectSettingsTest"/>
+            <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.MigratingSQSManagerTest"/>
         </classes>
     </test>
 </suite>

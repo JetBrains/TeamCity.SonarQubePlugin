@@ -9,7 +9,6 @@ import jetbrains.buildserver.sonarplugin.sqrunner.manager.BaseSQSInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +18,11 @@ import java.util.stream.Stream;
 
 /**
  * Created by linfar on 03.10.16.
+ *
+ * Project features based SQSManager. Doesn't store data itself converting it from project features on demand instead.
  */
 public class SQSManagerProjectFeatures implements SQSManager {
-    private static final String PROJECT_FEATURE_TYPE = "";
+    protected static final String PROJECT_FEATURE_TYPE = "";
 
     @NotNull
     @Override
@@ -36,46 +37,62 @@ public class SQSManagerProjectFeatures implements SQSManager {
     @NotNull
     @Override
     public synchronized List<SQSInfo> getOwnAvailableServers(@NotNull SProject project) {
-        return getOwnServersStream(project).collect(Collectors.toList());
-    }
-
-    private Stream<? extends SQSInfo> getOwnServersStream(@NotNull SProject project) {
-        return project.getOwnFeaturesOfType(PROJECT_FEATURE_TYPE).stream().map(SQSInfoImpl::new);
+        return project.getOwnFeaturesOfType(PROJECT_FEATURE_TYPE).stream().map(SQSInfoImpl::new).collect(Collectors.toList());
     }
 
     @Nullable
     @Override
     public synchronized SQSInfo getServer(@NotNull SProject project, @NotNull String serverId) {
-        return getAvailableServersStream(project).filter(sqs -> serverId.equals(sqs.getId())).findFirst().orElse(null);
+        final Optional<SProjectFeatureDescriptor> optional = project.getAvailableFeaturesOfType(PROJECT_FEATURE_TYPE).stream().filter(f -> {
+            final String id = f.getParameters().get(BaseSQSInfo.ID);
+            return id != null && serverId.equals(id);
+        }).findFirst();
+        if (optional.isPresent()) {
+            return new SQSInfoImpl(optional.get());
+        }
+        return null;
     }
 
     @Nullable
     @Override
     public synchronized SQSInfo getOwnServer(@NotNull SProject project, @NotNull String serverId) {
-        return getOwnServersStream(project).filter(sqs -> serverId.equals(sqs.getId())).findFirst().orElse(null);
+        final Optional<SProjectFeatureDescriptor> optional = findByServerId(project, serverId);
+        if (optional.isPresent()) {
+            return new SQSInfoImpl(optional.get());
+        }
+        return null;
     }
 
+    @NotNull
     @Override
-    public synchronized void editServer(@NotNull SProject project, @NotNull String serverId, @NotNull SQSInfo modifiedServer) throws IOException {
-        final Optional<SProjectFeatureDescriptor> found = findByServerId(project, serverId);
+    public synchronized SQSActionResult editServer(@NotNull SProject project, @NotNull SQSInfo modifiedServer) {
+        final Optional<SProjectFeatureDescriptor> found = findByServerId(project, modifiedServer.getId());
         if (found.isPresent()) {
             final SProjectFeatureDescriptor featureDescriptor = found.get();
             project.updateFeature(featureDescriptor.getId(), PROJECT_FEATURE_TYPE, toMap(modifiedServer));
+            return new SQSActionResult(new SQSInfoImpl(found.get()), modifiedServer, "SonarQube Server '" + modifiedServer.getName() + "' updated");
+        } else {
+            return addServer(project, modifiedServer);
         }
     }
 
+    @NotNull
     @Override
-    public synchronized void addServer(@NotNull SProject toProject, @NotNull SQSInfo newServer) throws IOException {
-        toProject.addFeature(PROJECT_FEATURE_TYPE, toMap(newServer));
+    public synchronized SQSActionResult addServer(@NotNull SProject toProject, @NotNull SQSInfo newServer) {
+        if (getServer(toProject, newServer.getId()) != null) return new SQSActionResult(null, null, "Cannot add: SonarQube Server with id '" + newServer.getId() + "' already exists", true);
+        doAddServer(toProject, newServer);
+        return new SQSActionResult(null, newServer, "SonarQube Server '" + newServer.getName() + " added");
     }
 
+    @NotNull
     @Override
-    public synchronized SQSInfo removeIfExists(@NotNull SProject project, @NotNull String serverId) throws CannotDeleteData {
+    public synchronized SQSActionResult removeServer(@NotNull SProject project, @NotNull String serverId) {
         final Optional<SProjectFeatureDescriptor> found = findByServerId(project, serverId);
         if (found.isPresent() && project.removeFeature(found.get().getId()) != null) {
-            return new SQSInfoImpl(found.get());
+            final SQSInfoImpl old = new SQSInfoImpl(found.get());
+            return new SQSActionResult(old, null, "SonarQube Server '" + old.getName() + "' removed");
         }
-        return null;
+        return new SQSActionResult(null, null, "Cannot remove: SonarQube Server with id '" + serverId + "' doesn't exist");
     }
 
     private Optional<SProjectFeatureDescriptor> findByServerId(@NotNull SProject project, @NotNull String serverId) {
@@ -96,5 +113,9 @@ public class SQSManagerProjectFeatures implements SQSManager {
             }
         }
         return res;
+    }
+
+    private void doAddServer(@NotNull SProject toProject, @NotNull SQSInfo newServer) {
+        toProject.addFeature(PROJECT_FEATURE_TYPE, toMap(newServer));
     }
 }

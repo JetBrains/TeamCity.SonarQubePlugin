@@ -9,7 +9,6 @@ import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -75,26 +74,37 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
         return res;
     }
 
-    public synchronized void editServer(@NotNull final SProject project,
-                                        @NotNull final String serverId,
-                                        @NotNull final SQSInfo sqsInfo) throws IOException {
-        getSettings(project).setInfo(serverId, sqsInfo);
-    }
-
-    public synchronized void addServer(@NotNull final SProject project,
-                                       @NotNull final SQSInfo sqsInfo) throws IOException {
-        getSettings(project).setInfo(sqsInfo.getId(), sqsInfo);
-    }
-
-    public SQSInfo removeIfExists(@NotNull final SProject project,
-                                  @NotNull final String serverId) throws CannotDeleteData {
+    @NotNull
+    public synchronized SQSActionResult editServer(@NotNull final SProject project,
+                                                   @NotNull final SQSInfo sqsInfo){
         final SQSProjectSettings settings = getSettings(project);
-        final SQSInfo info = settings.getInfo(serverId);
-        if (info != null) {
-            settings.remove(serverId);
-            return info;
+        final SQSInfo old = settings.getInfo(sqsInfo.getId());
+        settings.setInfo(sqsInfo.getId(), sqsInfo);
+        return new SQSActionResult(old, sqsInfo, "SonarQube Server '" + sqsInfo.getName() + "' updated");
+    }
+
+    @NotNull
+    public synchronized SQSActionResult addServer(@NotNull final SProject project,
+                                                  @NotNull final SQSInfo sqsInfo) {
+        final SQSProjectSettings settings = getSettings(project);
+        final SQSInfo old = settings.getInfo(sqsInfo.getId());
+        if (old != null) {
+            return new SQSActionResult(old, null, "Cannot add: SonarQube Server with id " + sqsInfo.getId() + " already exists");
         }
-        return null;
+        settings.setInfo(sqsInfo.getId(), sqsInfo);
+        return new SQSActionResult(null, sqsInfo, "SonarQube Server '" + sqsInfo.getName() + " added");
+    }
+
+    @NotNull
+    public SQSActionResult removeServer(@NotNull final SProject project,
+                                        @NotNull final String serverId) {
+        final SQSProjectSettings settings = getSettings(project);
+        final SQSInfo old = settings.getInfo(serverId);
+        if (old != null) {
+            settings.remove(serverId);
+            return new SQSActionResult(old, null, "SonarQube Server '" + old.getName() + "' removed");
+        }
+        return new SQSActionResult(null, null, "Cannot remove: SonarQube Server with id '" + serverId + "' doesn't exist");
     }
 
     @NotNull

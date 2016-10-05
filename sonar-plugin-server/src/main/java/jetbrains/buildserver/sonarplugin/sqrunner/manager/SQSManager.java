@@ -4,12 +4,11 @@ import jetbrains.buildServer.serverSide.SProject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
  * Created by Andrey Titov on 7/9/14.
- *
+ * <p>
  * SonarQube Server data manager
  */
 public interface SQSManager {
@@ -25,21 +24,46 @@ public interface SQSManager {
     @Nullable
     SQSInfo getOwnServer(@NotNull final SProject project, @NotNull String serverId);
 
-    void editServer(@NotNull final SProject project,
-                    @NotNull final String serverId,
-                    @NotNull final SQSInfo sqsInfo) throws IOException;
+    @NotNull
+    SQSActionResult editServer(@NotNull final SProject project, @NotNull final SQSInfo sqsInfo);
 
-    void addServer(@NotNull final SProject project, @NotNull final SQSInfo sqsInfo) throws IOException;
+    @NotNull
+    SQSActionResult addServer(@NotNull final SProject project, @NotNull final SQSInfo sqsInfo);
 
-    SQSInfo removeIfExists(@NotNull SProject project,
-                           @NotNull String serverId) throws CannotDeleteData;
+    @NotNull
+    SQSActionResult removeServer(@NotNull final SProject project, @NotNull final String serverId);
 
-    class ServerInfoExists extends IOException {
-    }
+    class SQSActionResult {
+        final SQSInfo myBeforeAction;
+        final SQSInfo myAfterAction;
+        final String myReason;
+        final boolean myIsError;
 
-    class CannotDeleteData extends IOException {
-        public CannotDeleteData(@NotNull final String message) {
-            super(message);
+        public SQSActionResult(@Nullable final SQSInfo beforeAction, @Nullable final SQSInfo afterAction, @NotNull final String reason) {
+            this(beforeAction, afterAction, reason, false);
+        }
+
+        public SQSActionResult(@Nullable final SQSInfo beforeAction, @Nullable final SQSInfo afterAction, @NotNull final String reason, final boolean isError) {
+            myBeforeAction = beforeAction;
+            myAfterAction = afterAction;
+            myReason = reason;
+            myIsError = isError;
+        }
+
+        public SQSInfo getBeforeAction() {
+            return myBeforeAction;
+        }
+
+        public SQSInfo getAfterAction() {
+            return myAfterAction;
+        }
+
+        public String getReason() {
+            return myReason;
+        }
+
+        public boolean isError() {
+            return myIsError;
         }
     }
 }

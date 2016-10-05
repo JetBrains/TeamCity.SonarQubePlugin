@@ -29,22 +29,21 @@ import java.io.IOException;
  * Ajax controller for SonarQube Server management
  */
 public class ManageSQSActionController extends BaseAjaxActionController implements ControllerAction {
+    private static final String SERVERINFO_ID = "serverinfo.id";
+    private static final String SERVERINFO_NAME = "serverinfo.name";
+    private static final String SONAR_URL = "sonar.host.url";
+    private static final String SONAR_LOGIN = "sonar.login";
+    private static final String SONAR_PASSWORD = "sonar.password";
+    private static final String SONAR_PASSWORD_PRESERVE = "sonar.password_preserve";
+    private static final String SONAR_JDBC_URL = "sonar.jdbc.url";
+    private static final String SONAR_JDBC_USERNAME = "sonar.jdbc.username";
+    private static final String SONAR_JDBC_PASSWORD = "sonar.jdbc.password";
+    private static final String SONAR_JDBC_PASSWORD_PRESERVE = "sonar.jdbc.password_preserve";
 
-    public static final String SERVERINFO_ID = "serverinfo.id";
-    public static final String SERVERINFO_NAME = "serverinfo.name";
-    public static final String SONAR_URL = "sonar.host.url";
-    public static final String SONAR_LOGIN = "sonar.login";
-    public static final String SONAR_PASSWORD = "sonar.password";
-    public static final String SONAR_PASSWORD_PRESERVE = "sonar.password_preserve";
-    public static final String SONAR_JDBC_URL = "sonar.jdbc.url";
-    public static final String SONAR_JDBC_USERNAME = "sonar.jdbc.username";
-    public static final String SONAR_JDBC_PASSWORD = "sonar.jdbc.password";
-    public static final String SONAR_JDBC_PASSWORD_PRESERVE = "sonar.jdbc.password_preserve";
-
-    public static final String ADD_SQS_ACTION = "addSqs";
-    public static final String REMOVE_SQS_ACTION = "removeSqs";
-    public static final String EDIT_SQS_ACTION = "editSqs";
-    public static final String SQS_ACTION = "action";
+    private static final String ADD_SQS_ACTION = "addSqs";
+    private static final String REMOVE_SQS_ACTION = "removeSqs";
+    private static final String EDIT_SQS_ACTION = "editSqs";
+    private static final String SQS_ACTION = "action";
     @NotNull
     private final SQSManager mySqsManager;
     @NotNull
@@ -146,14 +145,13 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
         final String pass = getPassword(request, old);
         final String jdbcPass = getJDBCPassword(request, old);
         final SQSInfo info = createServerInfo(request, serverInfoId, pass, jdbcPass);
-        try {
-            mySqsManager.editServer(project, serverInfoId, info);
+        final SQSManager.SQSActionResult result = mySqsManager.editServer(project, info);
+        if (!result.isError()) {
             ajaxResponse.setAttribute("status", "OK");
-            return info;
-        } catch (IOException e) {
-            ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
+        } else {
+            ajaxResponse.setAttribute("error", result.getReason());
         }
-        return null;
+        return result.getAfterAction();
     }
 
     @Nullable
@@ -189,18 +187,14 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
         if (serverinfoId == null) {
             ajaxResponse.setAttribute("error", "ID is not set");
         } else {
-            try {
-                final SQSInfo wasRemoved = mySqsManager.removeIfExists(project, serverinfoId);
-                if (wasRemoved != null) {
-                    ajaxResponse.setAttribute("status", serverinfoId + " was removed");
-                    return wasRemoved;
-                } else {
-                    ajaxResponse.setAttribute("error", serverinfoId + " wasn't removed");
-                }
-            } catch (SQSManager.CannotDeleteData cannotDeleteData) {
-                ajaxResponse.setAttribute("error", "Cannot delete data - " + cannotDeleteData.getMessage());
+            final SQSManager.SQSActionResult result = mySqsManager.removeServer(project, serverinfoId);
+            if (!result.isError()) {
+                ajaxResponse.setAttribute("status", result.getReason());
+                return result.getBeforeAction();
+            } else {
+                ajaxResponse.setAttribute("error", result.getReason());
             }
-        }
+    }
         return null;
     }
 
@@ -209,15 +203,13 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                                   @NotNull final Element ajaxResponse) throws IOException {
         if (validate(request, ajaxResponse)) {
             final SQSInfo serverInfo = createServerInfo(request, null, decryptIfNeeded(request.getParameter(SONAR_PASSWORD)), decryptIfNeeded(request.getParameter(SONAR_JDBC_PASSWORD)));
-            try {
-                mySqsManager.addServer(project, serverInfo);
+            final SQSManager.SQSActionResult result = mySqsManager.addServer(project, serverInfo);
+            if (!result.isError()) {
                 ajaxResponse.setAttribute("status", "OK");
-                return serverInfo;
-            } catch (SQSManager.ServerInfoExists e) {
-                ajaxResponse.setAttribute("error", "Server with such name already exists");
-            } catch (IOException e) {
-                ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
+            } else {
+                ajaxResponse.setAttribute("error", result.getReason());
             }
+            return serverInfo;
         }
         return null;
     }
