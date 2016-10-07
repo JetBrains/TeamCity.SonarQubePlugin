@@ -5,6 +5,7 @@ import jetbrains.buildServer.agent.plugins.beans.PluginDescriptor;
 import jetbrains.buildServer.agent.runner.*;
 import jetbrains.buildServer.runner.JavaRunnerConstants;
 import jetbrains.buildServer.util.OSType;
+import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,7 +80,7 @@ public class SQRBuildService extends CommandLineBuildService {
         addSQRArg(res, "-Dsonar.jdbc.url", accessor.getJDBCUrl());
         addSQRArg(res, "-Dsonar.jdbc.username", accessor.getJDBCUsername());
         addSQRArg(res, "-Dsonar.jdbc.password", accessor.getJDBCPassword());
-        addSQRArg(res, "-Dsonar.projectKey", accessor.getProjectKey());
+        addSQRArg(res, "-Dsonar.projectKey", getProjectKey(accessor.getProjectKey()));
         addSQRArg(res, "-Dsonar.projectName", accessor.getProjectName());
         addSQRArg(res, "-Dsonar.projectVersion", accessor.getProjectVersion());
         addSQRArg(res, "-Dsonar.sources", accessor.getProjectSources());
@@ -109,6 +110,13 @@ public class SQRBuildService extends CommandLineBuildService {
             }
         }
         return res;
+    }
+
+    protected static String getProjectKey(String projectKey) {
+        if (!StringUtil.isEmpty(projectKey)) {
+            projectKey = projectKey.replaceAll("[^\\w\\-.:]", "_");
+        }
+        return projectKey;
     }
 
     @Nullable
