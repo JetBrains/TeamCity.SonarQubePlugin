@@ -1,0 +1,10 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Sonar server">
+    <test name="Sonar server">
+        <classes>
+            <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerTest"/>
+            <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSProjectSettingsTest"/>
+            <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.MigratingSQSManagerTest"/>
+        </classes>
+    </test>
+</suite>

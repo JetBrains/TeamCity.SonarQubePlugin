@@ -2,11 +2,14 @@ package jetbrains.buildserver.sonarplugin.sqrunner;
 
 import jetbrains.buildServer.controllers.BaseAjaxActionController;
 import jetbrains.buildServer.controllers.PublicKeyUtil;
+import jetbrains.buildServer.serverSide.ConfigAction;
+import jetbrains.buildServer.serverSide.ConfigActionFactory;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.auth.AuthUtil;
 import jetbrains.buildServer.serverSide.auth.SecurityContext;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
@@ -26,34 +29,41 @@ import java.io.IOException;
  * Ajax controller for SonarQube Server management
  */
 public class ManageSQSActionController extends BaseAjaxActionController implements ControllerAction {
+    private static final String SERVERINFO_ID = "serverinfo.id";
+    private static final String SERVERINFO_NAME = "serverinfo.name";
+    private static final String SONAR_URL = "sonar.host.url";
+    private static final String SONAR_LOGIN = "sonar.login";
+    private static final String SONAR_PASSWORD = "sonar.password";
+    private static final String SONAR_PASSWORD_PRESERVE = "sonar.password_preserve";
+    private static final String SONAR_JDBC_URL = "sonar.jdbc.url";
+    private static final String SONAR_JDBC_USERNAME = "sonar.jdbc.username";
+    private static final String SONAR_JDBC_PASSWORD = "sonar.jdbc.password";
+    private static final String SONAR_JDBC_PASSWORD_PRESERVE = "sonar.jdbc.password_preserve";
 
-    public static final String SERVERINFO_ID = "serverinfo.id";
-    public static final String SERVERINFO_NAME = "serverinfo.name";
-    public static final String SONAR_URL = "sonar.host.url";
-    public static final String SONAR_LOGIN = "sonar.login";
-    public static final String SONAR_PASSWORD = "sonar.password";
-    public static final String SONAR_PASSWORD_PRESERVE = "sonar.password_preserve";
-    public static final String SONAR_JDBC_URL = "sonar.jdbc.url";
-    public static final String SONAR_JDBC_USERNAME = "sonar.jdbc.username";
-    public static final String SONAR_JDBC_PASSWORD = "sonar.jdbc.password";
-    public static final String SONAR_JDBC_PASSWORD_PRESERVE = "sonar.jdbc.password_preserve";
-
-    public static final String ADD_SQS_ACTION = "addSqs";
-    public static final String REMOVE_SQS_ACTION = "removeSqs";
-    public static final String EDIT_SQS_ACTION = "editSqs";
-    public static final String SQS_ACTION = "action";
+    private static final String ADD_SQS_ACTION = "addSqs";
+    private static final String REMOVE_SQS_ACTION = "removeSqs";
+    private static final String EDIT_SQS_ACTION = "editSqs";
+    private static final String SQS_ACTION = "action";
     @NotNull
     private final SQSManager mySqsManager;
     @NotNull
     private final ProjectManager myProjectManager;
     @NotNull
     private final SecurityContext securityContext;
+    @NotNull
+    private final SQSInfoFactory mySQSInfoFactory;
+    @NotNull
+    private final ConfigActionFactory myConfigActionFactory;
 
     public ManageSQSActionController(@NotNull final WebControllerManager controllerManager,
                                      @NotNull final SQSManager sqsManager,
                                      @NotNull final ProjectManager projectManager,
-                                     @NotNull final SecurityContext securityContext) {
+                                     @NotNull final SecurityContext securityContext,
+                                     @NotNull final SQSInfoFactory sqsInfoFactory,
+                                     @NotNull final ConfigActionFactory configActionFactory) {
         super(controllerManager);
+        mySQSInfoFactory = sqsInfoFactory;
+        myConfigActionFactory = configActionFactory;
         controllerManager.registerController("/admin/manageSonarServers.html", this);
         registerAction(this);
 
@@ -89,45 +99,59 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
 
         final String action = getAction(request);
         try {
+            ConfigAction configAction = null;
             if (ADD_SQS_ACTION.equals(action)) {
-                addServerInfo(request, project, ajaxResponse);
+                final SQSInfo sqsInfo = addServerInfo(request, project, ajaxResponse);
+                if (sqsInfo != null) {
+                    configAction = myConfigActionFactory.createAction(project, "SonarQube Server '" + sqsInfo.getName() + "' was added");
+                }
             } else if (REMOVE_SQS_ACTION.equals(action)) {
-                removeServerInfo(request, project, ajaxResponse);
+                final SQSInfo sqsInfo = removeServerInfo(request, project, ajaxResponse);
+                if (sqsInfo != null) {
+                    configAction = myConfigActionFactory.createAction(project, "SonarQube Server '" + sqsInfo.getName() + "' was removed");
+                }
             } else if (EDIT_SQS_ACTION.equals(action)) {
-                editServerInfo(request, project, ajaxResponse);
+                final SQSInfo sqsInfo = editServerInfo(request, project, ajaxResponse);
+                if (sqsInfo != null) {
+                    configAction = myConfigActionFactory.createAction(project, "parameters of SonarQube Server '" + sqsInfo.getName() + "' were changed");
+                }
+            }
+            if (configAction != null) {
+                project.persist(configAction);
             }
         } catch (IOException e) {
             ajaxResponse.setAttribute("error", "Exception occurred: " + e.getMessage());
         }
     }
 
-    private void editServerInfo(@NotNull final HttpServletRequest request,
+    private SQSInfo editServerInfo(@NotNull final HttpServletRequest request,
                                 @NotNull final SProject project,
                                 @NotNull final Element ajaxResponse) {
         if (!validate(request, ajaxResponse)) {
-            return;
+            return null;
         }
 
         final String serverInfoId = getServerInfoId(request);
         if (serverInfoId == null) {
             ajaxResponse.setAttribute("error", "ID is not set");
-            return;
+            return null;
         }
 
-        final SQSInfo old = mySqsManager.findServer(SQSManager.ProjectAccessor.recurse(project), serverInfoId);
+        final SQSInfo old = mySqsManager.getServer(project, serverInfoId);
         if (old == null) {
-            return;
+            return null;
         }
 
         final String pass = getPassword(request, old);
         final String jdbcPass = getJDBCPassword(request, old);
-        final SQSInfo info = getServerInfo(request, serverInfoId, pass, jdbcPass);
-        try {
-            mySqsManager.editServer(project, serverInfoId, info);
+        final SQSInfo info = createServerInfo(request, serverInfoId, pass, jdbcPass);
+        final SQSManager.SQSActionResult result = mySqsManager.editServer(project, info);
+        if (!result.isError()) {
             ajaxResponse.setAttribute("status", "OK");
-        } catch (IOException e) {
-            ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
+        } else {
+            ajaxResponse.setAttribute("error", result.getReason());
         }
+        return result.getAfterAction();
     }
 
     @Nullable
@@ -141,55 +165,53 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     }
 
     @NotNull
-    private SQSInfo getServerInfo(@NotNull HttpServletRequest request, String serverInfoId, String pass, String jdbcPass) {
-        return SQSInfoFactory.createServerInfo(serverInfoId,
-                request.getParameter(SERVERINFO_NAME),
-                request.getParameter(SONAR_URL),
-                request.getParameter(SONAR_LOGIN),
-                pass,
-                request.getParameter(SONAR_JDBC_URL),
-                request.getParameter(SONAR_JDBC_USERNAME),
-                jdbcPass);
+    private SQSInfo createServerInfo(@NotNull HttpServletRequest request, String serverInfoId, String pass, String jdbcPass) {
+        return mySQSInfoFactory.create(serverInfoId,
+                StringUtil.nullIfEmpty(request.getParameter(SERVERINFO_NAME)),
+                StringUtil.nullIfEmpty(request.getParameter(SONAR_URL)),
+                StringUtil.nullIfEmpty(request.getParameter(SONAR_LOGIN)),
+                StringUtil.nullIfEmpty(pass),
+                StringUtil.nullIfEmpty(request.getParameter(SONAR_JDBC_URL)),
+                StringUtil.nullIfEmpty(request.getParameter(SONAR_JDBC_USERNAME)),
+                StringUtil.nullIfEmpty(jdbcPass));
     }
 
     private String decryptIfNeeded(@Nullable final String value) {
         return value != null ? RSACipher.decryptWebRequestData(value) : null;
     }
 
-    private void removeServerInfo(@NotNull final HttpServletRequest request,
+    private SQSInfo removeServerInfo(@NotNull final HttpServletRequest request,
                                   @NotNull final SProject project,
                                   @NotNull final Element ajaxResponse) throws IOException {
         final String serverinfoId = getServerInfoId(request);
         if (serverinfoId == null) {
             ajaxResponse.setAttribute("error", "ID is not set");
         } else {
-            try {
-                final boolean wasRemoved = mySqsManager.removeIfExists(project, serverinfoId);
-                if (wasRemoved) {
-                    ajaxResponse.setAttribute("status", serverinfoId + " was removed");
-                } else {
-                    ajaxResponse.setAttribute("error", serverinfoId + " wasn't removed");
-                }
-            } catch (SQSManager.CannotDeleteData cannotDeleteData) {
-                ajaxResponse.setAttribute("error", "Cannot delete data - " + cannotDeleteData.getMessage());
+            final SQSManager.SQSActionResult result = mySqsManager.removeServer(project, serverinfoId);
+            if (!result.isError()) {
+                ajaxResponse.setAttribute("status", result.getReason());
+                return result.getBeforeAction();
+            } else {
+                ajaxResponse.setAttribute("error", result.getReason());
             }
-        }
+    }
+        return null;
     }
 
-    private void addServerInfo(@NotNull final HttpServletRequest request,
-                               @NotNull final SProject project,
-                               @NotNull final Element ajaxResponse) throws IOException {
+    private SQSInfo addServerInfo(@NotNull final HttpServletRequest request,
+                                  @NotNull final SProject project,
+                                  @NotNull final Element ajaxResponse) throws IOException {
         if (validate(request, ajaxResponse)) {
-            final SQSInfo serverInfo = getServerInfo(request, null, decryptIfNeeded(request.getParameter(SONAR_PASSWORD)), decryptIfNeeded(request.getParameter(SONAR_JDBC_PASSWORD)));
-            try {
-                mySqsManager.addServer(project, serverInfo);
+            final SQSInfo serverInfo = createServerInfo(request, null, decryptIfNeeded(request.getParameter(SONAR_PASSWORD)), decryptIfNeeded(request.getParameter(SONAR_JDBC_PASSWORD)));
+            final SQSManager.SQSActionResult result = mySqsManager.addServer(project, serverInfo);
+            if (!result.isError()) {
                 ajaxResponse.setAttribute("status", "OK");
-            } catch (SQSManager.ServerInfoExists e) {
-                ajaxResponse.setAttribute("error", "Server with such name already exists");
-            } catch (IOException e) {
-                ajaxResponse.setAttribute("error", "Cannot add server: " + e.getMessage());
+            } else {
+                ajaxResponse.setAttribute("error", result.getReason());
             }
+            return serverInfo;
         }
+        return null;
     }
 
     private boolean validate(HttpServletRequest request, Element ajaxResponse) {

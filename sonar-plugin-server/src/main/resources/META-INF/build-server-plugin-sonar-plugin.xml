@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans default-autowire="constructor">
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+        default-autowire="constructor">
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQRRunType"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.BuildSummaryLinkExtension"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.ServerManagementProjectTab"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.ManageSQSActionController"/>
-    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerImpl"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.EditSQRRunType"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQSPropertiesProvider"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQRPasswordProvider"/>
+    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfoFactory"/>
+
+    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.MigratingSQSManager" autowire-candidate="true">
+        <constructor-arg index="0" ref="oldManager"/>
+        <constructor-arg index="1" ref="newManager"/>
+    </bean>
+    <bean id="oldManager" class="jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSManagerImpl" autowire-candidate="false"/>
+    <bean id="newManager" class="jetbrains.buildserver.sonarplugin.sqrunner.manager.projectfeatures.SQSManagerProjectFeatures" autowire-candidate="false"/>
+
 </beans>

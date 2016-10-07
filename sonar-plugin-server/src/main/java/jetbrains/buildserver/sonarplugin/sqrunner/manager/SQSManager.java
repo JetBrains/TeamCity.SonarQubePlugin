@@ -4,71 +4,66 @@ import jetbrains.buildServer.serverSide.SProject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
  * Created by Andrey Titov on 7/9/14.
- *
+ * <p>
  * SonarQube Server data manager
  */
 public interface SQSManager {
     @NotNull
-    List<SQSInfo> getAvailableServers(@NotNull ProjectAccessor accessor);
+    List<SQSInfo> getAvailableServers(@NotNull final SProject project);
+
+    @NotNull
+    List<SQSInfo> getOwnAvailableServers(@NotNull final SProject project);
 
     @Nullable
-    SQSInfo findServer(@NotNull ProjectAccessor accessor, @NotNull String serverId);
+    SQSInfo getServer(@NotNull final SProject project, @NotNull String serverId);
 
-    void editServer(@NotNull final SProject project,
-                    @NotNull final String serverId,
-                    @NotNull final SQSInfo modifiedServer) throws IOException;
+    @Nullable
+    SQSInfo getOwnServer(@NotNull final SProject project, @NotNull String serverId);
 
-    void addServer(@NotNull final SProject toProject, @NotNull final SQSInfo newServer) throws IOException;
+    @NotNull
+    SQSActionResult editServer(@NotNull final SProject project, @NotNull final SQSInfo sqsInfo);
 
-    boolean removeIfExists(@NotNull SProject currentProject,
-                           @NotNull String id) throws CannotDeleteData;
+    @NotNull
+    SQSActionResult addServer(@NotNull final SProject project, @NotNull final SQSInfo sqsInfo);
 
-    class ServerInfoExists extends IOException {
-    }
+    @NotNull
+    SQSActionResult removeServer(@NotNull final SProject project, @NotNull final String serverId);
 
-    class CannotDeleteData extends IOException {
-        public CannotDeleteData(@NotNull final String message) {
-            super(message);
-        }
-    }
+    class SQSActionResult {
+        final SQSInfo myBeforeAction;
+        final SQSInfo myAfterAction;
+        final String myReason;
+        final boolean myIsError;
 
-    abstract class ProjectAccessor {
-        @Nullable
-        protected SProject myProject;
-
-        public ProjectAccessor(@Nullable final SProject firstProject) {
-            myProject = firstProject;
+        public SQSActionResult(@Nullable final SQSInfo beforeAction, @Nullable final SQSInfo afterAction, @NotNull final String reason) {
+            this(beforeAction, afterAction, reason, false);
         }
 
-        public static ProjectAccessor recurse(@NotNull final SProject project) {
-            return new ProjectAccessor(project) {
-                public SProject next() {
-                    if (myProject == null) {
-                        return null;
-                    }
-                    SProject t = myProject;
-                    myProject = myProject.getParentProject();
-                    return t;
-                }
-            };
+        public SQSActionResult(@Nullable final SQSInfo beforeAction, @Nullable final SQSInfo afterAction, @NotNull final String reason, final boolean isError) {
+            myBeforeAction = beforeAction;
+            myAfterAction = afterAction;
+            myReason = reason;
+            myIsError = isError;
         }
 
-        public static ProjectAccessor single(@NotNull final SProject project) {
-            return new ProjectAccessor(project) {
-                @Override
-                public SProject next() {
-                    SProject t = myProject;
-                    myProject = null;
-                    return t;
-                }
-            };
+        public SQSInfo getBeforeAction() {
+            return myBeforeAction;
         }
 
-        public abstract SProject next();
+        public SQSInfo getAfterAction() {
+            return myAfterAction;
+        }
+
+        public String getReason() {
+            return myReason;
+        }
+
+        public boolean isError() {
+            return myIsError;
+        }
     }
 }

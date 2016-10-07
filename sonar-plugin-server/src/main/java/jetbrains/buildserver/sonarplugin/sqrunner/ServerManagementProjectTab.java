@@ -3,22 +3,17 @@ package jetbrains.buildserver.sonarplugin.sqrunner;
 import jetbrains.buildServer.controllers.admin.projects.EditProjectTab;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.auth.AuthUtil;
-import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.serverSide.auth.SecurityContext;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
-
 import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.ProjectAccessor.single;
 
 /**
  * Created by Andrey Titov on 4/4/14.
@@ -52,7 +47,7 @@ public class ServerManagementProjectTab extends EditProjectTab {
         if (currentProject == null) {
             return TAB_TITLE;
         }
-        final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(single(currentProject));
+        final List<SQSInfo> availableServers = mySqsManager.getOwnAvailableServers(currentProject);
         if (availableServers.isEmpty()) {
             return TAB_TITLE;
         }
@@ -78,7 +73,7 @@ public class ServerManagementProjectTab extends EditProjectTab {
             if (infoMap.containsKey(project)) {
                 break;
             }
-            final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(single(project));
+            final List<SQSInfo> availableServers = mySqsManager.getOwnAvailableServers(project);
             if (!availableServers.isEmpty()) {
                 infoMap.put(project, availableServers);
             }

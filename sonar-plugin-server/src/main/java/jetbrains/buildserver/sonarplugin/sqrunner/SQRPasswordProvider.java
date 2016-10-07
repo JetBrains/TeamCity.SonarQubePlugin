@@ -15,8 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.ProjectAccessor.recurse;
-
 /**
  * Created by Andrey Titov on 10/30/14.
  *
@@ -82,7 +80,7 @@ public class SQRPasswordProvider implements PasswordsProvider {
         for (final SBuildRunnerDescriptor r : buildType.getBuildRunners()) {
             final String serverId = r.getParameters().get(Constants.SONAR_SERVER_ID);
             if (!Util.isEmpty(serverId)) {
-                final SQSInfo server = mySqsManager.findServer(recurse(buildType.getProject()), serverId);
+                final SQSInfo server = mySqsManager.getServer(buildType.getProject(), serverId);
                 if (server != null) {
                     res.add(server);
                 }

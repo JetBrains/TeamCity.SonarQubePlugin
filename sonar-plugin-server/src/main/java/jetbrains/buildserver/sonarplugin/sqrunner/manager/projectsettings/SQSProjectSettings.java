@@ -1,6 +1,7 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager;
+package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings;
 
 import jetbrains.buildServer.serverSide.settings.ProjectSettings;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,11 +24,11 @@ public class SQSProjectSettings implements ProjectSettings {
         return mySQSInfos != null ? mySQSInfos.get(serverId) : null;
     }
 
-    public void setInfo(@NotNull final String serverId, @NotNull final SQSInfo modifiedSerever) {
+    public void setInfo(@NotNull final String serverId, @NotNull final SQSInfo modifiedServer) {
         if (mySQSInfos == null) {
-            mySQSInfos = new HashMap<String, XMLBasedSQSInfo>();
+            mySQSInfos = new HashMap<>();
         }
-        mySQSInfos.put(serverId, cast(modifiedSerever));
+        mySQSInfos.put(serverId, cast(modifiedServer));
     }
 
     public boolean remove(String serverId) {
@@ -41,7 +42,7 @@ public class SQSProjectSettings implements ProjectSettings {
     public void readFrom(Element element) {
         final List children = element.getChildren(SONARQUBE_SERVER);
         if (mySQSInfos == null && !children.isEmpty()) {
-            mySQSInfos = new HashMap<String, XMLBasedSQSInfo>(children.size());
+            mySQSInfos = new HashMap<>(children.size());
         }
         for (Object o : children) {
             Element child = (Element)o;
