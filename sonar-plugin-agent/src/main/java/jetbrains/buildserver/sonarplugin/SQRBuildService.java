@@ -113,7 +113,7 @@ public class SQRBuildService extends CommandLineBuildService {
     }
 
     protected static String getProjectKey(String projectKey) {
-        if (!StringUtil.isEmpty(projectKey)) {
+        if (!Util.isEmpty(projectKey)) {
             projectKey = projectKey.replaceAll("[^\\w\\-.:]", "_");
         }
         return projectKey;
