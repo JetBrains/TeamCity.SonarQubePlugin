@@ -50,6 +50,8 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
         } else if (mySqsManager.findServer(recurse(form.getProject()), sonarServer) == null) {
             model.put("showUnknownServer", Boolean.TRUE);
         }
+
+        model.put("project", form.getProject());
     }
 
     public void updateState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {

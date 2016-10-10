@@ -1,6 +1,7 @@
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 <%@ taglib prefix="forms" tagdir="/WEB-INF/tags/forms" %>
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -27,13 +28,13 @@
                     </props:selectProperty>
                 </c:when>
                 <c:otherwise>
-                    <span class="smallNote">No SonarQube Server registered yet for this project</span>
+                    <span class="error">No SonarQube Server registered yet for this project</span>
+                    <span>Please configure SonarQube Server connection on <admin:editProjectLink projectId="${project.externalId}" addToUrl="&tab=sonar-plugin">SonarQube Servers tab</admin:editProjectLink></span>
                 </c:otherwise>
             </c:choose>
             <span id="error_sonarServer" class="error"></span>
         </td>
     </tr>
-    <%--<tr style="display: none;"><th></th><td><props:textProperty name="sonarServer"/></td></tr>--%>
     <tr>
         <th class="noBorder"><label for="sonarProjectName">Project name: </label></th>
         <td>
