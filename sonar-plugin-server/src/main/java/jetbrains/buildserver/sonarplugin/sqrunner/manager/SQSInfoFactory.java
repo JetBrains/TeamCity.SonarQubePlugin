@@ -1,24 +1,22 @@
 package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectfeatures.SQSInfoImpl;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 /**
- * Created by Andrey Titov on 7/10/14.
+ * Created by linfar on 04.10.16.
  */
 public class SQSInfoFactory {
-    private SQSInfoFactory() {
-    }
-
-    public static SQSInfo createServerInfo(@Nullable final String id,
-                                           @Nullable final String name,
-                                           @Nullable final String url,
-                                           @Nullable final String login,
-                                           @Nullable final String password,
-                                           @Nullable final String dbUrl,
-                                           @Nullable final String dbUsername,
-                                           @Nullable final String dbPassword) {
-        return new XMLBasedSQSInfo(id == null ? UUID.randomUUID().toString() : id, name, url, login, password, dbUrl, dbUsername, dbPassword);
+    public SQSInfo create(@Nullable final String id,
+                          @Nullable final String name,
+                          @Nullable final String url,
+                          @Nullable final String login,
+                          @Nullable final String password,
+                          @Nullable final String jdbcUrl,
+                          @Nullable final String jdbcUsername,
+                          @Nullable final String jdbcPassword) {
+        return new SQSInfoImpl(id == null ? UUID.randomUUID().toString() : id, name, url, login, password, jdbcUrl, jdbcUsername, jdbcPassword);
     }
 }

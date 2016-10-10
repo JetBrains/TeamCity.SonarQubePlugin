@@ -5,7 +5,6 @@ import jetbrains.buildServer.controllers.StatefulObject;
 import jetbrains.buildServer.controllers.admin.projects.BuildTypeForm;
 import jetbrains.buildServer.controllers.admin.projects.EditRunTypeControllerExtension;
 import jetbrains.buildServer.serverSide.BuildTypeSettings;
-import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildserver.sonarplugin.Constants;
@@ -18,8 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
-
-import static jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager.ProjectAccessor.recurse;
 
 /**
  * Created by Andrey Titov on 5/29/14.
@@ -41,13 +38,13 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
                           @NotNull final BuildTypeForm form,
                           @NotNull final Map model) {
         SProject project = form.getProject();
-        final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(recurse(project));
+        final List<SQSInfo> availableServers = mySqsManager.getAvailableServers(project);
         model.put("servers", availableServers);
         final String sonarServer = getSonarServer(form);
 
         if (Util.isEmpty(sonarServer)) {
             model.put("showSelectServer", Boolean.TRUE);
-        } else if (mySqsManager.findServer(recurse(form.getProject()), sonarServer) == null) {
+        } else if (mySqsManager.getServer(form.getProject(), sonarServer) == null) {
             model.put("showUnknownServer", Boolean.TRUE);
         }
 
@@ -70,7 +67,7 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
         if (Util.isEmpty(sonarServer)) {
             errors.addError("sonarServer", "SonarQube server should be set");
         } else {
-            final SQSInfo server = mySqsManager.findServer(recurse(form.getProject()), sonarServer);
+            final SQSInfo server = mySqsManager.getServer(form.getProject(), sonarServer);
             if (server == null) {
                 errors.addError("sonarServer", "This SonarQube server doesn't exist");
             }
