@@ -1,19 +1,19 @@
 
  TeamCity SonarQube plugin
 
- This plugin allows confguring and running SonarQube analysis in the TeamCity server.
+ This plugin allows configuring and running SonarQube analysis in the TeamCity server.
 
  1. Downloading binaries
  =====
 
- The latest build of the plugin is available on public TeamCity server and could be downloaded from:
+ The latest build of the plugin is available on the public TeamCity server and can be downloaded from:
   for TeamCity 10:  http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build100x/.lastPinned/sonar-plugin.zip
   for prior versions: http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build/.lastPinned/sonar-plugin.zip
 
  2. Building sources
  =====
 
- Run the following command in the root of checked out repository:
+ Run the following command in the root of the checked out repository:
  mvn clean package
 
  3. Installing
@@ -31,13 +31,13 @@
 
  a. Build step to run SonarQube Runner analysis
 
- The most used properties could be configured from the TeamCity UI in a comfortable way. Maven test results and JaCoCo code coverage results will be sent to the SonarQube Server automatically.
+ The most used properties can be configured from the TeamCity UI in a comfortable way. Maven test results and JaCoCo code coverage results will be sent to the SonarQube Server automatically.
 
  b. Configuring SonarQube Server locations to send information from the SonarQube Runner to
 
- Any number of SonarQube Server connections could be defined for a project. A connection could be used in any Build Configuration under the project including those from subprojects.
+ Any number of SonarQube Server connections can be defined for a project. A connection can be used in any Build Configuration under the project including those from subprojects.
 
- The permission 'Edit project' is required to manage SonarQube servers (add/edit/remove, and view account).
+ The 'Edit project' permission is required to manage SonarQube servers (add/edit/remove, and view account).
 
  c. Build Breaker plugin integration
 
