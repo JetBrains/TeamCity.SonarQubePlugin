@@ -4,7 +4,7 @@
     <name>sonar-plugin</name>
     <display-name>Sonar runner</display-name>
     <version>@Version@</version>
-    <description>Allows confguring and running SonarQube analysis in the TeamCity server</description>
+    <description>Allows configuring and running SonarQube analysis on the TeamCity server</description>
     <vendor>
       <name>@VendorName@</name>
       <url>@VendorURL@</url>
