@@ -75,21 +75,21 @@ public class SQRBuildService extends CommandLineBuildService {
         final Map<String, String> allParameters = new HashMap<String, String>(runnerParameters);
         allParameters.putAll(sharedConfigParameters);
         final SQRParametersAccessor accessor = new SQRParametersAccessor(allParameters);
-        addSQRArg(res, "-Dproject.home", ".");
-        addSQRArg(res, "-Dsonar.host.url", accessor.getHostUrl());
-        addSQRArg(res, "-Dsonar.jdbc.url", accessor.getJDBCUrl());
-        addSQRArg(res, "-Dsonar.jdbc.username", accessor.getJDBCUsername());
-        addSQRArg(res, "-Dsonar.jdbc.password", accessor.getJDBCPassword());
-        addSQRArg(res, "-Dsonar.projectKey", getProjectKey(accessor.getProjectKey()));
-        addSQRArg(res, "-Dsonar.projectName", accessor.getProjectName());
-        addSQRArg(res, "-Dsonar.projectVersion", accessor.getProjectVersion());
-        addSQRArg(res, "-Dsonar.sources", accessor.getProjectSources());
-        addSQRArg(res, "-Dsonar.tests", accessor.getProjectTests());
-        addSQRArg(res, "-Dsonar.binaries", accessor.getProjectBinaries());
-        addSQRArg(res, "-Dsonar.java.binaries", accessor.getProjectBinaries());
-        addSQRArg(res, "-Dsonar.modules", accessor.getProjectModules());
-        addSQRArg(res, "-Dsonar.password", accessor.getPassword());
-        addSQRArg(res, "-Dsonar.login", accessor.getLogin());
+        addSQRArg(res, "-Dproject.home", ".", myOsType);
+        addSQRArg(res, "-Dsonar.host.url", accessor.getHostUrl(), myOsType);
+        addSQRArg(res, "-Dsonar.jdbc.url", accessor.getJDBCUrl(), myOsType);
+        addSQRArg(res, "-Dsonar.jdbc.username", accessor.getJDBCUsername(), myOsType);
+        addSQRArg(res, "-Dsonar.jdbc.password", accessor.getJDBCPassword(), myOsType);
+        addSQRArg(res, "-Dsonar.projectKey", getProjectKey(accessor.getProjectKey()), myOsType);
+        addSQRArg(res, "-Dsonar.projectName", accessor.getProjectName(), myOsType);
+        addSQRArg(res, "-Dsonar.projectVersion", accessor.getProjectVersion(), myOsType);
+        addSQRArg(res, "-Dsonar.sources", accessor.getProjectSources(), myOsType);
+        addSQRArg(res, "-Dsonar.tests", accessor.getProjectTests(), myOsType);
+        addSQRArg(res, "-Dsonar.binaries", accessor.getProjectBinaries(), myOsType);
+        addSQRArg(res, "-Dsonar.java.binaries", accessor.getProjectBinaries(), myOsType);
+        addSQRArg(res, "-Dsonar.modules", accessor.getProjectModules(), myOsType);
+        addSQRArg(res, "-Dsonar.password", accessor.getPassword(), myOsType);
+        addSQRArg(res, "-Dsonar.login", accessor.getLogin(), myOsType);
         final String additionalParameters = accessor.getAdditionalParameters();
         if (additionalParameters != null) {
             res.addAll(Arrays.asList(additionalParameters.split("\\n")));
@@ -97,16 +97,16 @@ public class SQRBuildService extends CommandLineBuildService {
 
         final Set<String> collectedReports = mySonarProcessListener.getCollectedReports();
         if (!collectedReports.isEmpty() && (accessor.getAdditionalParameters() == null || !accessor.getAdditionalParameters().contains("-Dsonar.junit.reportsPath"))) {
-            addSQRArg(res, "-Dsonar.dynamicAnalysis", "reuseReports");
-            addSQRArg(res, "-Dsonar.junit.reportsPath", collectReportsPath(collectedReports, accessor.getProjectModules()));
+            addSQRArg(res, "-Dsonar.dynamicAnalysis", "reuseReports", myOsType);
+            addSQRArg(res, "-Dsonar.junit.reportsPath", collectReportsPath(collectedReports, accessor.getProjectModules()), myOsType);
         }
 
         final String jacocoExecFilePath = sharedConfigParameters.get("teamcity.jacoco.coverage.datafile");
         if (jacocoExecFilePath != null) {
             final File file = new File(jacocoExecFilePath);
             if (file.exists() && file.isFile() && file.canRead()) {
-                addSQRArg(res, "-Dsonar.java.coveragePlugin", "jacoco");
-                addSQRArg(res, "-Dsonar.jacoco.reportPath", jacocoExecFilePath);
+                addSQRArg(res, "-Dsonar.java.coveragePlugin", "jacoco", myOsType);
+                addSQRArg(res, "-Dsonar.jacoco.reportPath", jacocoExecFilePath, myOsType);
             }
         }
         return res;
@@ -147,10 +147,13 @@ public class SQRBuildService extends CommandLineBuildService {
      * @param argList Result list of arguments
      * @param key Argument key
      * @param value Argument value
+     * @param osType
      */
-    protected static void addSQRArg(@NotNull final List<String> argList, @NotNull final String key, @Nullable final String value) {
+    protected static void addSQRArg(@NotNull final List<String> argList, @NotNull final String key, @Nullable final String value, @NotNull final OSType osType) {
         if (!Util.isEmpty(value)) {
-            argList.add(key + "=" + value);
+            final String paramValue = key + "=" + value;
+            argList.add(osType == WINDOWS ? StringUtil.doubleQuote(StringUtil.escapeQuotes(paramValue)) : paramValue);
+//            final String paramValue = key + "=" + doubleQuote(escapeQuotes(unquoteString(value)));
         }
     }
 
