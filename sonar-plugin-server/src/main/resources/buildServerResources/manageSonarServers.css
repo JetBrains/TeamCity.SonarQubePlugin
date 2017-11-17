@@ -5,3 +5,8 @@
 .sqsTable .defaultValue {
     font-style: italic;
 }
+
+.enableDatabaseSettings {
+    width: 100%;
+    text-align: right;
+}

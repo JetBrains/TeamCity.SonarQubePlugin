@@ -57,6 +57,13 @@ SonarPlugin = {
             $j(".runnerFormTable input[id='sonar.jdbc.username']").val(data.JDBCUsername);
             $j(".runnerFormTable input[id='sonar.jdbc.password']").val(data.JDBCPassword);
             $j(".runnerFormTable input[id='sonar.jdbc.password_field']").val(data.JDBCPassword ? "*****" : "" );
+            if (data.JDBCUrl || data.JDBCUsername || data.JDBCPassword) {
+                $j(".runnerFormTable .databaseSettings").show();
+                $j(".enableDatabaseSettings").hide();
+            } else {
+                $j(".runnerFormTable .databaseSettings").hide();
+                $j(".enableDatabaseSettings").show();
+            }
             $j("#serverInfoForm input[id='projectId']").val(data.projectId);
 
             this.cleanErrors();

@@ -34,8 +34,8 @@
                     <table class="sqsTable parametersTable">
                         <tr>
                             <th class="id">Name</th>
-                            <th class="host">Server</th>
-                            <th class="db">Database</th>
+                            <th class="host">SonarQube Server connection</th>
+                            <th class="db">Database connection</th>
                             <c:if test="${userHasPermissionManagement}">
                                 <th class="actions" colspan="2">Manage</th>
                             </c:if>
@@ -65,6 +65,11 @@
                                         </c:if>
                                     </td>
                                     <td class="db">
+                                        <c:set var="jdbcNotNeeded" value="${empty server.JDBCUrl and empty server.JDBCPassword and empty server.JDBCUsername}"/>
+                                        <c:if test="${jdbcNotNeeded}">
+                                            <div class="defaultValue grayNote">not needed</div>
+                                        </c:if>
+                                        <c:if test="${not jdbcNotNeeded}">
                                         <c:choose>
                                             <c:when test="${not empty server.JDBCUrl}"><div class="url"><c:out value="${server.JDBCUrl}"/></div></c:when>
                                             <c:otherwise><div class="defaultValue grayNote">jdbc:h2:tcp://localhost:9092/sonar</div></c:otherwise>
@@ -78,6 +83,7 @@
                                                 <c:when test="${not empty server.JDBCPassword}"><div class="dbPass">Password: *****</div></c:when>
                                                 <c:otherwise><div class="defaultValue grayNote">Password: sonar</div></c:otherwise>
                                             </c:choose>
+                                        </c:if>
                                         </c:if>
                                     </td>
                                     <c:if test="${userHasPermissionManagement && afn:permissionGrantedForProject(projectServersEntry.key, 'EDIT_PROJECT')}">
@@ -151,22 +157,22 @@
                         </div>
                     </td>
                 </tr>
-                <tr class="groupingTitle">
+                <tr class="groupingTitle databaseSettings" style="display: none">
                     <td colspan="2">Database settings</td>
                 </tr>
-                <tr>
+                <tr class="databaseSettings" style="display: none">
                     <th>JDBC URL</th>
                     <td>
                         <div><input type="text" id="sonar.jdbc.url" name="sonar.jdbc.url"/></div>
                     </td>
                 </tr>
-                <tr>
+                <tr class="databaseSettings" style="display: none">
                     <th>Username</th>
                     <td>
                         <div><input type="text" id="sonar.jdbc.username" name="sonar.jdbc.username"/></div>
                     </td>
                 </tr>
-                <tr>
+                <tr class="databaseSettings" style="display: none">
                     <th>Password</th>
                     <td>
                         <div>
@@ -176,6 +182,7 @@
                     </td>
                 </tr>
             </table>
+            <a href="#" class="enableDatabaseSettings">Obsolete SonarQube Scanner is used which needs Database settings</a>
             <input type="hidden" id="serverinfo.id" name="serverinfo.id"/>
             <input type="hidden" name="action" id="SQSaction" value="addSqs"/>
             <input type="hidden" name="projectId" id="projectId" value="${projectId}"/>
@@ -197,6 +204,10 @@
             $pjf.click(function() {
                 $pjf.val("");
                 $pjf.attr("data-modified",  "modified");
+            });
+            $j(".enableDatabaseSettings").click(function() {
+                $j(".databaseSettings").show();
+                $j(".enableDatabaseSettings").hide();
             });
         });
     </script>
