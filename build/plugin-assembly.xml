@@ -21,7 +21,7 @@
        <includes>
            <include>jetbrains.buildServer.sonarplugin:sonar-plugin-server</include>
            <include>jetbrains.buildServer.sonarplugin:sonar-plugin-common</include>
-       </includes> 
+       </includes>
        <binaries>
            <outputDirectory>server</outputDirectory>
            <unpack>false</unpack>
@@ -35,4 +35,13 @@
        </binaries>
     </moduleSet>
   </moduleSets>
+    <fileSets>
+        <fileSet>
+            <directory>../sonar-qube-runner/</directory>
+            <outputDirectory>bundled/sonar-qube-runner-2.4/</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+        </fileSet>
+    </fileSets>
 </assembly>

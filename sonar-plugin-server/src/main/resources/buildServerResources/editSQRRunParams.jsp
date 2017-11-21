@@ -6,6 +6,7 @@
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
+<jsp:useBean id="constants" class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerConstants"/>
 <%--@elvariable id="showUnknownServer" type="java.lang.Boolean"--%>
 <%--@elvariable id="showSelectServer" type="java.lang.Boolean"--%>
 
@@ -35,6 +36,7 @@
             <span id="error_sonarServer" class="error"></span>
         </td>
     </tr>
+    <jsp:include page="/tools/editToolUsage.html?toolType=${constants.toolTypeId}&versionParameterName=${constants.sonarQubeScannerVersionParameter}&class=longField"/>
     <tr>
         <th class="noBorder"><label for="sonarProjectName">Project name: </label></th>
         <td>
