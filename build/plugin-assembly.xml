@@ -37,10 +37,10 @@
   </moduleSets>
     <fileSets>
         <fileSet>
-            <directory>../sonar-qube-runner/</directory>
-            <outputDirectory>bundled/sonar-qube-runner-2.4/</outputDirectory>
+            <directory>../bundled/</directory>
+            <outputDirectory>bundled/</outputDirectory>
             <includes>
-                <include>*</include>
+                <include>*.zip</include>
             </includes>
         </fileSet>
     </fileSets>

@@ -29,7 +29,8 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
     private static final String SONAR_QUBE_RUNNER_PREFIX = "sonar-qube-runner";
     private static final String SONAR_QUBE_SCANNER_PREFIX = "sonar-qube-scanner";
     private static final String VERSION_PATTERN = "((\\d+.)*\\d+)";
-    private static final Pattern SONAR_QUBE_SCANNER_ROOT_DIR_PATTERN = Pattern.compile("(" + SONAR_QUBE_RUNNER_PREFIX + "|" + SONAR_QUBE_SCANNER_PREFIX + ")-" + VERSION_PATTERN);
+    private static final String FILE_EXTENSION = "\\.zip";
+    private static final Pattern SONAR_QUBE_SCANNER_ROOT_DIR_PATTERN = Pattern.compile("(" + SONAR_QUBE_RUNNER_PREFIX + "|" + SONAR_QUBE_SCANNER_PREFIX + ")\\." + VERSION_PATTERN + FILE_EXTENSION);
 
     @NotNull private final PluginDescriptor myPluginDescriptor;
 
@@ -132,7 +133,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
 
     @NotNull
     private GetPackageVersionResult tryParsePackage(@NotNull final Path root) {
-        if (!checkDirectory(root, "Cannot parse SonarQube Scanner package")) return GetPackageVersionResult.error("Cannot parse SonarQube Scanner package");
+        if (!checkFile(root, "Cannot parse SonarQube Scanner package")) return GetPackageVersionResult.error("Cannot parse SonarQube Scanner package");
 
         final String fileName = root.getFileName().toString();
 
@@ -163,14 +164,12 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
         if (!checkDirectory(targetPath, "Cannot unpack " + toolPackage + " to " + targetDirectory)) {
             throw new ToolException("Cannot unpack " + toolPackage + " to " + targetDirectory);
         }
-
-
     }
 
     @Nullable
     @Override
     public String getDefaultBundledVersionId() {
-        return SONAR_QUBE_RUNNER_PREFIX + "-2.4";
+        return SONAR_QUBE_RUNNER_PREFIX + ".2.4";
     }
 
     private boolean checkDirectory(@NotNull final Path bundledTools, final String description) {
@@ -184,6 +183,22 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
         }
         if (!Files.isDirectory(bundledTools)) {
             LOG.warn(description + ": '" + bundledTools + "' is not a directory");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkFile(@NotNull final Path bundledTool, final String description) {
+        if (!Files.exists(bundledTool)) {
+            LOG.warn(description + ": '" + bundledTool + "' expected to exist");
+            return false;
+        }
+        if (!Files.isReadable(bundledTool)) {
+            LOG.warn(description + ": cannot read '" + bundledTool + "'");
+            return false;
+        }
+        if (!Files.isRegularFile(bundledTool)) {
+            LOG.warn(description + ": '" + bundledTool + "' is not a file");
             return false;
         }
         return true;
