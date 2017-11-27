@@ -43,35 +43,57 @@ public class SQRBuildService extends CommandLineBuildService {
     @NotNull
     @Override
     public ProgramCommandLine makeProgramCommandLine() throws RunBuildException {
-        final List<String> programArgs = composeSQRArgs(
-                getRunnerContext().getRunnerParameters(),
-                getBuild().getSharedConfigParameters()
-        );
-
         final String jdkHome = getRunnerContext().getRunnerParameters().get(JavaRunnerConstants.TARGET_JDK_HOME);
         if (jdkHome != null) {
             getRunnerContext().addEnvironmentVariable("JAVA_HOME", jdkHome);
         }
 
-        final String executablePath = getExecutablePath();
-        final SimpleProgramCommandLine cmd = new SimpleProgramCommandLine(getRunnerContext(), executablePath, programArgs);
+        final String sonarScannerRoot = getSonarScannerRoot();
+        if (sonarScannerRoot == null) {
+            throw new RunBuildException("No SonarQube Scanner selected");
+        }
+        final List<String> programArgs = composeSQRArgs(getRunnerContext().getRunnerParameters(), getBuild().getSharedConfigParameters(), sonarScannerRoot);
 
-        getLogger().message("Starting SQR in " + executablePath);
-        for (String str : cmd.getArguments()) {
+        final boolean useScanner = isUseScannerMain(sonarScannerRoot);
+        final JavaCommandLineBuilder builder = new JavaCommandLineBuilder();
+
+        final ProgramCommandLine build = builder.withClassPath(getClasspath())
+                .withMainClass(getMainClass(useScanner))
+                .withJavaHome(jdkHome)
+                .withBaseDir(getBuild().getCheckoutDirectory().getAbsolutePath())
+                .withEnvVariables(getRunnerContext().getBuildParameters().getEnvironmentVariables())
+                .withJvmArgs(JavaRunnerUtil.extractJvmArgs(getRunnerContext().getRunnerParameters()))
+                .withClassPath(getClasspath())
+                .withProgramArgs(programArgs)
+                .withWorkingDir(getRunnerContext().getWorkingDirectory().getAbsolutePath()).build();
+
+        getLogger().message("Starting SQS from " + sonarScannerRoot);
+        for (String str : build.getArguments()) {
             getLogger().message(str);
         }
 
-        return cmd;
+        return build;
+    }
+
+    @NotNull
+    private String getMainClass(boolean useScanner) {
+        return useScanner ? "org.sonarsource.scanner.cli.Main" : "org.sonar.runner.Main";
+    }
+
+    private boolean isUseScannerMain(String sonarScannerRoot) {
+        return sonarScannerRoot.startsWith("sonar-qube-scanner");
     }
 
     /**
      * Composes SonarQube Runner arguments.
      * @param runnerParameters Parameters to compose arguments from
      * @param sharedConfigParameters Shared config parameters to compose arguments from
+     * @param sonarScannerRoot
      * @return List of arguments to be passed to the SQR
      */
     private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters,
-                                        @NotNull final Map<String, String> sharedConfigParameters) {
+                                        @NotNull final Map<String, String> sharedConfigParameters,
+                                        @NotNull final String sonarScannerRoot) {
         final List<String> res = new LinkedList<String>();
         final Map<String, String> allParameters = new HashMap<String, String>(runnerParameters);
         allParameters.putAll(sharedConfigParameters);
@@ -91,6 +113,7 @@ public class SQRBuildService extends CommandLineBuildService {
         addSQRArg(res, "-Dsonar.modules", accessor.getProjectModules(), myOsType);
         addSQRArg(res, "-Dsonar.password", accessor.getPassword(), myOsType);
         addSQRArg(res, "-Dsonar.login", accessor.getLogin(), myOsType);
+        res.add("-Dscanner.home=" + sonarScannerRoot);
         final String additionalParameters = accessor.getAdditionalParameters();
         if (additionalParameters != null) {
             res.addAll(Arrays.asList(additionalParameters.split("\\n")));
@@ -163,7 +186,7 @@ public class SQRBuildService extends CommandLineBuildService {
      */
     @NotNull
     private String getClasspath() throws SQRJarException {
-        final File pluginJar[] = getSQRJar(myPluginDescriptor.getPluginRoot());
+        final File pluginJar[] = getSQRJar(new File(getSonarScannerRoot()));
         final StringBuilder builder = new StringBuilder();
         for (final File file : pluginJar) {
             builder.append(file.getAbsolutePath()).append(File.pathSeparatorChar);
@@ -173,9 +196,7 @@ public class SQRBuildService extends CommandLineBuildService {
 
     @NotNull
     private String getExecutablePath() throws RunBuildException {
-        final String explicitPath = getRunnerContext().getConfigParameters().get(SonarQubeScannerConstants.SONAR_QUBE_SCANNER_VERSION_PARAMETER);
-
-        final String path = explicitPath != null ? explicitPath : getRunnerContext().getRunnerParameters().get(SonarQubeScannerConstants.SONAR_QUBE_SCANNER_VERSION_PARAMETER);
+        final String path = getSonarScannerRoot();
 
         final String execName = myOsType == WINDOWS ? "sonar-runner.bat" : "sonar-runner";
 
@@ -190,6 +211,12 @@ public class SQRBuildService extends CommandLineBuildService {
         return exec.getAbsolutePath();
     }
 
+    private String getSonarScannerRoot() {
+        final String explicitPath = getRunnerContext().getConfigParameters().get(SonarQubeScannerConstants.SONAR_QUBE_SCANNER_VERSION_PARAMETER);
+
+        return explicitPath != null ? explicitPath : getRunnerContext().getRunnerParameters().get(SonarQubeScannerConstants.SONAR_QUBE_SCANNER_VERSION_PARAMETER);
+    }
+
     /**
      * @param sqrRoot SQR root directory
      * @return SonarQube Runner jar location
@@ -197,14 +224,7 @@ public class SQRBuildService extends CommandLineBuildService {
      */
     @NotNull
     private File[] getSQRJar(@NotNull final File sqrRoot) throws SQRJarException {
-        final String path = getRunnerContext().getConfigParameters().get(SQR_RUNNER_PATH_PROPERTY);
-        File baseDir;
-        if (path != null) {
-            baseDir = new File(path);
-        } else {
-            baseDir = new File(sqrRoot, BUNDLED_SQR_RUNNER_PATH);
-        }
-        final File libPath = new File(baseDir, "lib");
+        final File libPath = new File(sqrRoot, "lib");
         if (!libPath.exists()) {
             throw new SQRJarException("SonarQube Runner lib path doesn't exist: " + libPath.getAbsolutePath());
         } else if (!libPath.isDirectory()) {
