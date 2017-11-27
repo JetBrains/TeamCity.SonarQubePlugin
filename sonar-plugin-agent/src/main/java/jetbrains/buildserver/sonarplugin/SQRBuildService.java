@@ -6,6 +6,7 @@ import jetbrains.buildServer.agent.runner.*;
 import jetbrains.buildServer.runner.JavaRunnerConstants;
 import jetbrains.buildServer.util.OSType;
 import jetbrains.buildServer.util.StringUtil;
+import jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -153,7 +154,6 @@ public class SQRBuildService extends CommandLineBuildService {
         if (!Util.isEmpty(value)) {
             final String paramValue = key + "=" + value;
             argList.add(osType == WINDOWS ? StringUtil.doubleQuote(StringUtil.escapeQuotes(paramValue)) : paramValue);
-//            final String paramValue = key + "=" + doubleQuote(escapeQuotes(unquoteString(value)));
         }
     }
 
@@ -173,17 +173,14 @@ public class SQRBuildService extends CommandLineBuildService {
 
     @NotNull
     private String getExecutablePath() throws RunBuildException {
-        File sqrRoot = myPluginDescriptor.getPluginRoot();
-        final String path = getRunnerContext().getConfigParameters().get(SQR_RUNNER_PATH_PROPERTY);
-        File exec;
+        final String explicitPath = getRunnerContext().getConfigParameters().get(SonarQubeScannerConstants.SONAR_QUBE_SCANNER_VERSION_PARAMETER);
 
-        String execName = myOsType == WINDOWS ? "sonar-runner.bat" : "sonar-runner";
+        final String path = explicitPath != null ? explicitPath : getRunnerContext().getRunnerParameters().get(SonarQubeScannerConstants.SONAR_QUBE_SCANNER_VERSION_PARAMETER);
 
-        if (path != null) {
-            exec = new File(path + File.separatorChar + "bin" + File.separatorChar + execName);
-        } else {
-            exec = new File(sqrRoot, BUNDLED_SQR_RUNNER_PATH + File.separatorChar + "bin" + File.separatorChar + execName);
-        }
+        final String execName = myOsType == WINDOWS ? "sonar-runner.bat" : "sonar-runner";
+
+        final File exec = new File(path + File.separatorChar + "bin" + File.separatorChar + execName);
+
         if (!exec.exists()) {
             throw new RunBuildException("SonarQube executable doesn't exist: " + exec.getAbsolutePath());
         }
