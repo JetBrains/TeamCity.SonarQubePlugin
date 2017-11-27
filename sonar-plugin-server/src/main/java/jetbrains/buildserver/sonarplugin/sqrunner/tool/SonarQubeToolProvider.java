@@ -1,7 +1,6 @@
 package jetbrains.buildserver.sonarplugin.sqrunner.tool;
 
 import com.intellij.openapi.diagnostic.Logger;
-import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.tools.*;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,11 +24,19 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
 
     private static final String BUNDLED_SUBPATH = "bundled";
 
-    private static final String SONAR_QUBE_RUNNER_PREFIX = "sonar-qube-runner";
-    private static final String SONAR_QUBE_SCANNER_PREFIX = "sonar-qube-scanner";
-    private static final String VERSION_PATTERN = "((\\d+.)*\\d+)";
-    private static final String FILE_EXTENSION = "\\.zip";
-    private static final Pattern SONAR_QUBE_SCANNER_ROOT_DIR_PATTERN = Pattern.compile("(" + SONAR_QUBE_RUNNER_PREFIX + "|" + SONAR_QUBE_SCANNER_PREFIX + ")\\." + VERSION_PATTERN + FILE_EXTENSION);
+    private static final String SONAR_QUBE_SCANNER_PREFIX = SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID;
+    private static final String VERSION_GROUP_NAME = "version";
+    private static final String VERSION_PATTERN = "(?<" + VERSION_GROUP_NAME + ">X(\\d+.)*\\d+)";
+    private static final String SONAR_QUBE_SCANNER_TYPE = "scanner";
+    private static final String SONAR_QUBE_RUNNER_TYPE = "runner";
+    private static final String TYPE_GROUP_NAME = "type";
+    private static final String SONAR_QUBE_SCANNER_TYPE_SUFFIX = "-(?<" + TYPE_GROUP_NAME + ">X" + SONAR_QUBE_RUNNER_TYPE + "|"+ SONAR_QUBE_SCANNER_TYPE + ")";
+    private static final String ZIP_EXTENSION = "\\.zip";
+    private static final String JAR_EXTENSION = "\\.jar";
+    private static final Pattern PACKED_SONAR_QUBE_SCANNER_ROOT_ZIP_PATTERN = Pattern.compile(SONAR_QUBE_SCANNER_PREFIX + "\\." + VERSION_PATTERN + SONAR_QUBE_SCANNER_TYPE_SUFFIX + ZIP_EXTENSION);
+
+    private static final String DEFAULT_BUNDLED_VERSION = "2.4";
+    private static final String DEFAULT_BUNDLED_VERSION_STRING = SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + DEFAULT_BUNDLED_VERSION + "-" + SONAR_QUBE_RUNNER_TYPE;
 
     @NotNull private final PluginDescriptor myPluginDescriptor;
 
@@ -137,19 +143,18 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
 
         final String fileName = root.getFileName().toString();
 
-        final Matcher matcher = SONAR_QUBE_SCANNER_ROOT_DIR_PATTERN.matcher(fileName);
+        final Matcher matcher = PACKED_SONAR_QUBE_SCANNER_ROOT_ZIP_PATTERN.matcher(fileName);
         if (matcher.matches()) {
-            final MatchResult matchResult = matcher.toMatchResult();
-            final String version = matchResult.group(2);
+            final String version = matcher.group(VERSION_GROUP_NAME);
 
-            if (matchResult.group(1).equals(SONAR_QUBE_RUNNER_PREFIX)) {
-                return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, version, SONAR_QUBE_RUNNER_PREFIX + "." + version));
+            if (matcher.group(TYPE_GROUP_NAME).equals(SONAR_QUBE_SCANNER_TYPE)) {
+                return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, version, SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_SCANNER_TYPE));
             } else {
-                return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, version, SONAR_QUBE_SCANNER_PREFIX + "." + version));
+                return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, version, SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_SCANNER_PREFIX));
             }
         } else {
-            LOG.warn("Unexpected package " + fileName + ", only " + SONAR_QUBE_SCANNER_PREFIX + " and " + SONAR_QUBE_RUNNER_PREFIX + " with version suffix are allowed.");
-            return GetPackageVersionResult.error("Unexpected package " + fileName + ", only " + SONAR_QUBE_SCANNER_PREFIX + " and " + SONAR_QUBE_RUNNER_PREFIX + " are allowed.");
+            LOG.warn("Unexpected package " + fileName + ", only " + SONAR_QUBE_SCANNER_PREFIX + " and " + SONAR_QUBE_SCANNER_TYPE_SUFFIX + " with " + VERSION_GROUP_NAME + " suffix are allowed.");
+            return GetPackageVersionResult.error("Unexpected package " + fileName + ", only " + SONAR_QUBE_SCANNER_PREFIX + " and " + SONAR_QUBE_SCANNER_TYPE_SUFFIX + " are allowed.");
         }
     }
 
@@ -169,7 +174,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
     @Nullable
     @Override
     public String getDefaultBundledVersionId() {
-        return SONAR_QUBE_RUNNER_PREFIX + ".2.4";
+        return DEFAULT_BUNDLED_VERSION_STRING;
     }
 
     private boolean checkDirectory(@NotNull final Path bundledTools, final String description) {
