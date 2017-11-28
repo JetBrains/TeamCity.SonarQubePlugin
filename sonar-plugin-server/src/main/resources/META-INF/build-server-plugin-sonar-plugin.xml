@@ -22,4 +22,5 @@
 
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.ChooseSQSServerController"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeToolProvider"/>
+    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerToolType"/>
 </beans>

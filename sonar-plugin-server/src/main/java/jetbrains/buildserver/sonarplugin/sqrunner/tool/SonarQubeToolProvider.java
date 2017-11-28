@@ -37,72 +37,17 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
     private static final Pattern SONAR_QUBE_SCANNER_JAR_PATTERN = Pattern.compile(".*?[.-]" + VERSION_PATTERN + JAR_EXTENSION);
 
     @NotNull private final PluginDescriptor myPluginDescriptor;
+    @NotNull private final ToolType myToolType;
 
-    @NotNull private static final ToolTypeAdapter SQS_TOOL_TYPE = new ToolTypeAdapter() {
-        @Nullable
-        @Override
-        public String getValidPackageDescription() {
-            return "Specify path to the SonarQube Scanner jar, eg: sonar-runner.2.4.jar, sonar-scanner-cli-3.0.3.jar";
-        }
-
-        @NotNull
-        @Override
-        public String getType() {
-            return SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID;
-        }
-
-        @NotNull
-        @Override
-        public String getDisplayName() {
-            return "SonarQube Scanner";
-        }
-
-        @NotNull
-        @Override
-        public String getShortDisplayName() {
-            return "SonarQube Scanner";
-        }
-
-        @NotNull
-        @Override
-        public String getDescription() {
-            return "Tool to run SonarQube analyzis during the build";
-        }
-
-        @Override
-        public boolean isSupportDownload() {
-            return false;
-        }
-
-        @Override
-        public boolean isSupportUpload() {
-            return true;
-        }
-
-        @Override
-        public boolean isSingleton() {
-            return false;
-        }
-
-        @Override
-        public boolean isServerOnly() {
-            return false;
-        }
-
-        @Override
-        public boolean isCountUsages() {
-            return false;
-        }
-    };
-
-    public SonarQubeToolProvider(@NotNull PluginDescriptor pluginDescriptor) {
+    public SonarQubeToolProvider(@NotNull final PluginDescriptor pluginDescriptor, @NotNull final SonarQubeScannerToolType sonarQubeScannerToolType) {
         myPluginDescriptor = pluginDescriptor;
+        myToolType = sonarQubeScannerToolType;
     }
 
     @NotNull
     @Override
     public ToolType getType() {
-        return SQS_TOOL_TYPE;
+        return myToolType;
     }
 
     @NotNull
@@ -151,11 +96,11 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
                     final Path sonarScannerMain = fs.getPath("/org/sonarsource/scanner/cli/Main.class");
                     final String version = matcher.group("version");
                     if (Files.exists(sonarScannerMain)) {
-                        return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, matcher.group("version"), SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + matcher.group("version") + "-" + SONAR_QUBE_SCANNER_TYPE));
+                        return GetPackageVersionResult.version(new SonarQubeToolVersion(myToolType, matcher.group("version"), SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + matcher.group("version") + "-" + SONAR_QUBE_SCANNER_TYPE));
                     } else {
                         final Path sonarRunnerMain = fs.getPath("/org/sonar/runner/Main.class");
                         if (Files.exists(sonarRunnerMain)) {
-                            return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, matcher.group("version"), SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_RUNNER_TYPE));
+                            return GetPackageVersionResult.version(new SonarQubeToolVersion(myToolType, matcher.group("version"), SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_RUNNER_TYPE));
                         } else {
                             return GetPackageVersionResult.error("Doesn't seem like SonarQube Scanner or SonarQube Runner: cannot find main class neither in 'org.sonarsource.scanner.cli' package neither in 'org.sonar.runner' packege");
                         }
@@ -185,9 +130,9 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
             final String version = matcher.group(VERSION_GROUP_NAME);
 
             if (matcher.group(TYPE_GROUP_NAME).equals(SONAR_QUBE_SCANNER_TYPE)) {
-                return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, version, SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_SCANNER_TYPE));
+                return GetPackageVersionResult.version(new SonarQubeToolVersion(myToolType, version, SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_SCANNER_TYPE));
             } else {
-                return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, version, SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_RUNNER_TYPE));
+                return GetPackageVersionResult.version(new SonarQubeToolVersion(myToolType, version, SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_RUNNER_TYPE));
             }
         } else {
             LOG.warn("Unexpected package " + fileName + ", only " + SONAR_QUBE_SCANNER_PREFIX + " and " + SONAR_QUBE_SCANNER_TYPE_SUFFIX + " with " + VERSION_GROUP_NAME + " suffix are allowed.");
