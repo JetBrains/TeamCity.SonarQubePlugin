@@ -10,7 +10,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,20 +96,17 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
         final Matcher matcher = SONAR_QUBE_SCANNER_JAR_PATTERN.matcher(toolPackage.getName());
 
         if (matcher.matches()) {
-            try {
-
-                try (final FileSystem fs = FileSystems.newFileSystem(URI.create("jar:file:" + toolPackage.getAbsolutePath()), Collections.emptyMap())) {
-                    final Path sonarScannerMain = fs.getPath("/org/sonarsource/scanner/cli/Main.class");
-                    final String version = matcher.group("version");
-                    if (Files.exists(sonarScannerMain)) {
-                        return GetPackageVersionResult.version(new SonarQubeToolVersion(myToolType, matcher.group("version"), myToolType.getType() + "." + matcher.group("version") + "-" + SONAR_QUBE_SCANNER_TYPE));
+            try (final FileSystem fs = FileSystems.newFileSystem(URI.create("jar:file:" + toolPackage.getAbsolutePath()), Collections.emptyMap())) {
+                final Path sonarScannerMain = fs.getPath("/org/sonarsource/scanner/cli/Main.class");
+                final String version = matcher.group("version");
+                if (Files.exists(sonarScannerMain)) {
+                    return GetPackageVersionResult.version(new SonarQubeToolVersion(myToolType, matcher.group("version"), myToolType.getType() + "." + matcher.group("version") + "-" + SONAR_QUBE_SCANNER_TYPE));
+                } else {
+                    final Path sonarRunnerMain = fs.getPath("/org/sonar/runner/Main.class");
+                    if (Files.exists(sonarRunnerMain)) {
+                        return GetPackageVersionResult.version(new SonarQubeToolVersion(myToolType, matcher.group("version"), myToolType.getType() + "." + version + "-" + SONAR_QUBE_RUNNER_TYPE));
                     } else {
-                        final Path sonarRunnerMain = fs.getPath("/org/sonar/runner/Main.class");
-                        if (Files.exists(sonarRunnerMain)) {
-                            return GetPackageVersionResult.version(new SonarQubeToolVersion(myToolType, matcher.group("version"), myToolType.getType() + "." + version + "-" + SONAR_QUBE_RUNNER_TYPE));
-                        } else {
-                            return GetPackageVersionResult.error("Doesn't seem like SonarQube Scanner or SonarQube Runner: cannot find main class neither in 'org.sonarsource.scanner.cli' package neither in 'org.sonar.runner' packege");
-                        }
+                        return GetPackageVersionResult.error("Doesn't seem like SonarQube Scanner or SonarQube Runner: cannot find main class neither in 'org.sonarsource.scanner.cli' package neither in 'org.sonar.runner' packege");
                     }
                 }
             } catch (IOException e) {
