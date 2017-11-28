@@ -86,12 +86,6 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
 
     @NotNull
     @Override
-    public Collection<? extends ToolVersion> getAvailableToolVersions() {
-        return super.getAvailableToolVersions();
-    }
-
-    @NotNull
-    @Override
     public GetPackageVersionResult tryGetPackageVersion(@NotNull final File toolPackage) {
         final Matcher matcher = SONAR_QUBE_SCANNER_JAR_PATTERN.matcher(toolPackage.getName());
 
