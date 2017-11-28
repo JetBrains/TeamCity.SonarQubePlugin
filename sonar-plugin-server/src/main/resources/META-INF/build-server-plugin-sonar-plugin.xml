@@ -20,7 +20,6 @@
     <bean id="oldManager" class="jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSManagerImpl" autowire-candidate="false"/>
     <bean id="newManager" class="jetbrains.buildserver.sonarplugin.sqrunner.manager.projectfeatures.SQSManagerProjectFeatures" autowire-candidate="false"/>
 
-    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.ChooseSQSServerController"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeToolProvider"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerToolType"/>
 </beans>
