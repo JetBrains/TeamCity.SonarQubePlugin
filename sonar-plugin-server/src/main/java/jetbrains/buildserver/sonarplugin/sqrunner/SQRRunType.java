@@ -5,6 +5,7 @@ import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.RunType;
 import jetbrains.buildServer.serverSide.RunTypeRegistry;
 import jetbrains.buildserver.sonarplugin.Constants;
+import jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -85,6 +86,7 @@ public class SQRRunType extends RunType {
         map.put(Constants.SONAR_PROJECT_KEY, DEFAULT_PROJECT_KEY);
         map.put(Constants.SONAR_PROJECT_VERSION, DEFAULT_PROJECT_VERSION);
         map.put(Constants.SONAR_PROJECT_SOURCES, DEFAULT_SOURCE_PATH);
+        map.put(SonarQubeScannerConstants.SONAR_QUBE_SCANNER_VERSION_PARAMETER, "%teamcity.tool." + SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + ".DEFAULT%");
         return map;
     }
 

@@ -5,6 +5,7 @@ import jetbrains.buildserver.sonarplugin.Constants;
 import jetbrains.buildserver.sonarplugin.Util;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
+import jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,6 +64,9 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
         }
         if (!Util.isEmpty(server.getJDBCPassword())) {
             runnerContext.addRunnerParameter(Constants.SONAR_SERVER_JDBC_PASSWORD, server.getJDBCPassword());
+        }
+        if (Util.isEmpty(runnerContext.getParameters().get(SonarQubeScannerConstants.SONAR_QUBE_SCANNER_VERSION_PARAMETER))) {
+            runnerContext.addRunnerParameter(SonarQubeScannerConstants.SONAR_QUBE_SCANNER_VERSION_PARAMETER, "%teamcity.tool." + SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + ".DEFAULT%");
         }
     }
 
