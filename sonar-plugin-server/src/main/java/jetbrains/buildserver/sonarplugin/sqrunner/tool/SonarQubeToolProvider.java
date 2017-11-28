@@ -155,6 +155,11 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
         }
 
         final Path targetPath = targetDirectory.toPath();
+        try {
+            Files.createDirectory(targetPath);
+        } catch (IOException ignore) {
+        }
+
         {
             final String error = checkDirectory(targetPath, "Cannot unpack " + toolPackage + " to " + targetDirectory);
             if (error != null) {
