@@ -8,13 +8,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.net.URI;
+import java.nio.file.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,21 +22,29 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
 
     private static final String SONAR_QUBE_SCANNER_PREFIX = SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID;
     private static final String VERSION_GROUP_NAME = "version";
-    private static final String VERSION_PATTERN = "(?<" + VERSION_GROUP_NAME + ">X(\\d+.)*\\d+)";
+    private static final String VERSION_PATTERN = "(?<" + VERSION_GROUP_NAME + ">(\\d+.)*\\d+)";
     private static final String SONAR_QUBE_SCANNER_TYPE = "scanner";
     private static final String SONAR_QUBE_RUNNER_TYPE = "runner";
     private static final String TYPE_GROUP_NAME = "type";
-    private static final String SONAR_QUBE_SCANNER_TYPE_SUFFIX = "-(?<" + TYPE_GROUP_NAME + ">X" + SONAR_QUBE_RUNNER_TYPE + "|"+ SONAR_QUBE_SCANNER_TYPE + ")";
+    private static final String SONAR_QUBE_SCANNER_TYPE_SUFFIX = "-(?<" + TYPE_GROUP_NAME + ">" + SONAR_QUBE_RUNNER_TYPE + "|"+ SONAR_QUBE_SCANNER_TYPE + ")";
     private static final String ZIP_EXTENSION = "\\.zip";
     private static final String JAR_EXTENSION = "\\.jar";
     private static final Pattern PACKED_SONAR_QUBE_SCANNER_ROOT_ZIP_PATTERN = Pattern.compile(SONAR_QUBE_SCANNER_PREFIX + "\\." + VERSION_PATTERN + SONAR_QUBE_SCANNER_TYPE_SUFFIX + ZIP_EXTENSION);
+    private static final Pattern PACKED_SONAR_QUBE_SCANNER_ROOT_DIR_PATTERN = Pattern.compile(SONAR_QUBE_SCANNER_PREFIX + "\\." + VERSION_PATTERN + SONAR_QUBE_SCANNER_TYPE_SUFFIX);
 
     private static final String DEFAULT_BUNDLED_VERSION = "2.4";
     private static final String DEFAULT_BUNDLED_VERSION_STRING = SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + DEFAULT_BUNDLED_VERSION + "-" + SONAR_QUBE_RUNNER_TYPE;
+    private static final Pattern SONAR_QUBE_SCANNER_JAR_PATTERN = Pattern.compile(".*?[.-]" + VERSION_PATTERN + JAR_EXTENSION);
 
     @NotNull private final PluginDescriptor myPluginDescriptor;
 
     @NotNull private static final ToolTypeAdapter SQS_TOOL_TYPE = new ToolTypeAdapter() {
+        @Nullable
+        @Override
+        public String getValidPackageDescription() {
+            return "Specify path to the SonarQube Scanner jar, eg: sonar-runner.2.4.jar, sonar-scanner-cli-3.0.3.jar";
+        }
+
         @NotNull
         @Override
         public String getType() {
@@ -72,7 +76,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
 
         @Override
         public boolean isSupportUpload() {
-            return false;
+            return true;
         }
 
         @Override
@@ -107,13 +111,17 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
         final Path bundledTools = getBundledVersionsRoot();
         LOG.warn(" - getBundledToolVersions in " + bundledTools);
 
-        if (!checkDirectory(bundledTools, "Cannot get bundled SonarQube Scanner version")) return Collections.emptyList();
+        final String error = checkDirectory(bundledTools, "Cannot get bundled SonarQube Scanner version");
+        if (error != null) {
+            LOG.warn(error);
+            return Collections.emptyList();
+        }
 
         final List<InstalledToolVersion> res = new ArrayList<>();
         try (final DirectoryStream<Path> contents = Files.newDirectoryStream(bundledTools)) {
             for (Path path : contents) {
                 LOG.warn(" - getBundledToolVersions found package " + path);
-                final GetPackageVersionResult result = tryParsePackage(path);
+                final GetPackageVersionResult result = tryParsePackedPackage(path);
                 if (result.getToolVersion() != null) {
                     res.add(new SimpleInstalledToolVersion(result.getToolVersion(), null, null, path.toFile()));
                 }
@@ -133,13 +141,42 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
 
     @NotNull
     @Override
-    public GetPackageVersionResult tryGetPackageVersion(@NotNull File toolPackage) {
-        return tryParsePackage(toolPackage.toPath());
+    public GetPackageVersionResult tryGetPackageVersion(@NotNull final File toolPackage) {
+        final Matcher matcher = SONAR_QUBE_SCANNER_JAR_PATTERN.matcher(toolPackage.getName());
+
+        if (matcher.matches()) {
+            try {
+
+                try (final FileSystem fs = FileSystems.newFileSystem(URI.create("jar:file:" + toolPackage.getAbsolutePath()), Collections.emptyMap())) {
+                    final Path sonarScannerMain = fs.getPath("/org/sonarsource/scanner/cli/Main.class");
+                    final String version = matcher.group("version");
+                    if (Files.exists(sonarScannerMain)) {
+                        return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, matcher.group("version"), SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + matcher.group("version") + "-" + SONAR_QUBE_SCANNER_TYPE));
+                    } else {
+                        final Path sonarRunnerMain = fs.getPath("/org/sonar/runner/Main.class");
+                        if (Files.exists(sonarRunnerMain)) {
+                            return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, matcher.group("version"), SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_RUNNER_TYPE));
+                        } else {
+                            return GetPackageVersionResult.error("Doesn't seem like SonarQube Scanner or SonarQube Runner: cannot find main class neither in 'org.sonarsource.scanner.cli' package neither in 'org.sonar.runner' packege");
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                LOG.warnAndDebugDetails("Cannot read zip archive in '" + toolPackage + "'", e);
+                return GetPackageVersionResult.error("Should be single jar with. The name should contain version, eg: sonar-runner.2.4.jar or sonar-scanner-cli-3.0.3.jar");
+            }
+        }
+
+        return GetPackageVersionResult.error("Should be single jar with. The name should contain version, eg: sonar-runner.2.4.jar or sonar-scanner-cli-3.0.3.jar");
     }
 
     @NotNull
-    private GetPackageVersionResult tryParsePackage(@NotNull final Path root) {
-        if (!checkFile(root, "Cannot parse SonarQube Scanner package")) return GetPackageVersionResult.error("Cannot parse SonarQube Scanner package");
+    private GetPackageVersionResult tryParsePackedPackage(@NotNull final Path root) {
+        final String error = checkFile(root, "Cannot parse SonarQube Scanner package");
+        if (error != null) {
+            LOG.warn(error);
+            return GetPackageVersionResult.error(error);
+        }
 
         final String fileName = root.getFileName().toString();
 
@@ -150,7 +187,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
             if (matcher.group(TYPE_GROUP_NAME).equals(SONAR_QUBE_SCANNER_TYPE)) {
                 return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, version, SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_SCANNER_TYPE));
             } else {
-                return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, version, SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_SCANNER_PREFIX));
+                return GetPackageVersionResult.version(new SonarQubeToolVersion(SQS_TOOL_TYPE, version, SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + "." + version + "-" + SONAR_QUBE_RUNNER_TYPE));
             }
         } else {
             LOG.warn("Unexpected package " + fileName + ", only " + SONAR_QUBE_SCANNER_PREFIX + " and " + SONAR_QUBE_SCANNER_TYPE_SUFFIX + " with " + VERSION_GROUP_NAME + " suffix are allowed.");
@@ -161,13 +198,48 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
     @Override
     public void unpackToolPackage(@NotNull final File toolPackage, @NotNull final File targetDirectory) throws ToolException {
         final Path toolPath = toolPackage.toPath();
-        if (!checkDirectory(toolPath, "Cannot unpack " + toolPackage)) {
-            throw new ToolException("Cannot unpack " + toolPackage);
+        {
+            final String error = checkFile(toolPath, "Cannot unpack " + toolPackage);
+            if (error != null) {
+                LOG.warn(error);
+                throw new ToolException(error);
+            }
+        }
+
+        final Matcher matcher = SONAR_QUBE_SCANNER_JAR_PATTERN.matcher(toolPath.getFileName().toString());
+        if (!matcher.matches()) {
+            LOG.warn("Cannot unpack " + toolPackage + ": should be single jar file with version suffix: 'sonar-qube-scanner.3.0.3.778-scanner.jar'.");
+            throw new ToolException("Cannot unpack " + toolPackage + ": should be single jar file with version suffix. Eg: 'sonar-qube-scanner.3.0.3.778-scanner.jar'.");
         }
 
         final Path targetPath = targetDirectory.toPath();
-        if (!checkDirectory(targetPath, "Cannot unpack " + toolPackage + " to " + targetDirectory)) {
-            throw new ToolException("Cannot unpack " + toolPackage + " to " + targetDirectory);
+        {
+            final String error = checkDirectory(targetPath, "Cannot unpack " + toolPackage + " to " + targetDirectory);
+            if (error != null) {
+                LOG.warn(error);
+                throw new ToolException(error);
+            }
+        }
+
+        final Matcher dirMatcher = PACKED_SONAR_QUBE_SCANNER_ROOT_DIR_PATTERN.matcher(targetDirectory.getName());
+        if (!dirMatcher.matches()) {
+            throw new ToolException("Unexpected target directory name: should be 'sonar-qube-scanner.{version}.{type}' while got " + targetDirectory.getName());
+        }
+
+        final String type = dirMatcher.group(TYPE_GROUP_NAME);
+        final String version = dirMatcher.group(VERSION_GROUP_NAME);
+
+        final Path libDirectory;
+        try {
+            libDirectory = Files.createDirectories(targetPath.resolve("lib"));
+        } catch (IOException e) {
+            throw new ToolException("Cannot create directory for unpacked tool: '" + targetPath.resolve(type + "." + version) + "'", e);
+        }
+        final Path targetJarLocation = libDirectory.resolve(toolPath.getFileName());
+        try {
+            Files.copy(toolPath, targetJarLocation);
+        } catch (IOException e) {
+            throw new ToolException("Cannot copy jar to " + targetJarLocation);
         }
     }
 
@@ -177,36 +249,32 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
         return DEFAULT_BUNDLED_VERSION_STRING;
     }
 
-    private boolean checkDirectory(@NotNull final Path bundledTools, final String description) {
+    @Nullable
+    private String checkDirectory(@NotNull final Path bundledTools, final String description) {
         if (!Files.exists(bundledTools)) {
-            LOG.warn(description + ": '" + bundledTools + "' expected to exist");
-            return false;
+            return description + ": '" + bundledTools + "' expected to exist";
         }
         if (!Files.isReadable(bundledTools)) {
-            LOG.warn(description + ": cannot read '" + bundledTools + "'");
-            return false;
+            return description + ": cannot read '" + bundledTools + "'";
         }
         if (!Files.isDirectory(bundledTools)) {
-            LOG.warn(description + ": '" + bundledTools + "' is not a directory");
-            return false;
+            return description + ": '" + bundledTools + "' is not a directory";
         }
-        return true;
+        return null;
     }
 
-    private boolean checkFile(@NotNull final Path bundledTool, final String description) {
+    @Nullable
+    private String checkFile(@NotNull final Path bundledTool, final String description) {
         if (!Files.exists(bundledTool)) {
-            LOG.warn(description + ": '" + bundledTool + "' expected to exist");
-            return false;
+            return description + ": '" + bundledTool + "' expected to exist";
         }
         if (!Files.isReadable(bundledTool)) {
-            LOG.warn(description + ": cannot read '" + bundledTool + "'");
-            return false;
+            return description + ": cannot read '" + bundledTool + "'";
         }
         if (!Files.isRegularFile(bundledTool)) {
-            LOG.warn(description + ": '" + bundledTool + "' is not a file");
-            return false;
+            return description + ": '" + bundledTool + "' is not a file";
         }
-        return true;
+        return null;
     }
 
     @NotNull
