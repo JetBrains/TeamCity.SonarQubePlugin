@@ -6,7 +6,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
-      <teamcity-version>10.0</teamcity-version>
+      <teamcity-version>2017.2</teamcity-version>
   </properties>
   <repositories>
     <repository>
@@ -34,7 +34,7 @@
               <plugin>
                 <groupId>org.jetbrains.teamcity</groupId>
                 <artifactId>teamcity-sdk-maven-plugin</artifactId>
-                <version>0.1-SNAPSHOT</version>
+                <version>0.2</version>
                 <inherited>false</inherited>
               </plugin>
           </plugins>
