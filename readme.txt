@@ -7,6 +7,7 @@
  =====
 
  The latest build of the plugin is available on the public TeamCity server and can be downloaded from:
+  for TeamCity 2017.1 and later: http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build20171x/.lastPinned/sonar-plugin.zip
   for TeamCity 10:  http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build100x/.lastPinned/sonar-plugin.zip
   for prior versions: http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build/.lastPinned/sonar-plugin.zip
 
