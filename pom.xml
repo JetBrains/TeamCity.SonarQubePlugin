@@ -41,6 +41,7 @@
       </pluginManagement>
   </build>
   <modules>
+    <module>repository</module>
     <module>sonar-plugin-server</module>
     <module>sonar-plugin-agent</module>
     <module>sonar-plugin-common</module>
