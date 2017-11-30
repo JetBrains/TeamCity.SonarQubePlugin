@@ -22,20 +22,13 @@ import static jetbrains.buildServer.util.OSType.WINDOWS;
  * SonarQube Runner wrapper process.
  */
 public class SQRBuildService extends CommandLineBuildService {
-    private static final String BUNDLED_SQR_RUNNER_PATH = "sonar-qube-runner";
-    private static final String SQR_RUNNER_PATH_PROPERTY = "teamcity.tool.sonarquberunner";
-
-    @NotNull
-    private final PluginDescriptor myPluginDescriptor;
     @NotNull
     private final SonarProcessListener mySonarProcessListener;
     @NotNull
     private final OSType myOsType;
 
-    public SQRBuildService(@NotNull final PluginDescriptor pluginDescriptor,
-                           @NotNull final SonarProcessListener sonarProcessListener,
+    public SQRBuildService(@NotNull final SonarProcessListener sonarProcessListener,
                            @NotNull final OSType osType) {
-        myPluginDescriptor = pluginDescriptor;
         mySonarProcessListener = sonarProcessListener;
         myOsType = osType;
     }
@@ -81,7 +74,7 @@ public class SQRBuildService extends CommandLineBuildService {
     }
 
     private boolean isUseScannerMain(String sonarScannerRoot) {
-        return sonarScannerRoot.startsWith("sonar-qube-scanner");
+        return sonarScannerRoot.endsWith("scanner");
     }
 
     /**
