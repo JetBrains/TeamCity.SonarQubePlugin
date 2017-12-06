@@ -122,17 +122,21 @@ public class MigratingSQSManagerTest {
         when(sqsManagerProjectFeatures.removeServer(any(), any())).thenReturn(new SQSManager.SQSActionResult(any, null, ""));
         when(sqsManager.removeServer(any(), any())).thenReturn(new SQSManager.SQSActionResult(any, null, ""));
 
-        migratingSQSManager.removeServer(myProject, "any");
+        final SQSManager.SQSActionResult result = migratingSQSManager.removeServer(myProject, "any");
         verify(sqsManagerProjectFeatures, times(1)).removeServer(myProject, "any");
         verify(sqsManager, times(1)).removeServer(myProject, "any");
+        BDDAssertions.then(result.getBeforeAction()).isNotNull();
+        BDDAssertions.then(result.isError()).isFalse();
 
         reset(sqsManagerProjectFeatures, sqsManager);
         when(sqsManagerProjectFeatures.removeServer(any(), any())).thenReturn(new SQSManager.SQSActionResult(null, null, "", true));
         when(sqsManager.removeServer(any(), any())).thenReturn(new SQSManager.SQSActionResult(null, null, "", true));
 
-        migratingSQSManager.removeServer(myProject, "any");
+        final SQSManager.SQSActionResult result2 = migratingSQSManager.removeServer(myProject, "any");
         verify(sqsManagerProjectFeatures, times(1)).removeServer(myProject, "any");
         verify(sqsManager, times(1)).removeServer(myProject, "any");
+        BDDAssertions.then(result2.getBeforeAction()).isNull();
+        BDDAssertions.then(result2.isError()).isTrue();
     }
 
     public void should_get_from_both() throws IOException {
