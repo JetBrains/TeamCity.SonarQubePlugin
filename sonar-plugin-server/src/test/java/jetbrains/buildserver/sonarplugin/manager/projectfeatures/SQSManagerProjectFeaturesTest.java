@@ -1,9 +1,8 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectfeatures;
+package jetbrains.buildserver.sonarplugin.manager.projectfeatures;
 
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.SProjectFeatureDescriptor;
 import jetbrains.buildserver.sonarplugin.manager.BaseSQSInfo;
-import jetbrains.buildserver.sonarplugin.manager.projectfeatures.SQSManagerProjectFeatures;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.TestUtil;
 import org.assertj.core.api.Condition;
 import org.jetbrains.annotations.NotNull;
