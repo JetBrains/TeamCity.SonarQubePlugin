@@ -9,8 +9,8 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildserver.sonarplugin.Constants;
 import jetbrains.buildserver.sonarplugin.Util;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
+import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -2,9 +2,11 @@ package jetbrains.buildserver.sonarplugin.sqrunner.manager;
 
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.settings.ProjectSettingsManager;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSManagerImpl;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSProjectSettings;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.XMLBasedSQSInfo;
+import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.manager.SQSManager;
+import jetbrains.buildserver.sonarplugin.manager.projectsettings.SQSManagerImpl;
+import jetbrains.buildserver.sonarplugin.manager.projectsettings.SQSProjectSettings;
+import jetbrains.buildserver.sonarplugin.manager.projectsettings.XMLBasedSQSInfo;
 import org.assertj.core.api.Condition;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeMethod;
@@ -96,8 +98,8 @@ public class SQSManagerTest {
 
     @NotNull
     public static SQSInfo mockSQSInfo(@NotNull final ProjectSettingsManager settingsManager,
-                                       @NotNull final String serverId,
-                                       @NotNull final String inProject) {
+                                      @NotNull final String serverId,
+                                      @NotNull final String inProject) {
         final SQSProjectSettings t = new SQSProjectSettings();
         final SQSInfo modifiedServer = new XMLBasedSQSInfo(serverId, null, null, null, null, null, null, null);
         t.setInfo(serverId, modifiedServer);

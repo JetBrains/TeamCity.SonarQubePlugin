@@ -1,4 +1,4 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager;
+package jetbrains.buildserver.sonarplugin.manager;
 
 import jetbrains.buildServer.controllers.BasePropertiesBean;
 import org.jetbrains.annotations.NotNull;

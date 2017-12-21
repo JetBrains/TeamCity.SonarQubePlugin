@@ -1,4 +1,4 @@
-package jetbrains.buildserver.sonarplugin.sqrunner;
+package jetbrains.buildserver.sonarplugin.manager;
 
 import jetbrains.buildServer.controllers.admin.projects.EditProjectTab;
 import jetbrains.buildServer.serverSide.SProject;
@@ -6,8 +6,8 @@ import jetbrains.buildServer.serverSide.auth.AuthUtil;
 import jetbrains.buildServer.serverSide.auth.SecurityContext;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
+import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
