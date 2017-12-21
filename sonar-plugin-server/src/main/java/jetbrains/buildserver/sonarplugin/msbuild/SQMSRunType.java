@@ -1,33 +1,29 @@
-package jetbrains.buildserver.sonarplugin.sqrunner;
+package jetbrains.buildserver.sonarplugin.msbuild;
 
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.RunType;
 import jetbrains.buildServer.serverSide.RunTypeRegistry;
 import jetbrains.buildserver.sonarplugin.Constants;
 import jetbrains.buildserver.sonarplugin.PropertiesProcessorProvider;
-import jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerConstants;
+import jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Andrey Titov on 4/2/14.
- *
- * RunType definition for SonarQube Runner
- */
-public class SQRRunType extends RunType {
-    private static final String EDIT_SQRRUN_PARAMS_JSP_PATH = "editSQRRunParams.jsp";
-    private static final String VIEW_SQRRUN_PARAMS_JSP_PATH = "viewSQRRunParams.jsp";
-    private static final String RUNNER_DISPLAY_NAME = "SonarQube Runner";
-    private static final String RUNNER_DESCRIPTION = "Runner for executing SonarQube analysis";
-    private static final String DEFAULT_TOOL_VERSION = "%teamcity.tool." + SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + ".DEFAULT%";
+import static jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants.SONAR_QUBE_MSBUILD_RUN_TYPE_ID;
+
+public class SQMSRunType extends RunType {
+    @NotNull private static final String DISPLAY_NAME = "SonarQube MSBuild Scanner";
+    @NotNull private static final String DESCRIPTION = "Runner for executing SonarQube analysis for MSBuild";
+    @NotNull private static final String EDIT_JSP = "editSQRRunParams.jsp";
+    @NotNull private static final String VIEW_JSP = "viewSQRRunParams.jsp";
 
     @NotNull private final PropertiesProcessorProvider myPropertiesProcessorProvider;
 
-    public SQRRunType(@NotNull final RunTypeRegistry runTypeRegistry,
-                      @NotNull final PropertiesProcessorProvider propertiesProcessorProvider) {
+    public SQMSRunType(@NotNull final RunTypeRegistry runTypeRegistry,
+                       @NotNull final PropertiesProcessorProvider propertiesProcessorProvider) {
         myPropertiesProcessorProvider = propertiesProcessorProvider;
         runTypeRegistry.registerRunType(this);
     }
@@ -35,19 +31,19 @@ public class SQRRunType extends RunType {
     @NotNull
     @Override
     public String getType() {
-        return Constants.RUNNER_TYPE;
+        return SONAR_QUBE_MSBUILD_RUN_TYPE_ID;
     }
 
     @NotNull
     @Override
     public String getDisplayName() {
-        return RUNNER_DISPLAY_NAME;
+        return DISPLAY_NAME;
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return RUNNER_DESCRIPTION;
+        return DESCRIPTION;
     }
 
     @Nullable
@@ -59,13 +55,13 @@ public class SQRRunType extends RunType {
     @Nullable
     @Override
     public String getEditRunnerParamsJspFilePath() {
-        return EDIT_SQRRUN_PARAMS_JSP_PATH;
+        return EDIT_JSP;
     }
 
     @Nullable
     @Override
     public String getViewRunnerParamsJspFilePath() {
-        return VIEW_SQRRUN_PARAMS_JSP_PATH;
+        return VIEW_JSP;
     }
 
     @Nullable
@@ -76,13 +72,7 @@ public class SQRRunType extends RunType {
         map.put(Constants.SONAR_PROJECT_KEY, Constants.DEFAULT_PROJECT_KEY);
         map.put(Constants.SONAR_PROJECT_VERSION, Constants.DEFAULT_PROJECT_VERSION);
         map.put(Constants.SONAR_PROJECT_SOURCES, Constants.DEFAULT_SOURCE_PATH);
-        map.put(SonarQubeScannerConstants.SONAR_QUBE_SCANNER_VERSION_PARAMETER, DEFAULT_TOOL_VERSION);
+        map.put(SQMSConstants.SONAR_QUBE_MSBUILD_VERSION_PARAMETER, "%teamcity.tool." + SQMSConstants.SONAR_QUBE_MSBUILD_RUN_TYPE_ID + ".DEFAULT%");
         return map;
-    }
-
-    @NotNull
-    @Override
-    public String describeParameters(@NotNull final Map<String, String> parameters) {
-        return "";
     }
 }
