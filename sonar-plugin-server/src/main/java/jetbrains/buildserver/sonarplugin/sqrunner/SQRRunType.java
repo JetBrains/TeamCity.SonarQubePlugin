@@ -52,17 +52,15 @@ public class SQRRunType extends RunType {
     @Nullable
     @Override
     public PropertiesProcessor getRunnerPropertiesProcessor() {
-        return new PropertiesProcessor() {
-            public Collection<InvalidProperty> process(Map<String, String> properties) {
-                List<InvalidProperty> invalidProperties = new LinkedList<InvalidProperty>();
+        return properties -> {
+            List<InvalidProperty> invalidProperties = new LinkedList<>();
 
-                final String serverId = properties.get(Constants.SONAR_SERVER_ID);
-                if (serverId == null) {
-                    invalidProperties.add(new InvalidProperty(Constants.SQS_CHOOSER, "Choose a SonarQube Server to send information to"));
-                }
-
-                return invalidProperties;
+            final String serverId = properties.get(Constants.SONAR_SERVER_ID);
+            if (serverId == null) {
+                invalidProperties.add(new InvalidProperty(Constants.SQS_CHOOSER, "Choose a SonarQube Server to send information to"));
             }
+
+            return invalidProperties;
         };
     }
 
