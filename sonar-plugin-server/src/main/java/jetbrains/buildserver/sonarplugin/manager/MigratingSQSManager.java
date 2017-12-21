@@ -1,9 +1,9 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager;
+package jetbrains.buildserver.sonarplugin.manager;
 
 import jetbrains.buildServer.serverSide.ConfigActionFactory;
 import jetbrains.buildServer.serverSide.SProject;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectfeatures.SQSManagerProjectFeatures;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSManagerImpl;
+import jetbrains.buildserver.sonarplugin.manager.projectfeatures.SQSManagerProjectFeatures;
+import jetbrains.buildserver.sonarplugin.manager.projectsettings.SQSManagerImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

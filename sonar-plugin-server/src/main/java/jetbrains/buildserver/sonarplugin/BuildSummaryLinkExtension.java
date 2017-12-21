@@ -1,4 +1,4 @@
-package jetbrains.buildserver.sonarplugin.sqrunner;
+package jetbrains.buildserver.sonarplugin;
 
 import jetbrains.buildServer.controllers.BuildDataExtensionUtil;
 import jetbrains.buildServer.serverSide.SBuild;

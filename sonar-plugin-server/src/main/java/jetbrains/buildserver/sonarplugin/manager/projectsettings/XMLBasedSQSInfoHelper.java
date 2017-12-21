@@ -1,7 +1,6 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings;
+package jetbrains.buildserver.sonarplugin.manager.projectsettings;
 
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.XMLBasedSQSInfo;
+import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;

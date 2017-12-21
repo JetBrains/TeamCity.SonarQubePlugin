@@ -1,9 +1,9 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings;
+package jetbrains.buildserver.sonarplugin.manager.projectsettings;
 
 import jetbrains.buildServer.XmlStorable;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import jetbrains.buildserver.sonarplugin.Util;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.BaseSQSInfo;
+import jetbrains.buildserver.sonarplugin.manager.BaseSQSInfo;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

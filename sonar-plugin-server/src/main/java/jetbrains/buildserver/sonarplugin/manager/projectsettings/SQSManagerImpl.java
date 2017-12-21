@@ -1,11 +1,11 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings;
+package jetbrains.buildserver.sonarplugin.manager.projectsettings;
 
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.settings.ProjectSettings;
 import jetbrains.buildServer.serverSide.settings.ProjectSettingsFactory;
 import jetbrains.buildServer.serverSide.settings.ProjectSettingsManager;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
+import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

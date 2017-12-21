@@ -14,7 +14,7 @@
     <tr><th class="noBorder"><label for="sqsChooser">SonarQube Server: </label></th>
         <td>
             <c:choose>
-                <%--@elvariable id="servers" type="java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
+                <%--@elvariable id="servers" type="java.util.List<jetbrains.buildserver.sonarplugin.manager.SQSInfo>"--%>
                 <c:when test="${not empty servers}">
                     <props:selectProperty name="sonarServer" enableFilter="true" className="sqsChooser mediumField">
                         <c:if test="${showUnknownServer}">
