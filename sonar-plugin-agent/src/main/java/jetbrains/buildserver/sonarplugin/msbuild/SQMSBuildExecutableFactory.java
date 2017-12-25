@@ -18,7 +18,6 @@ public class SQMSBuildExecutableFactory implements ExecutableFactory {
     }
 
     @NotNull
-    @Override
     public Executable create(@NotNull final BuildRunnerContext runnerContext) throws RunBuildException {
         final String msBuildScannerRoot = mySonarQubeMSBuildScannerLocator.getExecutablePath(runnerContext);
 
