@@ -17,8 +17,8 @@ import static jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants.SONAR
 public class SQMSRunType extends RunType {
     @NotNull private static final String DISPLAY_NAME = "SonarQube MSBuild Scanner";
     @NotNull private static final String DESCRIPTION = "Runner for executing SonarQube analysis for MSBuild";
-    @NotNull private static final String EDIT_JSP = "editSQRRunParams.jsp";
-    @NotNull private static final String VIEW_JSP = "viewSQRRunParams.jsp";
+    @NotNull private static final String EDIT_JSP = "editSQMSRunParams.jsp";
+    @NotNull private static final String VIEW_JSP = "viewSQMSRunParams.jsp";
 
     @NotNull private final PropertiesProcessorProvider myPropertiesProcessorProvider;
 
