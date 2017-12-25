@@ -5,6 +5,13 @@
             <executable-files>
                 <include name='sonar-qube-runner/bin/sonar-runner'/>
                 <include name='sonar-qube-runner/bin/sonar-runner.bat'/>
+                <include name='sonarscanner_for_msbuild/MSBuild.SonarQube.Runner.exe'/>
+                <include name='sonarscanner_for_msbuild/SonarQube.Scanner.MSBuild.exe'/>
+                <include name='sonarscanner_for_msbuild/SonarScanner.MSBuild.exe'/>
+                <include name='sonarscanner_for_msbuild/sonar-scanner-3.1.0.1141/bin/sonar-scanner'/>
+                <include name='sonarscanner_for_msbuild/sonar-scanner-3.1.0.1141/bin/sonar-scanner.bat'/>
+                <include name='sonarscanner_for_msbuild/sonar-scanner-3.1.0.1141/bin/sonar-scanner-debug'/>
+                <include name='sonarscanner_for_msbuild/sonar-scanner-3.1.0.1141/bin/sonar-scanner-debug.bat'/>
             </executable-files>
         </layout>
     </plugin-deployment>
