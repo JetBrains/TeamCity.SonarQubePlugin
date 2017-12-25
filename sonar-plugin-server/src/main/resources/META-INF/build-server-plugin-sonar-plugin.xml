@@ -11,12 +11,19 @@
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.EditSQRRunType"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQSPropertiesProvider"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQRPasswordProvider"/>
-    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeToolProvider"/>
+    <bean id="SQScannerToolProvider" class="jetbrains.buildserver.sonarplugin.tool.SonarQubeToolProvider">
+        <constructor-arg index="0" ref="simpleZipToolProviderSQScanner"/>
+    </bean>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerToolType"/>
+    <bean id="simpleZipToolProviderSQScanner" class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SimpleZipToolProviderSQScanner"/>
 
     <bean class="jetbrains.buildserver.sonarplugin.msbuild.SQMSBeginRunType"/>
     <bean class="jetbrains.buildserver.sonarplugin.msbuild.SQMSFinishRunType"/>
-    <bean class="jetbrains.buildserver.sonarplugin.msbuild.tool.SonarQubeMSBuildToolProvider"/>
+    <bean class="jetbrains.buildserver.sonarplugin.msbuild.tool.SonarQubeMSBuildToolType"/>
+    <bean id="SQMSBuildToolProvider" class="jetbrains.buildserver.sonarplugin.tool.SonarQubeToolProvider">
+        <constructor-arg index="0" ref="simpleZipToolProviderSQMSBuild"/>
+    </bean>
+    <bean id="simpleZipToolProviderSQMSBuild" class="jetbrains.buildserver.sonarplugin.msbuild.tool.SimpleZipToolProviderSQMSBuild"/>
 
     <bean class="jetbrains.buildserver.sonarplugin.manager.ServerManagementProjectTab"/>
     <bean class="jetbrains.buildserver.sonarplugin.manager.ManageSQSActionController"/>
@@ -25,7 +32,7 @@
         <constructor-arg index="0" ref="oldManager"/>
         <constructor-arg index="1" ref="newManager"/>
     </bean>
-<    <bean id="oldManager" class="jetbrains.buildserver.sonarplugin.manager.projectsettings.SQSManagerImpl" autowire-candidate="false"/>
+    <bean id="oldManager" class="jetbrains.buildserver.sonarplugin.manager.projectsettings.SQSManagerImpl" autowire-candidate="false"/>
     <bean id="newManager" class="jetbrains.buildserver.sonarplugin.manager.projectfeatures.SQSManagerProjectFeatures" autowire-candidate="false"/>
 
 </beans>
