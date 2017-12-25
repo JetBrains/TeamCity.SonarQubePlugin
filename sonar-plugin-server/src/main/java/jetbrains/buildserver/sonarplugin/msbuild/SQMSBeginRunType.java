@@ -3,6 +3,7 @@ package jetbrains.buildserver.sonarplugin.msbuild;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.RunType;
 import jetbrains.buildServer.serverSide.RunTypeRegistry;
+import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildserver.sonarplugin.Constants;
 import jetbrains.buildserver.sonarplugin.PropertiesProcessorProvider;
 import jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants;
@@ -14,17 +15,20 @@ import java.util.Map;
 
 import static jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants.SONAR_QUBE_MSBUILD_RUN_TYPE_ID;
 
-public class SQMSRunType extends RunType {
-    @NotNull private static final String DISPLAY_NAME = "SonarQube MSBuild Scanner";
+public class SQMSBeginRunType extends RunType {
+    @NotNull private static final String DISPLAY_NAME = "SonarQube MSBuild Scanner: begin analysis";
     @NotNull private static final String DESCRIPTION = "Runner for executing SonarQube analysis for MSBuild";
-    @NotNull private static final String EDIT_JSP = "editSQMSRunParams.jsp";
-    @NotNull private static final String VIEW_JSP = "viewSQMSRunParams.jsp";
+    @NotNull private static final String EDIT_JSP = "msbuild/editBeginSQMSRunParams.jsp";
+    @NotNull private static final String VIEW_JSP = "msbuild/viewBeginSQMSRunParams.jsp";
 
     @NotNull private final PropertiesProcessorProvider myPropertiesProcessorProvider;
+    @NotNull private final PluginDescriptor myPluginDescriptor;
 
-    public SQMSRunType(@NotNull final RunTypeRegistry runTypeRegistry,
-                       @NotNull final PropertiesProcessorProvider propertiesProcessorProvider) {
+    public SQMSBeginRunType(@NotNull final RunTypeRegistry runTypeRegistry,
+                            @NotNull final PropertiesProcessorProvider propertiesProcessorProvider,
+                            @NotNull final PluginDescriptor pluginDescriptor) {
         myPropertiesProcessorProvider = propertiesProcessorProvider;
+        myPluginDescriptor = pluginDescriptor;
         runTypeRegistry.registerRunType(this);
     }
 
@@ -55,13 +59,13 @@ public class SQMSRunType extends RunType {
     @Nullable
     @Override
     public String getEditRunnerParamsJspFilePath() {
-        return EDIT_JSP;
+        return myPluginDescriptor.getPluginResourcesPath(EDIT_JSP);
     }
 
     @Nullable
     @Override
     public String getViewRunnerParamsJspFilePath() {
-        return VIEW_JSP;
+        return myPluginDescriptor.getPluginResourcesPath(VIEW_JSP);
     }
 
     @Nullable

@@ -5,10 +5,10 @@
 %><%@ taglib prefix="forms" tagdir="/WEB-INF/tags/forms"
 %><%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout"
 %><%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
-%><%@ attribute name="toolFragment" fragment="true"%>
+%>
 
-<jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"
-/><jsp:useBean id="constants" class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerConstants"/>
+
+<jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
 <l:settingsGroup title="SonarQube Runner Parameters" className="advancedSetting">
     <tr>
@@ -41,7 +41,7 @@
         </td>
     </tr>
 
-    <jsp:invoke fragment="toolFragment"/>
+    <jsp:include page="${param.selectToolFragment}"/>
 
     <tr>
         <th class="noBorder"><label for="sonarProjectName">Project name: </label></th>
