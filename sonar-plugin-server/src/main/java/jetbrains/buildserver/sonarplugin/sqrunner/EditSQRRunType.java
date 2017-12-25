@@ -11,6 +11,7 @@ import jetbrains.buildserver.sonarplugin.Constants;
 import jetbrains.buildserver.sonarplugin.Util;
 import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
 import jetbrains.buildserver.sonarplugin.manager.SQSManager;
+import jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +32,7 @@ public class EditSQRRunType implements EditRunTypeControllerExtension {
                           @NotNull final SQSManager mySqsManager) {
         this.mySqsManager = mySqsManager;
         server.registerExtension(EditRunTypeControllerExtension.class, Constants.RUNNER_TYPE, this);
+        server.registerExtension(EditRunTypeControllerExtension.class, SQMSConstants.SONAR_QUBE_MSBUILD_RUN_TYPE_ID, this);
     }
 
     @SuppressWarnings("unchecked")

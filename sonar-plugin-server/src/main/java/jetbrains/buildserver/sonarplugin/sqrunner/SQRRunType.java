@@ -3,6 +3,7 @@ package jetbrains.buildserver.sonarplugin.sqrunner;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.RunType;
 import jetbrains.buildServer.serverSide.RunTypeRegistry;
+import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildserver.sonarplugin.Constants;
 import jetbrains.buildserver.sonarplugin.PropertiesProcessorProvider;
 import jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerConstants;
