@@ -1,4 +1,3 @@
-<%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
 <jsp:useBean id="constants" class="jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants"/>
 
 <jsp:include page="../SQSEditRunnerCommon.jsp">
