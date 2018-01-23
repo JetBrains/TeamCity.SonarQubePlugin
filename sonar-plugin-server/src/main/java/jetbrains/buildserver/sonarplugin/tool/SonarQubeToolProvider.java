@@ -115,11 +115,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
             }
         }
 
-        final Matcher matcher = mySonarQubeScannerJarPattern.matcher(toolPath.getFileName().toString());
-        if (!matcher.matches()) {
-            LOG.warn("Cannot unpack " + toolPackage + ": should be single jar file with version suffix: 'sonar-qube-scanner.3.0.3.778-scanner.jar'.");
-            throw new ToolException("Cannot unpack " + toolPackage + ": should be single jar file with version suffix. Eg: 'sonar-qube-scanner.3.0.3.778-scanner.jar'.");
-        }
+        mySimpleZipToolProvider.validatePackedTool(toolPath);
 
         final Path targetPath = targetDirectory.toPath();
         try {
@@ -140,18 +136,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
             throw new ToolException("Unexpected target directory name: should match '" + myPackedSonarQubeScannerRootDirPattern.pattern() + "' while got " + targetDirectory.getName());
         }
 
-        final Path libDirectory;
-        try {
-            libDirectory = Files.createDirectories(targetPath.resolve("lib"));
-        } catch (IOException e) {
-            throw new ToolException("Cannot create directory for unpacked tool: '" + targetPath.resolve("lib") + "'", e);
-        }
-        final Path targetJarLocation = libDirectory.resolve(toolPath.getFileName());
-        try {
-            Files.copy(toolPath, targetJarLocation);
-        } catch (IOException e) {
-            throw new ToolException("Cannot copy jar to " + targetJarLocation);
-        }
+        mySimpleZipToolProvider.layoutContents(toolPath, targetPath);
     }
 
     @Nullable

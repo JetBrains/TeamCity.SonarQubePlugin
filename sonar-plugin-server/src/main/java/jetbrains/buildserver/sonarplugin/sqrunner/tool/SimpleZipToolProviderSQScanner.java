@@ -2,12 +2,14 @@ package jetbrains.buildserver.sonarplugin.sqrunner.tool;
 
 import com.intellij.openapi.diagnostic.Logger;
 import jetbrains.buildServer.tools.GetPackageVersionResult;
+import jetbrains.buildServer.tools.ToolException;
 import jetbrains.buildServer.tools.ToolType;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildserver.sonarplugin.tool.SimpleZipToolProvider;
 import jetbrains.buildserver.sonarplugin.tool.SonarQubeToolProvider;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -15,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     private static final Logger LOG = Logger.getInstance(SimpleZipToolProviderSQScanner.class.getName());
@@ -123,5 +126,30 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     @Override
     public GetPackageVersionResult describeBrokenPackage() {
         return GetPackageVersionResult.error("Should be single jar with. The name should contain version, eg: sonar-runner.2.4.jar or sonar-scanner-cli-3.0.3.jar");
+    }
+
+    @Override
+    public void validatePackedTool(@NotNull final Path toolPackage) throws ToolException {
+        final Matcher matcher = Pattern.compile(myPackedSonarQubeScannerRootZipPattern).matcher(toolPackage.getFileName().toString());
+        if (!matcher.matches()) {
+            LOG.warn("Cannot unpack " + toolPackage + ": should be single jar file with version suffix: 'sonar-qube-scanner.3.0.3.778-scanner.jar'.");
+            throw new ToolException("Cannot unpack " + toolPackage + ": should be single jar file with version suffix. Eg: 'sonar-qube-scanner.3.0.3.778-scanner.jar'.");
+        }
+    }
+
+    @Override
+    public void layoutContents(@NotNull final Path toolPath, @NotNull final Path targetPath) throws ToolException {
+        final Path libDirectory;
+        try {
+            libDirectory = Files.createDirectories(targetPath.resolve("lib"));
+        } catch (IOException e) {
+            throw new ToolException("Cannot create directory for unpacked tool: '" + targetPath.resolve("lib") + "'", e);
+        }
+        final Path targetJarLocation = libDirectory.resolve(toolPath.getFileName());
+        try {
+            Files.copy(toolPath, targetJarLocation);
+        } catch (IOException e) {
+            throw new ToolException("Cannot copy jar to " + targetJarLocation);
+        }
     }
 }

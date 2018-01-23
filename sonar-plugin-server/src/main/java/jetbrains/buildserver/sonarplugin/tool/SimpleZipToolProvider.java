@@ -1,9 +1,11 @@
 package jetbrains.buildserver.sonarplugin.tool;
 
 import jetbrains.buildServer.tools.GetPackageVersionResult;
+import jetbrains.buildServer.tools.ToolException;
 import jetbrains.buildServer.tools.ToolType;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 
@@ -37,4 +39,8 @@ public interface SimpleZipToolProvider {
 
     @NotNull
     GetPackageVersionResult describeBrokenPackage();
+
+    void validatePackedTool(@NotNull final Path toolPackage) throws ToolException;
+
+    void layoutContents(@NotNull Path toolPath, @NotNull Path targetPath) throws ToolException;
 }

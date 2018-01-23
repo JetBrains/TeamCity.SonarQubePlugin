@@ -1,7 +1,9 @@
 package jetbrains.buildserver.sonarplugin.msbuild.tool;
 
 import com.intellij.openapi.diagnostic.Logger;
+import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.tools.GetPackageVersionResult;
+import jetbrains.buildServer.tools.ToolException;
 import jetbrains.buildServer.tools.ToolType;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeToolVersion;
@@ -9,13 +11,16 @@ import jetbrains.buildserver.sonarplugin.tool.SimpleZipToolProvider;
 import jetbrains.buildserver.sonarplugin.tool.SonarQubeToolProvider;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Spliterators;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.StreamSupport;
 
 public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
     private static final Logger LOG = Logger.getInstance(SimpleZipToolProviderSQMSBuild.class.getName());
@@ -110,5 +115,84 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
     @Override
     public GetPackageVersionResult describeBrokenPackage() {
         return GetPackageVersionResult.error("Should be single zip, name should contain version, eg: sonar-scanner-msbuild.4.0.2.892.zip");
+    }
+
+    @Override
+    public void validatePackedTool(@NotNull final Path toolPackage) throws ToolException {
+        final Matcher matcher = Pattern.compile(myPackedSonarQubeScannerRootZipPattern).matcher(toolPackage.getFileName().toString());
+        if (!matcher.matches()) {
+            LOG.warn("Cannot unpack " + toolPackage + ": should be single zip file with version suffix: 'sonar-scanner-msbuild-4.0.2.892.zip'.");
+            throw new ToolException("Cannot unpack " + toolPackage + ": should be single zip file with version suffix: 'sonar-scanner-msbuild-4.0.2.892.zip'.");
+        }
+    }
+
+    public static Path resolve(@NotNull final Path targetPath, @NotNull final Path path) {
+        final String[] paths = StreamSupport.stream(path.spliterator(), false).map(Path::toString).toArray(String[]::new);
+        return targetPath.getFileSystem().getPath(targetPath.toString(), paths);
+    }
+
+    @Override
+    public void layoutContents(@NotNull final Path toolPath, @NotNull final Path targetPath) throws ToolException {
+        try (final FileSystem fs = FileSystems.newFileSystem(URI.create("jar:file:" + toolPath.toAbsolutePath()), Collections.emptyMap())) {
+            Files.walkFileTree(fs.getPath("/"), new FileVisitor<Path>() {
+                @NotNull private Path currentPath = targetPath;
+
+                @Override
+                public FileVisitResult preVisitDirectory(final Path path, final BasicFileAttributes basicFileAttributes) throws IOException {
+                    final Path targetDir = resolve(targetPath, fs.getPath("/").relativize(path));
+
+                    try {
+                        Files.createDirectory(targetDir);
+                    } catch (FileAlreadyExistsException ignore) {
+                    }
+
+                    currentPath = targetDir;
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(final Path path, final BasicFileAttributes basicFileAttributes) throws IOException {
+                    Files.copy(path, currentPath.resolve(path.getFileName().toString()));
+
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(final Path path, final IOException e) throws IOException {
+                    Loggers.SERVER.warn(e);
+
+                    return FileVisitResult.TERMINATE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(final Path path, final IOException e) throws IOException {
+                    currentPath = currentPath.getParent();
+
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            throw new ToolException("Error", e);
+        }
+
+        final Path descriptor = targetPath.resolve("teamcity-plugin.xml");
+        try {
+            Files.write(descriptor, Arrays.asList("<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                    "<teamcity-agent-plugin xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"",
+                    "                       xsi:noNamespaceSchemaLocation=\"urn:shemas-jetbrains-com:teamcity-agent-plugin-v1-xml\">",
+                    "  <tool-deployment>",
+                    "    <layout>",
+                    "        <executable-files>",
+                    "            <include name='sonar-scanner-3.0.3.778/bin/sonar-runner'/>",
+                    "            <include name='sonar-scanner-3.0.3.778/bin/sonar-runner.bat'/>",
+                    "            <include name='MSBuild.SonarQube.Runner.exe'/>",
+                    "            <include name='SonarQube.Scanner.MSBuild.exe'/>",
+                    "        </executable-files>",
+                    "    </layout>",
+                    "  </tool-deployment>",
+                    "</teamcity-agent-plugin>"));
+        } catch (IOException e) {
+            throw new ToolException("Cannot write teamcity-plugin.xml", e);
+        }
     }
 }

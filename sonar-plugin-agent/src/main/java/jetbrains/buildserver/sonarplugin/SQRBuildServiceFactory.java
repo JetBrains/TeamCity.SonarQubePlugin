@@ -1,7 +1,6 @@
 package jetbrains.buildserver.sonarplugin;
 
 import jetbrains.buildServer.agent.AgentBuildRunnerInfo;
-import jetbrains.buildServer.agent.plugins.beans.PluginDescriptor;
 import jetbrains.buildServer.agent.runner.CommandLineBuildService;
 import jetbrains.buildServer.agent.runner.CommandLineBuildServiceFactory;
 import jetbrains.buildServer.util.OSType;
