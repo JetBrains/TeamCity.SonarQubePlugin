@@ -108,6 +108,12 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
     }
 
     @NotNull
+    @Override
+    public String getDescription() {
+        return "plugin-settings";
+    }
+
+    @NotNull
     private SQSProjectSettings getSettings(@NotNull final SProject project) {
         final ProjectSettings settings = mySettingsManager.getSettings(project.getProjectId(), SQS_MANAGER_KEY);
         if (!(settings instanceof SQSProjectSettings)) {
