@@ -14,11 +14,18 @@
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfoFactory"/>
 
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.MigratingSQSManager" autowire-candidate="true">
-        <constructor-arg index="0" ref="oldManager"/>
+        <constructor-arg index="0">
+            <list>
+                <ref bean="newManager"/>
+                <ref bean="emptyProjectFeatureManager"/>
+                <ref bean="oldManager"/>
+            </list>
+        </constructor-arg>
         <constructor-arg index="1" ref="newManager"/>
     </bean>
     <bean id="oldManager" class="jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSManagerImpl" autowire-candidate="false"/>
     <bean id="newManager" class="jetbrains.buildserver.sonarplugin.sqrunner.manager.projectfeatures.SQSManagerProjectFeatures" autowire-candidate="false"/>
+    <bean id="emptyProjectFeatureManager" class="jetbrains.buildserver.sonarplugin.sqrunner.manager.projectfeatures.SQSManagerEmptyTypeProjectFeatures" autowire-candidate="false"/>
 
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeToolProvider"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerToolType"/>

@@ -33,6 +33,9 @@ public interface SQSManager {
     @NotNull
     SQSActionResult removeServer(@NotNull final SProject project, @NotNull final String serverId);
 
+    @NotNull
+    String getDescription();
+
     class SQSActionResult {
         final SQSInfo myBeforeAction;
         final SQSInfo myAfterAction;
