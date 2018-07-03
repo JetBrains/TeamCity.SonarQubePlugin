@@ -22,6 +22,7 @@
     Project modules: <strong><props:displayValue name="sonarProjectModules" emptyValue="not specified"/></strong>
 </div>
 
+<c:if test="${param.includeSourceParameters}">
 <div class="parameter">
     Sources location: <strong><props:displayValue name="sonarProjectSources"/></strong>
 </div>
@@ -33,6 +34,7 @@
 <div class="parameter">
     Binaries location: <strong><props:displayValue name="sonarProjectBinaries"/></strong>
 </div>
+</c:if>
 
 <div class="parameter">
     Additional parameters: <strong><props:displayValue name="additionalParameters"/></strong>

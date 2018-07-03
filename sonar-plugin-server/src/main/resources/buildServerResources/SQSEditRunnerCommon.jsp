@@ -69,6 +69,7 @@
         <forms:workingDirectory/>
     </tr>
 
+    <c:if test="${param.includeSourceParameters}">
     <tr>
         <th class="noBorder"><label for="sonarProjectSources">Sources location: </label></th>
         <td>
@@ -93,6 +94,7 @@
             <span class="smallNote">Path to directory containing binaries.</span>
         </td>
     </tr>
+    </c:if>
     <tr class="advancedSetting">
         <th class="noBorder"><label for="sonarProjectModules">Modules: </label></th>
         <td>
