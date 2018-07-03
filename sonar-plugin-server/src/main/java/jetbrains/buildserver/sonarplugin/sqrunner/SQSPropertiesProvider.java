@@ -5,6 +5,7 @@ import jetbrains.buildserver.sonarplugin.Constants;
 import jetbrains.buildserver.sonarplugin.Util;
 import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
 import jetbrains.buildserver.sonarplugin.manager.SQSManager;
+import jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants;
 import jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +28,7 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
 
     public void updateParameters(@NotNull final BuildStartContext context) {
         for (SRunnerContext runnerContext : context.getRunnerContexts()) {
-            if (!Constants.RUNNER_TYPE.equals(runnerContext.getType())) {
+            if (!Constants.RUNNER_TYPE.equals(runnerContext.getType()) && !SQMSConstants.SONAR_QUBE_MSBUILD_RUN_TYPE_ID.equals(runnerContext.getType())) {
                 continue;
             }
 
