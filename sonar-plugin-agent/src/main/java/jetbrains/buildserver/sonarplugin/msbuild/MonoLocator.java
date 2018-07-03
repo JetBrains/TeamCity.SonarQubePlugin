@@ -2,7 +2,7 @@ package jetbrains.buildserver.sonarplugin.msbuild;
 
 import org.jetbrains.annotations.NotNull;
 
-interface MonoLocator {
+public interface MonoLocator {
     @NotNull
     String getMono();
 }
