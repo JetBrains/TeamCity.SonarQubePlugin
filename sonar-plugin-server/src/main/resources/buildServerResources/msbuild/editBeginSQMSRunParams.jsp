@@ -2,6 +2,7 @@
 
 <jsp:include page="../SQSEditRunnerCommon.jsp">
     <jsp:param name="selectToolFragment" value="/tools/editToolUsage.html?toolType=${constants.toolTypeId}&versionParameterName=${constants.sonarQubeScannerVersionParameter}&class=longField"/>
+    <jsp:param name="includeSourceParameters" value="${false}"/>
 </jsp:include>
 
 <script type="text/javascript">
