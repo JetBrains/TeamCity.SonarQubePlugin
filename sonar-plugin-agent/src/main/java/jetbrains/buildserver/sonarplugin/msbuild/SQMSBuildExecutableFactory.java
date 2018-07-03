@@ -2,18 +2,17 @@ package jetbrains.buildserver.sonarplugin.msbuild;
 
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.BuildRunnerContext;
-import jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants;
 import jetbrains.buildserver.sonarplugin.util.Executable;
 import jetbrains.buildserver.sonarplugin.util.ExecutableFactory;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collections;
 
 public class SQMSBuildExecutableFactory implements ExecutableFactory {
     @NotNull private final SonarQubeMSBuildScannerLocator mySonarQubeMSBuildScannerLocator;
 
+    @SuppressWarnings("WeakerAccess")
     public SQMSBuildExecutableFactory(@NotNull final SonarQubeMSBuildScannerLocator sonarQubeMSBuildScannerLocator) {
         mySonarQubeMSBuildScannerLocator = sonarQubeMSBuildScannerLocator;
     }
@@ -42,7 +41,7 @@ public class SQMSBuildExecutableFactory implements ExecutableFactory {
             throw new RunBuildException("Incorrect SonarQube MSBuild Scanner installation: " + executable.getAbsolutePath() + " is not a file");
         }
         if (!executable.canExecute()) {
-            throw new RunBuildException("Incorrect SonarQube MSBuild Scanner installation: cannot " + executable.getAbsolutePath() + "");
+            throw new RunBuildException("Incorrect SonarQube MSBuild Scanner installation: cannot execute " + executable.getAbsolutePath() + "");
         }
     }
 }
