@@ -4,6 +4,9 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
         default-autowire="constructor">
+    <bean class="jetbrains.buildserver.sonarplugin.SonarQubeServerPropertiesProcessorProviderImpl"/>
+    <bean class="jetbrains.buildserver.sonarplugin.BuildSummaryLinkExtension"/>
+
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQRRunType"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.BuildSummaryLinkExtension"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.ServerManagementProjectTab"/>
@@ -11,8 +14,15 @@
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.EditSQRRunType"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQSPropertiesProvider"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.SQRPasswordProvider"/>
-    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfoFactory"/>
+    <bean id="SQScannerToolProvider" class="jetbrains.buildserver.sonarplugin.tool.SonarQubeToolProvider">
+        <constructor-arg index="0" ref="simpleZipToolProviderSQScanner"/>
+    </bean>
+    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerToolType"/>
+    <bean id="simpleZipToolProviderSQScanner" class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SimpleZipToolProviderSQScanner"/>
 
+    <bean class="jetbrains.buildserver.sonarplugin.msbuild.SQMSBeginRunType"/>
+    <bean class="jetbrains.buildserver.sonarplugin.msbuild.SQMSFinishRunType"/>
+    <bean class="jetbrains.buildserver.sonarplugin.msbuild.tool.SonarQubeMSBuildToolType"/>
     <bean class="jetbrains.buildserver.sonarplugin.sqrunner.manager.MigratingSQSManager" autowire-candidate="true">
         <constructor-arg index="0">
             <list>
@@ -21,12 +31,16 @@
                 <ref bean="oldManager"/>
             </list>
         </constructor-arg>
+    <bean id="simpleZipToolProviderSQMSBuild" class="jetbrains.buildserver.sonarplugin.msbuild.tool.SimpleZipToolProviderSQMSBuild"/>
+
+    <bean class="jetbrains.buildserver.sonarplugin.manager.ServerManagementProjectTab"/>
+    <bean class="jetbrains.buildserver.sonarplugin.manager.ManageSQSActionController"/>
+    <bean class="jetbrains.buildserver.sonarplugin.manager.SQSInfoFactory"/>
+    <bean class="jetbrains.buildserver.sonarplugin.manager.MigratingSQSManager" autowire-candidate="true">
+        <constructor-arg index="0" ref="oldManager"/>
         <constructor-arg index="1" ref="newManager"/>
     </bean>
     <bean id="oldManager" class="jetbrains.buildserver.sonarplugin.sqrunner.manager.projectsettings.SQSManagerImpl" autowire-candidate="false"/>
     <bean id="newManager" class="jetbrains.buildserver.sonarplugin.sqrunner.manager.projectfeatures.SQSManagerProjectFeatures" autowire-candidate="false"/>
     <bean id="emptyProjectFeatureManager" class="jetbrains.buildserver.sonarplugin.sqrunner.manager.projectfeatures.SQSManagerEmptyTypeProjectFeatures" autowire-candidate="false"/>
-
-    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeToolProvider"/>
-    <bean class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerToolType"/>
 </beans>
