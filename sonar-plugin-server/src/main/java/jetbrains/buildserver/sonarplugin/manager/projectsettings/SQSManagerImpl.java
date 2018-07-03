@@ -104,7 +104,13 @@ public class SQSManagerImpl implements SQSManager, ProjectSettingsFactory {
             settings.remove(serverId);
             return new SQSActionResult(old, null, "SonarQube Server '" + old.getName() + "' removed");
         }
-        return new SQSActionResult(null, null, "Cannot remove: SonarQube Server with id '" + serverId + "' doesn't exist");
+        return new SQSActionResult(null, null, "Cannot remove: SonarQube Server with id '" + serverId + "' doesn't exist", true);
+    }
+
+    @NotNull
+    @Override
+    public String getDescription() {
+        return "plugin-settings";
     }
 
     @NotNull

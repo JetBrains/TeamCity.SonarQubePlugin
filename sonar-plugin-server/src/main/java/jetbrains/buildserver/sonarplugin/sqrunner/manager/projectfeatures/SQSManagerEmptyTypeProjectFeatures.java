@@ -1,12 +1,11 @@
-package jetbrains.buildserver.sonarplugin.manager.projectfeatures;
+package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectfeatures;
 
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.SProjectFeatureDescriptor;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
-import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
-import jetbrains.buildserver.sonarplugin.manager.SQSManager;
-import jetbrains.buildserver.sonarplugin.manager.BaseSQSInfo;
-import jetbrains.buildserver.sonarplugin.manager.projectfeatures.SQSInfoImpl;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.BaseSQSInfo;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,8 +21,8 @@ import java.util.stream.Stream;
  *
  * Project features based SQSManager. Doesn't store data itself converting it from project features on demand instead.
  */
-public class SQSManagerProjectFeatures implements SQSManager {
-    protected static final String PROJECT_FEATURE_TYPE = "sonar-qube";
+public class SQSManagerEmptyTypeProjectFeatures implements SQSManager {
+    protected static final String PROJECT_FEATURE_TYPE = "";
 
     @NotNull
     @Override
@@ -32,7 +31,7 @@ public class SQSManagerProjectFeatures implements SQSManager {
     }
 
     private Stream<? extends SQSInfo> getAvailableServersStream(@NotNull SProject project) {
-        return project.getAvailableFeaturesOfType(PROJECT_FEATURE_TYPE).stream().map(SQSInfoImpl::new);
+        return project.getAvailableFeaturesOfType(PROJECT_FEATURE_TYPE).stream().filter(d -> d.getParameters().containsKey("id") && d.getParameters().containsKey("url")).map(SQSInfoImpl::new);
     }
 
     @NotNull
@@ -99,7 +98,7 @@ public class SQSManagerProjectFeatures implements SQSManager {
     @NotNull
     @Override
     public String getDescription() {
-        return "'sonar-qube' project features";
+        return "project features with empty type";
     }
 
     private Optional<SProjectFeatureDescriptor> findByServerId(@NotNull SProject project, @NotNull String serverId) {

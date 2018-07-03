@@ -33,13 +33,13 @@ public class MigratingSQSManagerTest {
     private final String myRootProjectId = "_Root";
 
     @BeforeMethod(alwaysRun = true)
-    public void setUp() throws Exception {
+    public void setUp() {
         final TestUtil.Projects projects = TestUtil.createProjects(myRootProjectId, myProjectId);
         myRoot = projects.myRoot;
         myProject = projects.myProject;
     }
 
-    public void test() throws IOException {
+    public void test() {
         ProjectSettingsManager settingsManager = mock(ProjectSettingsManager.class);
 
         String serverId = "serverId";
@@ -65,7 +65,7 @@ public class MigratingSQSManagerTest {
         BDDAssertions.then(migratingSQSManager.getOwnServer(myProject, serverId)).isNotNull().isSameAs(replacement);
     }
 
-    public void should_not_add_to_old() throws IOException {
+    public void should_not_add_to_old() {
         final BaseSQSInfo any = new BaseSQSInfo("any");
 
         final SQSManagerImpl sqsManager = mock(SQSManagerImpl.class);
@@ -81,7 +81,7 @@ public class MigratingSQSManagerTest {
         verify(sqsManager, never()).addServer(any(), any());
     }
 
-    public void should_remove_from_old_on_edit() throws IOException {
+    public void should_remove_from_old_on_edit() {
         final BaseSQSInfo any = new BaseSQSInfo("any");
 
         final SQSManagerProjectFeatures sqsManagerProjectFeatures = mock(SQSManagerProjectFeatures.class);
@@ -99,7 +99,7 @@ public class MigratingSQSManagerTest {
         verify(sqsManager, times(1)).removeServer(myProject, "any");
     }
 
-    public void should_add_to_new_when_edit() throws IOException {
+    public void should_add_to_new_when_edit() {
         final BaseSQSInfo any = new BaseSQSInfo("any");
 
         final SQSManagerImpl sqsManager = mock(SQSManagerImpl.class);
@@ -116,7 +116,7 @@ public class MigratingSQSManagerTest {
         verify(sqsManager, times(1)).removeServer(myProject, "any");
     }
 
-    public void should_remove_from_both() throws IOException {
+    public void should_remove_from_both() {
         final SQSManagerImpl sqsManager = mock(SQSManagerImpl.class);
         final SQSManagerProjectFeatures sqsManagerProjectFeatures = mock(SQSManagerProjectFeatures.class);
         final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(sqsManager, sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
@@ -126,20 +126,24 @@ public class MigratingSQSManagerTest {
         when(sqsManagerProjectFeatures.removeServer(any(), any())).thenReturn(new SQSManager.SQSActionResult(any, null, ""));
         when(sqsManager.removeServer(any(), any())).thenReturn(new SQSManager.SQSActionResult(any, null, ""));
 
-        migratingSQSManager.removeServer(myProject, "any");
+        final SQSManager.SQSActionResult result = migratingSQSManager.removeServer(myProject, "any");
         verify(sqsManagerProjectFeatures, times(1)).removeServer(myProject, "any");
         verify(sqsManager, times(1)).removeServer(myProject, "any");
+        BDDAssertions.then(result.getBeforeAction()).isNotNull();
+        BDDAssertions.then(result.isError()).isFalse();
 
         reset(sqsManagerProjectFeatures, sqsManager);
         when(sqsManagerProjectFeatures.removeServer(any(), any())).thenReturn(new SQSManager.SQSActionResult(null, null, "", true));
         when(sqsManager.removeServer(any(), any())).thenReturn(new SQSManager.SQSActionResult(null, null, "", true));
 
-        migratingSQSManager.removeServer(myProject, "any");
+        final SQSManager.SQSActionResult result2 = migratingSQSManager.removeServer(myProject, "any");
         verify(sqsManagerProjectFeatures, times(1)).removeServer(myProject, "any");
         verify(sqsManager, times(1)).removeServer(myProject, "any");
+        BDDAssertions.then(result2.getBeforeAction()).isNull();
+        BDDAssertions.then(result2.isError()).isTrue();
     }
 
-    public void should_get_from_both() throws IOException {
+    public void should_get_from_both() {
         final SQSManagerImpl sqsManager = mock(SQSManagerImpl.class);
         final SQSManagerProjectFeatures sqsManagerProjectFeatures = mock(SQSManagerProjectFeatures.class);
         final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(sqsManager, sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
