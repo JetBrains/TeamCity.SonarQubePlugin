@@ -15,11 +15,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Spliterators;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
@@ -39,8 +40,8 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
                                           @NotNull final SonarQubeMSBuildToolType sonarQubeScannerToolType) {
         myPluginDescriptor = pluginDescriptor;
         myToolType = sonarQubeScannerToolType;
-        myPackedSonarQubeScannerRootZipPattern = myToolType.getType() + "\\." + VERSION_PATTERN + ZIP_EXTENSION;
-        myPackedSonarQubeScannerRootDirPattern = myToolType.getType() + "\\." + VERSION_PATTERN;
+        myPackedSonarQubeScannerRootZipPattern = myToolType.getType() + "[\\.-]" + VERSION_PATTERN + ZIP_EXTENSION;
+        myPackedSonarQubeScannerRootDirPattern = myToolType.getType() + "[\\.-]" + VERSION_PATTERN;
     }
 
     @NotNull
@@ -126,7 +127,7 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
         }
     }
 
-    public static Path resolve(@NotNull final Path targetPath, @NotNull final Path path) {
+    private static Path resolve(@NotNull final Path targetPath, @NotNull final Path path) {
         final String[] paths = StreamSupport.stream(path.spliterator(), false).map(Path::toString).toArray(String[]::new);
         return targetPath.getFileSystem().getPath(targetPath.toString(), paths);
     }
@@ -152,20 +153,23 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
 
                 @Override
                 public FileVisitResult visitFile(final Path path, final BasicFileAttributes basicFileAttributes) throws IOException {
-                    Files.copy(path, currentPath.resolve(path.getFileName().toString()));
+                    Path resolve = currentPath.resolve(path.getFileName().toString());
+                    if (!Files.exists(resolve) && resolve.startsWith(currentPath)) {
+                        Files.copy(path, resolve);
+                    }
 
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override
-                public FileVisitResult visitFileFailed(final Path path, final IOException e) throws IOException {
+                public FileVisitResult visitFileFailed(final Path path, final IOException e) {
                     Loggers.SERVER.warn(e);
 
                     return FileVisitResult.TERMINATE;
                 }
 
                 @Override
-                public FileVisitResult postVisitDirectory(final Path path, final IOException e) throws IOException {
+                public FileVisitResult postVisitDirectory(final Path path, final IOException e) {
                     currentPath = currentPath.getParent();
 
                     return FileVisitResult.CONTINUE;
@@ -175,24 +179,71 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
             throw new ToolException("Error", e);
         }
 
+        List<Path> sonarScanners = null;
+        try (Stream<Path> children = Files.list(targetPath)) {
+            sonarScanners = children.filter(p -> p.getFileName().toString().startsWith("sonar-scanner")).collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (sonarScanners == null) {
+            sonarScanners = Collections.emptyList();
+        }
+        List<Path> executablePaths = new ArrayList<>();
+        for (Path sonarScanner: sonarScanners) {
+            try (Stream<Path> bin = Files.list(sonarScanner.resolve("bin"))) {
+                bin.filter(Files::isRegularFile).forEach(executablePaths::add);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try (Stream<Path> children = Files.list(targetPath)) {
+            children.filter(p -> p.getFileName().toString().endsWith(".exe")).forEach(executablePaths::add);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         final Path descriptor = targetPath.resolve("teamcity-plugin.xml");
         try {
-            Files.write(descriptor, Arrays.asList("<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            List<String> iterable = new ArrayList<>(Arrays.asList(
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
                     "<teamcity-agent-plugin xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"",
                     "                       xsi:noNamespaceSchemaLocation=\"urn:shemas-jetbrains-com:teamcity-agent-plugin-v1-xml\">",
                     "  <tool-deployment>",
                     "    <layout>",
-                    "        <executable-files>",
-                    "            <include name='sonar-scanner-3.0.3.778/bin/sonar-runner'/>",
-                    "            <include name='sonar-scanner-3.0.3.778/bin/sonar-runner.bat'/>",
-                    "            <include name='MSBuild.SonarQube.Runner.exe'/>",
-                    "            <include name='SonarQube.Scanner.MSBuild.exe'/>",
-                    "        </executable-files>",
+                    "      <executable-files>"));
+            for (Path path: executablePaths) {
+                iterable.add("          <include name='" + targetPath.relativize(path).toString() + "'/>");
+            }
+            iterable.addAll(Arrays.asList(
+                    "      </executable-files>",
                     "    </layout>",
                     "  </tool-deployment>",
                     "</teamcity-agent-plugin>"));
+            Files.write(descriptor, iterable);
         } catch (IOException e) {
             throw new ToolException("Cannot write teamcity-plugin.xml", e);
+        }
+
+        final Path bin = targetPath.resolve("bin");
+        try (Stream<Path> children = Files.list(bin)) {
+            children.forEach(f -> {
+                try {
+                    if (Files.isRegularFile(f)) {
+                        Set<PosixFilePermission> posixFilePermissions = Files.getPosixFilePermissions(f);
+                        if (!posixFilePermissions.contains(PosixFilePermission.OWNER_EXECUTE)) {
+                            HashSet<PosixFilePermission> updatedPermission = new HashSet<>(posixFilePermissions);
+                            updatedPermission.add(PosixFilePermission.OWNER_EXECUTE);
+                            updatedPermission.add(PosixFilePermission.GROUP_EXECUTE);
+                            updatedPermission.add(PosixFilePermission.OTHERS_EXECUTE);
+                            Files.setPosixFilePermissions(f, updatedPermission);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
