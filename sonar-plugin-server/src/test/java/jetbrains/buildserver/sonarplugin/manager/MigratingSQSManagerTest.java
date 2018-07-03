@@ -1,20 +1,18 @@
-package jetbrains.buildserver.sonarplugin.sqrunner.manager;
+package jetbrains.buildserver.sonarplugin.manager;
 
 import jetbrains.buildServer.serverSide.ConfigActionFactory;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.settings.ProjectSettingsManager;
-import jetbrains.buildserver.sonarplugin.manager.BaseSQSInfo;
-import jetbrains.buildserver.sonarplugin.manager.MigratingSQSManager;
-import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
-import jetbrains.buildserver.sonarplugin.manager.SQSManager;
 import jetbrains.buildserver.sonarplugin.manager.projectfeatures.SQSManagerProjectFeatures;
 import jetbrains.buildserver.sonarplugin.manager.projectsettings.SQSManagerImpl;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerTest;
+import jetbrains.buildserver.sonarplugin.sqrunner.manager.TestUtil;
 import org.assertj.core.api.BDDAssertions;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
+import java.util.Arrays;
 
 import static org.mockito.Mockito.*;
 
@@ -52,7 +50,7 @@ public class MigratingSQSManagerTest {
 
         final SQSManagerProjectFeatures sqsManagerProjectFeatures = mock(SQSManagerProjectFeatures.class);
 
-        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(SQSManager, sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
+        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(Arrays.asList(sqsManagerProjectFeatures, SQSManager), sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
 
         BDDAssertions.then(migratingSQSManager.getOwnServer(myRoot, serverId)).isNull();
         BDDAssertions.then(migratingSQSManager.getOwnServer(myRoot, rootServerId)).isNotNull().isSameAs(rootServerInfo);
@@ -74,7 +72,7 @@ public class MigratingSQSManagerTest {
         final SQSManagerProjectFeatures sqsManagerProjectFeatures = mock(SQSManagerProjectFeatures.class);
         when(sqsManagerProjectFeatures.addServer(myProject, any)).thenReturn(new SQSManager.SQSActionResult(null, any, ""));
 
-        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(sqsManager, sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
+        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(Arrays.asList(sqsManagerProjectFeatures, sqsManager), sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
 
         migratingSQSManager.addServer(myProject, any);
         verify(sqsManagerProjectFeatures, times(1)).addServer(myProject, any);
@@ -92,7 +90,7 @@ public class MigratingSQSManagerTest {
         when(sqsManager.removeServer(any(), any())).thenReturn(new SQSManager.SQSActionResult(any, null, ""));
         when(sqsManager.getServer(myProject, "any")).thenReturn(any);
 
-        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(sqsManager, sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
+        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(Arrays.asList(sqsManagerProjectFeatures, sqsManager), sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
 
         migratingSQSManager.editServer(myProject, any);
         verify(sqsManagerProjectFeatures, times(1)).addServer(myProject, any);
@@ -109,7 +107,7 @@ public class MigratingSQSManagerTest {
         final SQSManagerProjectFeatures sqsManagerProjectFeatures = mock(SQSManagerProjectFeatures.class);
         when(sqsManagerProjectFeatures.getServer(myProject, "any")).thenReturn(null);
 
-        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(sqsManager, sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
+        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(Arrays.asList(sqsManagerProjectFeatures, sqsManager), sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
         migratingSQSManager.editServer(myProject, any);
 
         verify(sqsManagerProjectFeatures, times(1)).addServer(myProject, any);
@@ -119,7 +117,7 @@ public class MigratingSQSManagerTest {
     public void should_remove_from_both() {
         final SQSManagerImpl sqsManager = mock(SQSManagerImpl.class);
         final SQSManagerProjectFeatures sqsManagerProjectFeatures = mock(SQSManagerProjectFeatures.class);
-        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(sqsManager, sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
+        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(Arrays.asList(sqsManagerProjectFeatures, sqsManager), sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
 
         final BaseSQSInfo any = new BaseSQSInfo("any");
 
@@ -146,7 +144,7 @@ public class MigratingSQSManagerTest {
     public void should_get_from_both() {
         final SQSManagerImpl sqsManager = mock(SQSManagerImpl.class);
         final SQSManagerProjectFeatures sqsManagerProjectFeatures = mock(SQSManagerProjectFeatures.class);
-        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(sqsManager, sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
+        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(Arrays.asList(sqsManagerProjectFeatures, sqsManager), sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
 
         migratingSQSManager.getAvailableServers(myProject);
         verify(sqsManagerProjectFeatures, times(1)).getAvailableServers(myProject);
@@ -168,7 +166,7 @@ public class MigratingSQSManagerTest {
     public void should_get_from_new_when_available() {
         final SQSManagerImpl sqsManager = mock(SQSManagerImpl.class);
         final SQSManagerProjectFeatures sqsManagerProjectFeatures = mock(SQSManagerProjectFeatures.class);
-        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(sqsManager, sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
+        final MigratingSQSManager migratingSQSManager = new MigratingSQSManager(Arrays.asList(sqsManagerProjectFeatures, sqsManager), sqsManagerProjectFeatures, mock(ConfigActionFactory.class));
 
         final BaseSQSInfo any = new BaseSQSInfo("any");
         when(sqsManagerProjectFeatures.getServer(myProject, "any")).thenReturn(any);
