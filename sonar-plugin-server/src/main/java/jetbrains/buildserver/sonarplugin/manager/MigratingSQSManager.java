@@ -2,12 +2,13 @@ package jetbrains.buildserver.sonarplugin.manager;
 
 import jetbrains.buildServer.serverSide.ConfigActionFactory;
 import jetbrains.buildServer.serverSide.SProject;
-import jetbrains.buildserver.sonarplugin.manager.projectfeatures.SQSManagerProjectFeatures;
-import jetbrains.buildserver.sonarplugin.manager.projectsettings.SQSManagerImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by linfar on 03.10.16.
@@ -15,8 +16,10 @@ import java.util.*;
  * A SonarQube Server manager migrating SQSInfos from plugin-settings.xml to project features
  */
 public class MigratingSQSManager implements SQSManager {
-    @NotNull private final List<SQSManager> mySQSManagers;
-    @NotNull private final SQSManager myEditManager;
+    @NotNull
+    private final List<SQSManager> mySQSManagers;
+    @NotNull
+    private final SQSManager myEditManager;
     @NotNull private final ConfigActionFactory myConfigActionFactory;
 
     public MigratingSQSManager(@NotNull final List<SQSManager> sqsManagers,
@@ -27,19 +30,11 @@ public class MigratingSQSManager implements SQSManager {
         myEditManager = editManager;
     }
 
-    MigratingSQSManager(@NotNull final SQSManager sqsManagerImpl,
-                        @NotNull final SQSManager sqsManagerProjectFeatures,
-                        @NotNull final ConfigActionFactory configActionFactory) {
-        mySQSManagers = Arrays.asList(sqsManagerProjectFeatures, sqsManagerImpl);
-        myConfigActionFactory = configActionFactory;
-        myEditManager = sqsManagerProjectFeatures;
-    }
-
     @NotNull
     @Override
     public List<SQSInfo> getAvailableServers(@NotNull SProject project) {
         final Set<SQSInfo> res = new HashSet<>();
-        for (SQSManager sqsManager : mySQSManagers) {
+        for (SQSManager sqsManager: mySQSManagers) {
             res.addAll(sqsManager.getAvailableServers(project));
         }
         return new ArrayList<>(res);
@@ -49,7 +44,7 @@ public class MigratingSQSManager implements SQSManager {
     @Override
     public List<SQSInfo> getOwnAvailableServers(@NotNull SProject project) {
         final Set<SQSInfo> res = new HashSet<>();
-        for (SQSManager sqsManager : mySQSManagers) {
+        for (SQSManager sqsManager: mySQSManagers) {
             res.addAll(sqsManager.getOwnAvailableServers(project));
         }
         return new ArrayList<>(res);
@@ -58,7 +53,7 @@ public class MigratingSQSManager implements SQSManager {
     @Nullable
     @Override
     public SQSInfo getServer(@NotNull SProject project, @NotNull String serverId) {
-        for (SQSManager sqsManager : mySQSManagers) {
+        for (SQSManager sqsManager: mySQSManagers) {
             SQSInfo server = sqsManager.getServer(project, serverId);
             if (server != null) return server;
         }
@@ -68,7 +63,7 @@ public class MigratingSQSManager implements SQSManager {
     @Nullable
     @Override
     public SQSInfo getOwnServer(@NotNull SProject project, @NotNull String serverId) {
-        for (SQSManager sqsManager : mySQSManagers) {
+        for (SQSManager sqsManager: mySQSManagers) {
             SQSInfo server = sqsManager.getOwnServer(project, serverId);
             if (server != null) return server;
         }
@@ -79,7 +74,7 @@ public class MigratingSQSManager implements SQSManager {
     @Override
     public SQSActionResult editServer(@NotNull SProject project, @NotNull SQSInfo sqsInfo) {
         if (myEditManager.getServer(project, sqsInfo.getId()) == null) {
-            for (SQSManager sqsManager : mySQSManagers) {
+            for (SQSManager sqsManager: mySQSManagers) {
                 if (sqsManager == myEditManager) continue;
 
                 SQSInfo init = sqsManager.getServer(project, sqsInfo.getId());
@@ -105,7 +100,7 @@ public class MigratingSQSManager implements SQSManager {
     @Override
     public SQSActionResult removeServer(@NotNull SProject project, @NotNull String serverId) {
         SQSActionResult oldSqsInfo = null;
-        for (SQSManager sqsManager : mySQSManagers) {
+        for (SQSManager sqsManager: mySQSManagers) {
             if (sqsManager != myEditManager) {
                 final SQSActionResult sqsActionResult = sqsManager.removeServer(project, serverId);
                 if (oldSqsInfo == null || !oldSqsInfo.isError()) {
