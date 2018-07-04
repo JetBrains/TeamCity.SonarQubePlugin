@@ -4,7 +4,17 @@
 
 <beans default-autowire="constructor">
     <bean class="jetbrains.buildserver.sonarplugin.SonarQubeRunnerBuildRunner"/>
-    <bean class="jetbrains.buildserver.sonarplugin.SonarProcessListener"/>
     <bean class="jetbrains.buildserver.sonarplugin.SQRBuildServiceFactory"/>
+
     <bean class="jetbrains.buildserver.sonarplugin.BuildBreakerProblemListener"/>
+    <bean class="jetbrains.buildserver.sonarplugin.SonarProcessListener"/>
+    <bean class="jetbrains.buildserver.sonarplugin.SQScannerArgsComposer"/>
+
+    <bean class="jetbrains.buildserver.sonarplugin.msbuild.SQMSBuildStartRunner"/>
+    <bean class="jetbrains.buildserver.sonarplugin.msbuild.SQMSBuildFinishRunner"/>
+    <bean class="jetbrains.buildserver.sonarplugin.msbuild.SQMSBuildStartServiceFactory"/>
+    <bean class="jetbrains.buildserver.sonarplugin.msbuild.SQMSBuildFinishServiceFactory"/>
+
+    <bean class="jetbrains.buildserver.sonarplugin.msbuild.MonoLocatorImpl"/>
+    <bean class="jetbrains.buildserver.sonarplugin.msbuild.MonoWrapper"/>
 </beans>

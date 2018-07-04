@@ -1,7 +1,6 @@
 package jetbrains.buildserver.sonarplugin;
 
 import jetbrains.buildServer.RunBuildException;
-import jetbrains.buildServer.agent.plugins.beans.PluginDescriptor;
 import jetbrains.buildServer.agent.runner.*;
 import jetbrains.buildServer.runner.JavaRunnerConstants;
 import jetbrains.buildServer.util.OSType;
@@ -26,11 +25,14 @@ public class SQRBuildService extends CommandLineBuildService {
     private final SonarProcessListener mySonarProcessListener;
     @NotNull
     private final OSType myOsType;
+    @NotNull
+    private final SQArgsComposer mySQArgsComposer;
 
     public SQRBuildService(@NotNull final SonarProcessListener sonarProcessListener,
                            @NotNull final OSType osType) {
         mySonarProcessListener = sonarProcessListener;
         myOsType = osType;
+        mySQArgsComposer = new SQScannerArgsComposer(osType);
     }
 
     @NotNull
@@ -87,30 +89,12 @@ public class SQRBuildService extends CommandLineBuildService {
     private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters,
                                         @NotNull final Map<String, String> sharedConfigParameters,
                                         @NotNull final String sonarScannerRoot) {
-        final List<String> res = new LinkedList<String>();
         final Map<String, String> allParameters = new HashMap<String, String>(runnerParameters);
         allParameters.putAll(sharedConfigParameters);
         final SQRParametersAccessor accessor = new SQRParametersAccessor(allParameters);
-        addSQRArg(res, "-Dproject.home", ".", myOsType);
-        addSQRArg(res, "-Dsonar.host.url", accessor.getHostUrl(), myOsType);
-        addSQRArg(res, "-Dsonar.jdbc.url", accessor.getJDBCUrl(), myOsType);
-        addSQRArg(res, "-Dsonar.jdbc.username", accessor.getJDBCUsername(), myOsType);
-        addSQRArg(res, "-Dsonar.jdbc.password", accessor.getJDBCPassword(), myOsType);
-        addSQRArg(res, "-Dsonar.projectKey", getProjectKey(accessor.getProjectKey()), myOsType);
-        addSQRArg(res, "-Dsonar.projectName", accessor.getProjectName(), myOsType);
-        addSQRArg(res, "-Dsonar.projectVersion", accessor.getProjectVersion(), myOsType);
-        addSQRArg(res, "-Dsonar.sources", accessor.getProjectSources(), myOsType);
-        addSQRArg(res, "-Dsonar.tests", accessor.getProjectTests(), myOsType);
-        addSQRArg(res, "-Dsonar.binaries", accessor.getProjectBinaries(), myOsType);
-        addSQRArg(res, "-Dsonar.java.binaries", accessor.getProjectBinaries(), myOsType);
-        addSQRArg(res, "-Dsonar.modules", accessor.getProjectModules(), myOsType);
-        addSQRArg(res, "-Dsonar.password", accessor.getPassword(), myOsType);
-        addSQRArg(res, "-Dsonar.login", accessor.getLogin(), myOsType);
+
+        final List<String> res = mySQArgsComposer.composeArgs(accessor, new JavaSonarQubeKeysProvider());
         res.add("-Dscanner.home=" + sonarScannerRoot);
-        final String additionalParameters = accessor.getAdditionalParameters();
-        if (additionalParameters != null) {
-            res.addAll(Arrays.asList(additionalParameters.split("\\n")));
-        }
 
         final Set<String> collectedReports = mySonarProcessListener.getCollectedReports();
         if (!collectedReports.isEmpty() && (accessor.getAdditionalParameters() == null || !accessor.getAdditionalParameters().contains("-Dsonar.junit.reportsPath"))) {
@@ -126,6 +110,7 @@ public class SQRBuildService extends CommandLineBuildService {
                 addSQRArg(res, "-Dsonar.jacoco.reportPath", jacocoExecFilePath, myOsType);
             }
         }
+
         return res;
     }
 

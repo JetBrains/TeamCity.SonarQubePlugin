@@ -3,9 +3,10 @@ package jetbrains.buildserver.sonarplugin.sqrunner.manager.projectfeatures;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.SProjectFeatureDescriptor;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.BaseSQSInfo;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo;
-import jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManager;
+import jetbrains.buildserver.sonarplugin.manager.BaseSQSInfo;
+import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.manager.SQSManager;
+import jetbrains.buildserver.sonarplugin.manager.projectfeatures.SQSInfoImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 
 /**
  * Created by linfar on 03.10.16.
- *
+ * <p>
  * Project features based SQSManager. Doesn't store data itself converting it from project features on demand instead.
  */
 public class SQSManagerEmptyTypeProjectFeatures implements SQSManager {
@@ -45,24 +46,19 @@ public class SQSManagerEmptyTypeProjectFeatures implements SQSManager {
     public synchronized SQSInfo getServer(@NotNull SProject project, @NotNull String serverId) {
         final Optional<SProjectFeatureDescriptor> optional = project.getAvailableFeaturesOfType(PROJECT_FEATURE_TYPE).stream().filter(f -> {
             final String id = f.getParameters().get(BaseSQSInfo.ID);
-            return id != null && serverId.equals(id);
+            return serverId.equals(id);
         }).findFirst();
-        if (optional.isPresent()) {
-            return new SQSInfoImpl(optional.get());
-        }
-        return null;
+        return optional.map(SQSInfoImpl::new).orElse(null);
     }
 
     @Nullable
     @Override
     public synchronized SQSInfo getOwnServer(@NotNull SProject project, @NotNull String serverId) {
         final Optional<SProjectFeatureDescriptor> optional = findByServerId(project, serverId);
-        if (optional.isPresent()) {
-            return new SQSInfoImpl(optional.get());
-        }
-        return null;
+        return optional.map(SQSInfoImpl::new).orElse(null);
     }
 
+    @SuppressWarnings("Duplicates") // migrating manager
     @NotNull
     @Override
     public synchronized SQSActionResult editServer(@NotNull SProject project, @NotNull SQSInfo modifiedServer) {
@@ -79,7 +75,8 @@ public class SQSManagerEmptyTypeProjectFeatures implements SQSManager {
     @NotNull
     @Override
     public synchronized SQSActionResult addServer(@NotNull SProject toProject, @NotNull SQSInfo newServer) {
-        if (getServer(toProject, newServer.getId()) != null) return new SQSActionResult(null, null, "Cannot add: SonarQube Server with id '" + newServer.getId() + "' already exists", true);
+        if (getServer(toProject, newServer.getId()) != null)
+            return new SQSActionResult(null, null, "Cannot add: SonarQube Server with id '" + newServer.getId() + "' already exists", true);
         doAddServer(toProject, newServer);
         return new SQSActionResult(null, newServer, "SonarQube Server '" + newServer.getName() + " added");
     }
@@ -104,7 +101,7 @@ public class SQSManagerEmptyTypeProjectFeatures implements SQSManager {
     private Optional<SProjectFeatureDescriptor> findByServerId(@NotNull SProject project, @NotNull String serverId) {
         return project.getOwnFeaturesOfType(PROJECT_FEATURE_TYPE).stream().filter(f -> {
             final String id = f.getParameters().get(BaseSQSInfo.ID);
-            return id != null && serverId.equals(id);
+            return serverId.equals(id);
         }).findFirst();
     }
 
@@ -112,7 +109,7 @@ public class SQSManagerEmptyTypeProjectFeatures implements SQSManager {
     private Map<String, String> toMap(@NotNull final SQSInfo sqsInfo) {
         final Map<String, String> res = new HashMap<>();
         res.putAll(sqsInfo.getParameters());
-        for (String key : BaseSQSInfo.ENCRYPTED_FIELDS) {
+        for (String key: BaseSQSInfo.ENCRYPTED_FIELDS) {
             final String value = sqsInfo.getParameters().get(key);
             if (value != null) {
                 res.put(key, EncryptUtil.scramble(value));

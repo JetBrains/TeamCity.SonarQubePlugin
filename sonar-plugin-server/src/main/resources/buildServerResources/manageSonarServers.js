@@ -3,22 +3,22 @@
  */
 
 SonarPlugin = {
-    initPage: function() {
+    initPage: function () {
         var $pf = $j(".runnerFormTable input[id='sonar.password_field']");
-        $pf.click(function() {
+        $pf.click(function () {
             $pf.val("");
-            $pf.attr("data-modified",  "modified");
-        }).keydown(function() {
-            $pf.attr("data-modified",  "modified");
+            $pf.attr("data-modified", "modified");
+        }).keydown(function () {
+            $pf.attr("data-modified", "modified");
         });
         var $pjf = $j(".runnerFormTable input[id='sonar.jdbc.password_field']");
-        $pjf.click(function() {
+        $pjf.click(function () {
             $pjf.val("");
-            $pjf.attr("data-modified",  "modified");
-        }).keydown(function() {
-            $pf.attr("data-modified",  "modified");
+            $pjf.attr("data-modified", "modified");
+        }).keydown(function () {
+            $pf.attr("data-modified", "modified");
         });
-        $j(".enableDatabaseSettings").click(function() {
+        $j(".enableDatabaseSettings").click(function () {
             $j(".databaseSettings").show();
             $j(".enableDatabaseSettings").hide();
         });
