@@ -23,7 +23,7 @@ public class SQMSBuildExecutableFactory implements ExecutableFactory {
         final String msBuildScannerRoot = mySonarQubeMSBuildScannerLocator.getExecutablePath(runnerContext);
 
         if (msBuildScannerRoot == null) {
-            throw new RunBuildException("No SonarQube MSBuild Scanner selected");
+            throw new RunBuildException("No SonarScanner for MSBuild selected");
         }
 
         final File executableFile = new File(msBuildScannerRoot, "MSBuild.SonarQube.Runner.exe");
@@ -35,13 +35,10 @@ public class SQMSBuildExecutableFactory implements ExecutableFactory {
 
     private void checkExecutable(final File executable) throws RunBuildException {
         if (!executable.exists()) {
-            throw new RunBuildException("Incorrect SonarQube MSBuild Scanner installation: " + executable.getAbsolutePath() + " not found");
+            throw new RunBuildException("Incorrect SonarScanner for MSBuild installation: " + executable.getAbsolutePath() + " not found");
         }
         if (!executable.isFile()) {
-            throw new RunBuildException("Incorrect SonarQube MSBuild Scanner installation: " + executable.getAbsolutePath() + " is not a file");
-        }
-        if (!executable.canExecute()) {
-            throw new RunBuildException("Incorrect SonarQube MSBuild Scanner installation: cannot execute " + executable.getAbsolutePath() + "");
+            throw new RunBuildException("Incorrect SonarScanner for MSBuild installation: " + executable.getAbsolutePath() + " is not a file");
         }
     }
 }
