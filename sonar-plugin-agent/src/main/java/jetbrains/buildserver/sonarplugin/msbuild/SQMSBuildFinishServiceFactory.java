@@ -60,7 +60,7 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
                 @NotNull
                 @Override
                 public ProgramCommandLine makeProgramCommandLine() throws RunBuildException {
-                    throw new RunBuildException("SonarQube MSBuild Scanner: begin analysis runner was not triggered yet");
+                    throw new RunBuildException("SonarScanner for MSBuild: begin analysis runner was not triggered yet");
                 }
             };
         }

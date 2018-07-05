@@ -15,7 +15,7 @@ import static jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants.SONAR
 
 public class SQMSFinishRunType extends RunType {
     @NotNull
-    private static final String DISPLAY_NAME = "SonarQube MSBuild Scanner: finish analysis";
+    private static final String DISPLAY_NAME = "SonarScanner for MSBuild: finish analysis";
     @NotNull
     private static final String DESCRIPTION = "Finishes SonarQube analysis and sends data to the server selected in begin analysis stage";
     @NotNull

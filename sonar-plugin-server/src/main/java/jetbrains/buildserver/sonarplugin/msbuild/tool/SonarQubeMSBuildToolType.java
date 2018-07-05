@@ -15,25 +15,25 @@ public class SonarQubeMSBuildToolType extends ToolTypeAdapter {
     @Nullable
     @Override
     public String getValidPackageDescription() {
-        return "Specify path to the SonarQube MSBuild Scanner zip package, eg: sonar-scanner-msbuild.4.0.2.892.zip";
+        return "Specify path to the SonarScanner for MSBuild zip package, eg: sonar-scanner-msbuild.4.0.2.892.zip";
     }
 
     @NotNull
     @Override
     public String getDisplayName() {
-        return "SonarQube MSBuild Scanner";
+        return "SonarScanner for MSBuild";
     }
 
     @NotNull
     @Override
     public String getShortDisplayName() {
-        return "SonarQube MSBuild Scanner";
+        return "SonarScanner for MSBuild";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Tool to run SonarQube analyzis during the build with MSBuild";
+        return "Tool to run SonarQube analysis during the build with MSBuild";
     }
 
     @Override

@@ -16,7 +16,7 @@ import java.util.Map;
 import static jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants.SONAR_QUBE_MSBUILD_RUN_TYPE_ID;
 
 public class SQMSBeginRunType extends RunType {
-    @NotNull private static final String DISPLAY_NAME = "SonarQube MSBuild Scanner: begin analysis";
+    @NotNull private static final String DISPLAY_NAME = "SonarScanner for MSBuild: begin analysis";
     @NotNull private static final String DESCRIPTION = "Runner for executing SonarQube analysis for MSBuild";
     @NotNull private static final String EDIT_JSP = "msbuild/editBeginSQMSRunParams.jsp";
     @NotNull private static final String VIEW_JSP = "msbuild/viewBeginSQMSRunParams.jsp";
