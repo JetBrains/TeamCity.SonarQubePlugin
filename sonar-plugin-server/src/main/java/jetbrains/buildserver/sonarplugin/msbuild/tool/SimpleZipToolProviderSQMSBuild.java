@@ -53,7 +53,7 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
     @NotNull
     @Override
     public String getName() {
-        return "SonarQube MSBuild Scanner";
+        return "SonarScanner for MSBuild";
     }
 
     @NotNull
@@ -88,7 +88,7 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
             if (Files.exists(executable) && Files.isRegularFile(executable)) {
                 return GetPackageVersionResult.version(new SonarQubeToolVersion(getToolType(), version, getToolType().getType() + "." + version));
             } else {
-                return GetPackageVersionResult.error("Doesn't seem like SonarQube MSBuild Scanner: cannot find 'MSBuild.SonarQube.Runner.exe'");
+                return GetPackageVersionResult.error("Doesn't seem like SonarScanner for MSBuild: cannot find 'MSBuild.SonarQube.Runner.exe'");
             }
         }
     }
