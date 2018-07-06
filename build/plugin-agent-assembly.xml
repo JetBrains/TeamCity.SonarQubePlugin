@@ -12,6 +12,11 @@
             <includes><include>**/*</include></includes>
         </fileSet>
         <fileSet>
+            <directory>../sonar-plugin-agent/sonarscanner_for_msbuild/</directory>
+            <outputDirectory>/sonarscanner_for_msbuild</outputDirectory>
+            <includes><include>**/*</include></includes>
+        </fileSet>
+        <fileSet>
             <directory>../sonar-plugin-agent/</directory>
             <outputDirectory>/</outputDirectory>
             <includes><include>teamcity-plugin.xml</include></includes>

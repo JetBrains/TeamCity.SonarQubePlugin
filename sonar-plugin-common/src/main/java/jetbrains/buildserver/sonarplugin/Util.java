@@ -1,5 +1,6 @@
 package jetbrains.buildserver.sonarplugin;
 
+import jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +31,7 @@ public final class Util {
     }
 
     public static boolean isSonarRunner(@NotNull final String runType) {
-        return Constants.RUNNER_TYPE.equals(runType);
+        return Constants.RUNNER_TYPE.equals(runType) || SQMSConstants.SONAR_QUBE_MSBUILD_RUN_TYPE_FINISH_ID.equals(runType);
     }
 
     /**

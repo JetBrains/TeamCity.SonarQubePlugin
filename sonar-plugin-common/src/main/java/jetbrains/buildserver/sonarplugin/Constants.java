@@ -41,6 +41,11 @@ public final class Constants {
     public static final String SQS_CHOOSER = "sonarServer";
     public static final String SECURE_TEAMCITY_PASSWORD_PREFIX = "secure:teamcity.password.";
 
+    public static final String DEFAULT_PROJECT_NAME = "%system.teamcity.projectName%";
+    public static final String DEFAULT_PROJECT_KEY = "%teamcity.project.id%";
+    public static final String DEFAULT_PROJECT_VERSION = "%build.number%";
+    public static final String DEFAULT_SOURCE_PATH = "src";
+
     private Constants() {
     }
 }
