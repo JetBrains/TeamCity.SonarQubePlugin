@@ -23,7 +23,6 @@ public class SQRRunType extends RunType {
     private static final String VIEW_SQRRUN_PARAMS_JSP_PATH = "viewSQRRunParams.jsp";
     private static final String RUNNER_DISPLAY_NAME = "SonarQube Runner";
     private static final String RUNNER_DESCRIPTION = "Runner for executing SonarQube analysis";
-    private static final String DEFAULT_TOOL_VERSION = "%teamcity.tool." + SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID + ".DEFAULT%";
 
     @NotNull private final PropertiesProcessorProvider myPropertiesProcessorProvider;
 
@@ -77,7 +76,6 @@ public class SQRRunType extends RunType {
         map.put(Constants.SONAR_PROJECT_KEY, Constants.DEFAULT_PROJECT_KEY);
         map.put(Constants.SONAR_PROJECT_VERSION, Constants.DEFAULT_PROJECT_VERSION);
         map.put(Constants.SONAR_PROJECT_SOURCES, Constants.DEFAULT_SOURCE_PATH);
-        map.put(SonarQubeScannerConstants.SONAR_QUBE_SCANNER_VERSION_PARAMETER, DEFAULT_TOOL_VERSION);
         return map;
     }
 
