@@ -5,6 +5,7 @@ import jetbrains.buildServer.agent.AgentBuildRunnerInfo;
 import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
 import jetbrains.buildServer.agent.AgentLifeCycleListener;
 import jetbrains.buildServer.agent.BuildRunnerContext;
+import jetbrains.buildServer.agent.plugins.beans.PluginDescriptor;
 import jetbrains.buildServer.agent.runner.CommandLineBuildService;
 import jetbrains.buildServer.agent.runner.CommandLineBuildServiceFactory;
 import jetbrains.buildServer.util.EventDispatcher;
@@ -32,12 +33,13 @@ public class SQMSBuildStartServiceFactory implements CommandLineBuildServiceFact
                                         @NotNull final OSType osType,
                                         @NotNull final MonoLocator monoLocator,
                                         @NotNull final SQMSBuildFinishServiceFactory sqmsBuildFinishServiceFactory,
-                                        @NotNull final EventDispatcher<AgentLifeCycleListener> dispatcher) {
+                                        @NotNull final EventDispatcher<AgentLifeCycleListener> dispatcher,
+                                        @NotNull final PluginDescriptor pluginDescriptor) {
         mySQMSBuildStartRunner = sqmsBuildStartRunner;
         myOSType = osType;
         myMonoLocator = monoLocator;
         mySqmsBuildFinishServiceFactory = sqmsBuildFinishServiceFactory;
-        mySonarQubeMSBuildScannerLocator = new SonarQubeMSBuildScannerLocatorImpl();
+        mySonarQubeMSBuildScannerLocator = new SonarQubeMSBuildScannerLocatorImpl(pluginDescriptor);
 
         dispatcher.addListener(new AgentLifeCycleAdapter() {
             @Override
@@ -45,7 +47,6 @@ public class SQMSBuildStartServiceFactory implements CommandLineBuildServiceFact
                 if (runner.getRunType().equals(mySQMSBuildStartRunner.getType())) {
                     mySqmsBuildFinishServiceFactory.setMSBuildScannerLocator(new SonarQubeMSBuildScannerLocator() {
                         @Nullable
-                        @Override
                         public String getExecutablePath(@NotNull final BuildRunnerContext runnerContext) throws RunBuildException {
                             return mySonarQubeMSBuildScannerLocator.getExecutablePath(runner);
                         }
@@ -56,7 +57,6 @@ public class SQMSBuildStartServiceFactory implements CommandLineBuildServiceFact
     }
 
     @NotNull
-    @Override
     public CommandLineBuildService createService() {
         return new SimpleExecute(
                 new ExecutionChain(
@@ -68,14 +68,12 @@ public class SQMSBuildStartServiceFactory implements CommandLineBuildServiceFact
     }
 
     @NotNull
-    @Override
     public AgentBuildRunnerInfo getBuildRunnerInfo() {
         return mySQMSBuildStartRunner;
     }
 
     private static class BeginExecutionWrapper implements Execution {
         @NotNull
-        @Override
         public Executable modify(@NotNull final Executable old, final BuildRunnerContext runnerContext) {
             final ArrayList<String> arguments = new ArrayList<String>(old.myArguments);
             arguments.add("begin");
