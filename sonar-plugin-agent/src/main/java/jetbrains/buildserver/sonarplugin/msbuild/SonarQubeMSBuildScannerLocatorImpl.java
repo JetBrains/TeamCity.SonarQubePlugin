@@ -10,7 +10,6 @@ import java.io.File;
 
 public class SonarQubeMSBuildScannerLocatorImpl implements SonarQubeMSBuildScannerLocator {
     private static final String BUNDLED_SQMS_DIR = "sonarscanner_for_msbuild";
-    private static final String EXE_PATH = "MSBuild.SonarQube.Runner.exe";
 
     @NotNull private final PluginDescriptor myPluginDescriptor;
 
@@ -21,11 +20,7 @@ public class SonarQubeMSBuildScannerLocatorImpl implements SonarQubeMSBuildScann
     @Nullable
     public String getExecutablePath(@NotNull final BuildRunnerContext runnerContext) {
         final String explicitPath = runnerContext.getConfigParameters().get(SQMSConstants.SONAR_QUBE_MSBUILD_VERSION_PARAMETER);
-        return getExecutablePath(explicitPath != null ? explicitPath : getBundledPath());
-    }
-
-    private String getExecutablePath(final String homeDir) {
-        return new File(homeDir, EXE_PATH).getAbsolutePath();
+        return explicitPath != null ? explicitPath : getBundledPath();
     }
 
     private String getBundledPath() {
