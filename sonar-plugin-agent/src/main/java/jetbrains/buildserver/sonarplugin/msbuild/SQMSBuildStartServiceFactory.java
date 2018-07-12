@@ -45,12 +45,12 @@ public class SQMSBuildStartServiceFactory implements CommandLineBuildServiceFact
             @Override
             public void beforeRunnerStart(@NotNull final BuildRunnerContext runner) {
                 if (runner.getRunType().equals(mySQMSBuildStartRunner.getType())) {
-                    mySqmsBuildFinishServiceFactory.setMSBuildScannerLocator(new SonarQubeMSBuildScannerLocator() {
+                    mySqmsBuildFinishServiceFactory.setUpFinishStep(new SonarQubeMSBuildScannerLocator() {
                         @Nullable
                         public String getExecutablePath(@NotNull final BuildRunnerContext runnerContext) throws RunBuildException {
                             return mySonarQubeMSBuildScannerLocator.getExecutablePath(runner);
                         }
-                    });
+                    }, runner.getWorkingDirectory());
                 }
             }
         });

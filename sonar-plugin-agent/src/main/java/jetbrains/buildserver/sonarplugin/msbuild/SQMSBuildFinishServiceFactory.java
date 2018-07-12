@@ -14,6 +14,7 @@ import jetbrains.buildserver.sonarplugin.util.SimpleExecute;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -25,6 +26,8 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
     private final CurrentBuildTracker myCurrentBuildTracker;
     @Nullable
     private volatile SonarQubeMSBuildScannerLocator myMSBuildScannerLocator;
+    @Nullable
+    private volatile File myWorkingDirectory;
 
     public SQMSBuildFinishServiceFactory(@NotNull final SQMSBuildFinishRunner sqmsBuildStartRunner,
                                          @NotNull final OSType osType,
@@ -38,12 +41,14 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
             @Override
             public void buildStarted(@NotNull final AgentRunningBuild runningBuild) {
                 myMSBuildScannerLocator = null;
+                myWorkingDirectory = null;
             }
 
             @Override
             public void runnerFinished(@NotNull final BuildRunnerContext runner, @NotNull final BuildFinishedStatus status) {
                 if (runner.getRunType().equals(mySQMSBuildFinishRunner.getType())) {
                     myMSBuildScannerLocator = null;
+                    myWorkingDirectory = null;
                 }
             }
         });
@@ -52,7 +57,8 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
     @NotNull
     public CommandLineBuildService createService() {
         SonarQubeMSBuildScannerLocator msBuildScannerLocator = myMSBuildScannerLocator;
-        if (msBuildScannerLocator == null) {
+        File workingDirectory = myWorkingDirectory;
+        if (msBuildScannerLocator == null || workingDirectory == null) {
             return new CommandLineBuildService() {
                 @NotNull
                 @Override
@@ -63,7 +69,7 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
         }
         return new SimpleExecute(
                 new ExecutionChain(Arrays.asList(new MonoWrapper(myOSType, myMonoLocator), new EndExecution())),
-                new SQMSBuildExecutableFactory(msBuildScannerLocator));
+                new SQMSBuildExecutableFactory(msBuildScannerLocator), workingDirectory.getAbsolutePath());
     }
 
     @NotNull
@@ -71,8 +77,10 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
         return mySQMSBuildFinishRunner;
     }
 
-    public void setMSBuildScannerLocator(final SonarQubeMSBuildScannerLocator sonarQubeMSBuildScannerLocator) {
+    public void setUpFinishStep(@NotNull final SonarQubeMSBuildScannerLocator sonarQubeMSBuildScannerLocator,
+                                @NotNull final File workingDirectory) {
         myMSBuildScannerLocator = sonarQubeMSBuildScannerLocator;
+        myWorkingDirectory = workingDirectory;
     }
 
     private static class EndExecution implements Execution {
