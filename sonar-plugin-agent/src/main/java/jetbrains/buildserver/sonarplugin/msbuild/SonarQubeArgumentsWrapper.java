@@ -8,24 +8,28 @@ import jetbrains.buildserver.sonarplugin.util.Execution;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SonarQubeArgumentsWrapper implements Execution {
     @NotNull private final SQArgsComposer mySQArgsComposer;
+    @NotNull
+    private final SQRParametersAccessorFactory mySQRParametersAccessorFactory;
 
     public SonarQubeArgumentsWrapper(@NotNull final SQArgsComposer sqArgsComposer) {
+        this(sqArgsComposer, new SQRParametersAccessorFactoryImpl());
+    }
+
+    public SonarQubeArgumentsWrapper(@NotNull final SQArgsComposer sqArgsComposer,
+                                     @NotNull final SQRParametersAccessorFactory sqrParametersAccessorFactory) {
         mySQArgsComposer = sqArgsComposer;
+        mySQRParametersAccessorFactory = sqrParametersAccessorFactory;
     }
 
     @NotNull
     @Override
     public Executable modify(@NotNull final Executable old,
                              @NotNull final BuildRunnerContext runnerContext) {
-        final Map<String, String> allParameters = new HashMap<String, String>(runnerContext.getRunnerParameters());
-        allParameters.putAll(runnerContext.getBuild().getSharedConfigParameters());
-        final SQRParametersAccessor accessor = new SQRParametersAccessor(allParameters);
+        final SQRParametersAccessor accessor = mySQRParametersAccessorFactory.createAccessor(runnerContext);
 
         final List<String> args = mySQArgsComposer.composeArgs(accessor, new DotNetSonarQubeKeysProvider());
         final List<String> res = new ArrayList<String>(old.myArguments);

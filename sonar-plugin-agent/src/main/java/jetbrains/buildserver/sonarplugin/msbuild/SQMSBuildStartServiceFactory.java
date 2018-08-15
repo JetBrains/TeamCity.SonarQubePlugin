@@ -10,6 +10,8 @@ import jetbrains.buildServer.agent.runner.CommandLineBuildService;
 import jetbrains.buildServer.agent.runner.CommandLineBuildServiceFactory;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.OSType;
+import jetbrains.buildserver.sonarplugin.SQRParametersAccessor;
+import jetbrains.buildserver.sonarplugin.SQRParametersUtil;
 import jetbrains.buildserver.sonarplugin.SQScannerArgsComposer;
 import jetbrains.buildserver.sonarplugin.util.Executable;
 import jetbrains.buildserver.sonarplugin.util.Execution;
@@ -45,12 +47,13 @@ public class SQMSBuildStartServiceFactory implements CommandLineBuildServiceFact
             @Override
             public void beforeRunnerStart(@NotNull final BuildRunnerContext runner) {
                 if (runner.getRunType().equals(mySQMSBuildStartRunner.getType())) {
+
                     mySqmsBuildFinishServiceFactory.setUpFinishStep(new SonarQubeMSBuildScannerLocator() {
                         @Nullable
                         public String getExecutablePath(@NotNull final BuildRunnerContext runnerContext) throws RunBuildException {
                             return mySonarQubeMSBuildScannerLocator.getExecutablePath(runner);
                         }
-                    }, runner.getWorkingDirectory());
+                    }, runner.getWorkingDirectory(), new SQRParametersAccessor(SQRParametersUtil.mergeAuthParameters(runner.getBuild().getSharedConfigParameters(), runner.getRunnerParameters())));
                 }
             }
         });

@@ -5,7 +5,9 @@ import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import static jetbrains.buildServer.util.OSType.WINDOWS;
 
@@ -21,7 +23,7 @@ public class SQScannerArgsComposer implements SQArgsComposer {
     public List<String> composeArgs(@NotNull final SQRParametersAccessor accessor,
                                     @NotNull final SonarQubeKeysProvider keys) {
         final List<String> res = new LinkedList<String>();
-        addSQRArg(res, keys.getProjectHome(), ".", myOsType);
+        addSQRArg(res, keys.getProjectHome(), accessor.getProjectHome(), myOsType);
         addSQRArg(res, keys.getHostUrl(), accessor.getHostUrl(), myOsType);
         addSQRArg(res, keys.getJdbcUrl(), accessor.getJDBCUrl(), myOsType);
         addSQRArg(res, keys.getJdbcUsername(), accessor.getJDBCUsername(), myOsType);

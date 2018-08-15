@@ -45,6 +45,7 @@ public final class Constants {
     public static final String DEFAULT_PROJECT_KEY = "%teamcity.project.id%";
     public static final String DEFAULT_PROJECT_VERSION = "%build.number%";
     public static final String DEFAULT_SOURCE_PATH = "src";
+    public static final String PROJECT_HOME = "sonarProjectHome";
 
     private Constants() {
     }
