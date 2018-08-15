@@ -7,6 +7,8 @@ import jetbrains.buildServer.agent.runner.CommandLineBuildServiceFactory;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.OSType;
+import jetbrains.buildserver.sonarplugin.SQRParametersAccessor;
+import jetbrains.buildserver.sonarplugin.SQScannerArgsComposer;
 import jetbrains.buildserver.sonarplugin.util.Executable;
 import jetbrains.buildserver.sonarplugin.util.Execution;
 import jetbrains.buildserver.sonarplugin.util.ExecutionChain;
@@ -28,6 +30,8 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
     private volatile SonarQubeMSBuildScannerLocator myMSBuildScannerLocator;
     @Nullable
     private volatile File myWorkingDirectory;
+    @Nullable
+    private volatile SQRParametersAccessor mySqrParametersAccessor;
 
     public SQMSBuildFinishServiceFactory(@NotNull final SQMSBuildFinishRunner sqmsBuildStartRunner,
                                          @NotNull final OSType osType,
@@ -42,6 +46,7 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
             public void buildStarted(@NotNull final AgentRunningBuild runningBuild) {
                 myMSBuildScannerLocator = null;
                 myWorkingDirectory = null;
+                mySqrParametersAccessor = null;
             }
 
             @Override
@@ -49,6 +54,7 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
                 if (runner.getRunType().equals(mySQMSBuildFinishRunner.getType())) {
                     myMSBuildScannerLocator = null;
                     myWorkingDirectory = null;
+                    mySqrParametersAccessor = null;
                 }
             }
         });
@@ -57,9 +63,10 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
     @NotNull
     @Override
     public CommandLineBuildService createService() {
-        SonarQubeMSBuildScannerLocator msBuildScannerLocator = myMSBuildScannerLocator;
-        File workingDirectory = myWorkingDirectory;
-        if (msBuildScannerLocator == null || workingDirectory == null) {
+        final SonarQubeMSBuildScannerLocator msBuildScannerLocator = myMSBuildScannerLocator;
+        final File workingDirectory = myWorkingDirectory;
+        final SQRParametersAccessor sqrParametersAccessor = mySqrParametersAccessor;
+        if (msBuildScannerLocator == null || workingDirectory == null || sqrParametersAccessor == null) {
             return new CommandLineBuildService() {
                 @NotNull
                 @Override
@@ -68,8 +75,16 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
                 }
             };
         }
+
         return new SimpleExecute(
-                new ExecutionChain(Arrays.asList(new MonoWrapper(myOSType, myMonoLocator), new EndExecution())),
+                new ExecutionChain(Arrays.asList(
+                        new SonarQubeArgumentsWrapper(new SQScannerArgsComposer(myOSType), new SQRParametersAccessorFactory() {
+                            public SQRParametersAccessor createAccessor(@NotNull final BuildRunnerContext runnerContext) {
+                                return sqrParametersAccessor;
+                            }
+                        }),
+                        new MonoWrapper(myOSType, myMonoLocator),
+                        new EndExecution())),
                 new SQMSBuildExecutableFactory(msBuildScannerLocator), workingDirectory.getAbsolutePath());
     }
 
@@ -80,9 +95,11 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
     }
 
     public void setUpFinishStep(@NotNull final SonarQubeMSBuildScannerLocator sonarQubeMSBuildScannerLocator,
-                                @NotNull final File workingDirectory) {
+                                @NotNull final File workingDirectory,
+                                @NotNull final SQRParametersAccessor sqrParametersAccessor) {
         myMSBuildScannerLocator = sonarQubeMSBuildScannerLocator;
         myWorkingDirectory = workingDirectory;
+        mySqrParametersAccessor = sqrParametersAccessor;
     }
 
     private static class EndExecution implements Execution {
