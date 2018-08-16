@@ -1,7 +1,10 @@
 package jetbrains.buildserver.sonarplugin;
 
 import jetbrains.buildServer.RunBuildException;
-import jetbrains.buildServer.agent.runner.*;
+import jetbrains.buildServer.agent.runner.CommandLineBuildService;
+import jetbrains.buildServer.agent.runner.JavaCommandLineBuilder;
+import jetbrains.buildServer.agent.runner.JavaRunnerUtil;
+import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.runner.JavaRunnerConstants;
 import jetbrains.buildServer.util.OSType;
 import jetbrains.buildServer.util.StringUtil;
@@ -11,7 +14,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static jetbrains.buildServer.util.OSType.WINDOWS;
 
@@ -89,9 +95,7 @@ public class SQRBuildService extends CommandLineBuildService {
     private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters,
                                         @NotNull final Map<String, String> sharedConfigParameters,
                                         @NotNull final String sonarScannerRoot) {
-        final Map<String, String> allParameters = new HashMap<String, String>(runnerParameters);
-        allParameters.putAll(sharedConfigParameters);
-        final SQRParametersAccessor accessor = new SQRParametersAccessor(allParameters);
+        final SQRParametersAccessor accessor = new SQRParametersAccessor(SQRParametersUtil.mergeParameters(sharedConfigParameters, runnerParameters));
 
         final List<String> res = mySQArgsComposer.composeArgs(accessor, new JavaSonarQubeKeysProvider());
         res.add("-Dscanner.home=" + sonarScannerRoot);

@@ -72,4 +72,8 @@ public class SQRParametersAccessor {
     public String getPassword() {
         return myParameters.get(Constants.SONAR_PASSWORD);
     }
+
+    public String getProjectHome() {
+        return myParameters.get(Constants.PROJECT_HOME);
+    }
 }
