@@ -83,7 +83,7 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
     @NotNull
     @Override
     public GetPackageVersionResult parseVersion(final Path toolPackage, final String version) throws Exception {
-        try (final FileSystem fs = FileSystems.newFileSystem(URI.create("jar:file:" + toolPackage.toAbsolutePath()), Collections.emptyMap())) {
+        try (final FileSystem fs = FileSystems.newFileSystem(URI.create("jar:" + toolPackage.toAbsolutePath().toUri()), Collections.emptyMap())) {
             final Path executable = fs.getPath("/SonarQube.Scanner.MSBuild.exe");
             if (Files.exists(executable) && Files.isRegularFile(executable)) {
                 return GetPackageVersionResult.version(new SonarQubeToolVersion(getToolType(), version, getToolType().getType() + "." + version));
