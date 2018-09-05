@@ -12,11 +12,12 @@ import jetbrains.buildserver.sonarplugin.tool.SonarQubeToolProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.PosixFilePermission;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -29,6 +30,10 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
     private static final String DEFAULT_BUNDLED_VERSION = "3.0.3.778";
     private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d+.)*\\d+)";
     private static final String ZIP_EXTENSION = "\\.zip";
+    static final String SONAR_QUBE_SCANNER_MSBUILD_EXE = "SonarQube.Scanner.MSBuild.exe";
+    static final String BIN = "bin";
+    static final String TEAMCITY_PLUGIN_XML = "teamcity-plugin.xml";
+    static final String SONAR_SCANNER_PREFIX = "sonar-scanner";
 
     @NotNull
     private final ToolType myToolType;
@@ -83,12 +88,12 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
     @NotNull
     @Override
     public GetPackageVersionResult parseVersion(final Path toolPackage, final String version) throws Exception {
-        try (final FileSystem fs = FileSystems.newFileSystem(URI.create("jar:" + toolPackage.toAbsolutePath().toUri()), Collections.emptyMap())) {
-            final Path executable = fs.getPath("/SonarQube.Scanner.MSBuild.exe");
+        try (final FileSystem fs = FileSystems.newFileSystem(toolPackage, null)) {
+            final Path executable = fs.getPath("/" + SONAR_QUBE_SCANNER_MSBUILD_EXE);
             if (Files.exists(executable) && Files.isRegularFile(executable)) {
                 return GetPackageVersionResult.version(new SonarQubeToolVersion(getToolType(), version, getToolType().getType() + "." + version));
             } else {
-                return GetPackageVersionResult.error("Doesn't seem like SonarScanner for MSBuild: cannot find 'MSBuild.SonarQube.Runner.exe'");
+                return GetPackageVersionResult.error("Doesn't seem like SonarScanner for MSBuild: cannot find '" + SONAR_QUBE_SCANNER_MSBUILD_EXE + "'");
             }
         }
     }
@@ -134,7 +139,7 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
 
     @Override
     public void layoutContents(@NotNull final Path toolPath, @NotNull final Path targetPath) throws ToolException {
-        try (final FileSystem fs = FileSystems.newFileSystem(URI.create("jar:file:" + toolPath.toAbsolutePath()), Collections.emptyMap())) {
+        try (final FileSystem fs = FileSystems.newFileSystem(toolPath, null)) {
             Files.walkFileTree(fs.getPath("/"), new FileVisitor<Path>() {
                 @NotNull private Path currentPath = targetPath;
 
@@ -181,7 +186,7 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
 
         List<Path> sonarScanners = null;
         try (Stream<Path> children = Files.list(targetPath)) {
-            sonarScanners = children.filter(p -> p.getFileName().toString().startsWith("sonar-scanner")).collect(Collectors.toList());
+            sonarScanners = children.filter(p -> p.getFileName().toString().startsWith(SONAR_SCANNER_PREFIX)).collect(Collectors.toList());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -190,7 +195,7 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
         }
         List<Path> executablePaths = new ArrayList<>();
         for (Path sonarScanner: sonarScanners) {
-            try (Stream<Path> bin = Files.list(sonarScanner.resolve("bin"))) {
+            try (Stream<Path> bin = Files.list(sonarScanner.resolve(BIN))) {
                 bin.filter(Files::isRegularFile).forEach(executablePaths::add);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -202,7 +207,7 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
             e.printStackTrace();
         }
 
-        final Path descriptor = targetPath.resolve("teamcity-plugin.xml");
+        final Path descriptor = targetPath.resolve(TEAMCITY_PLUGIN_XML);
         try {
             List<String> iterable = new ArrayList<>(Arrays.asList(
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -222,28 +227,6 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
             Files.write(descriptor, iterable);
         } catch (IOException e) {
             throw new ToolException("Cannot write teamcity-plugin.xml", e);
-        }
-
-        final Path bin = targetPath.resolve("bin");
-        try (Stream<Path> children = Files.list(bin)) {
-            children.forEach(f -> {
-                try {
-                    if (Files.isRegularFile(f)) {
-                        Set<PosixFilePermission> posixFilePermissions = Files.getPosixFilePermissions(f);
-                        if (!posixFilePermissions.contains(PosixFilePermission.OWNER_EXECUTE)) {
-                            HashSet<PosixFilePermission> updatedPermission = new HashSet<>(posixFilePermissions);
-                            updatedPermission.add(PosixFilePermission.OWNER_EXECUTE);
-                            updatedPermission.add(PosixFilePermission.GROUP_EXECUTE);
-                            updatedPermission.add(PosixFilePermission.OTHERS_EXECUTE);
-                            Files.setPosixFilePermissions(f, updatedPermission);
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }
