@@ -2,9 +2,16 @@
 <suite name="Sonar server">
     <test name="Sonar server">
         <classes>
+            <class name="jetbrains.buildserver.sonarplugin.SonarQubeServerPropertiesProcessorProviderImplTest"/>
+
             <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerTest"/>
             <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSProjectSettingsTest"/>
+            <class name="jetbrains.buildserver.sonarplugin.sqrunner.tool.SimpleZipToolProviderSQScannerTest"/>
+
             <class name="jetbrains.buildserver.sonarplugin.manager.MigratingSQSManagerTest"/>
+            <class name="jetbrains.buildserver.sonarplugin.manager.projectfeatures.SQSManagerProjectFeaturesTest"/>
+
+            <class name="jetbrains.buildserver.sonarplugin.msbuild.tool.SimpleZipToolProviderSQMSBuildTest"/>
         </classes>
     </test>
 </suite>
