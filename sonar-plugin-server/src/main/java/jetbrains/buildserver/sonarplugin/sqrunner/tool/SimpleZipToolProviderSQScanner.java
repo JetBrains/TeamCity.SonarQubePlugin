@@ -125,7 +125,7 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     @NotNull
     @Override
     public GetPackageVersionResult describeBrokenPackage() {
-        return GetPackageVersionResult.error("Should be single jar with. The name should contain version, eg: sonar-runner.2.4.jar or sonar-scanner-cli-3.0.3.jar");
+        return GetPackageVersionResult.error("Should be single jar. The name should contain version, eg: sonar-runner.2.4.jar or sonar-scanner-cli-3.0.3.jar");
     }
 
     @Override
