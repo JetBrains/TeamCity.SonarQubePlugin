@@ -28,7 +28,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
     @NotNull private final Pattern myPackedSonarQubeScannerRootDirPattern;
     @NotNull private final String myDefaultBundledVersionString;
 
-    @NotNull private final Pattern mySonarQubeScannerJarPattern;
+    @NotNull private final Pattern myUploadedPackagePattern;
 
     @NotNull private final SimpleZipToolProvider mySimpleZipToolProvider;
 
@@ -37,7 +37,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
         myDefaultBundledVersionString = mySimpleZipToolProvider.getDefaultBundledVersion();
         myPackedSonarQubeScannerRootZipPattern = Pattern.compile(mySimpleZipToolProvider.getPackedZipPattern());
         myPackedSonarQubeScannerRootDirPattern = Pattern.compile(mySimpleZipToolProvider.getPackedDirPattern());
-        mySonarQubeScannerJarPattern = Pattern.compile(mySimpleZipToolProvider.getVersionPattern());
+        myUploadedPackagePattern = Pattern.compile(mySimpleZipToolProvider.getVersionPattern());
     }
 
     @NotNull
@@ -91,7 +91,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
 
     @NotNull
     public GetPackageVersionResult tryGetPackageVersion(@NotNull final Path toolPackage) {
-        final Matcher matcher = mySonarQubeScannerJarPattern.matcher(toolPackage.getFileName().toString());
+        final Matcher matcher = myUploadedPackagePattern.matcher(toolPackage.getFileName().toString());
 
         if (matcher.matches()) {
             try {
