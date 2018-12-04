@@ -8,6 +8,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 public final class TestTools {
     private TestTools() {
@@ -28,5 +29,15 @@ public final class TestTools {
             consumer.consume(zipFs);
         }
         return zip;
+    }
+
+    public static Path createFile(@NotNull final Path file) throws IOException {
+        Files.createDirectories(file.getParent());
+        return Files.createFile(file);
+    }
+
+    public static Path fromZipString(@NotNull final FileSystem fs, @NotNull final String path) {
+        final String[] split = path.split("/");
+        return fs.getPath("/", Arrays.copyOf(split, split.length));
     }
 }
