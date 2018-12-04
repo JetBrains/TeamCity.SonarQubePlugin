@@ -7,6 +7,7 @@
             <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSManagerTest"/>
             <class name="jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSProjectSettingsTest"/>
             <class name="jetbrains.buildserver.sonarplugin.sqrunner.tool.SimpleZipToolProviderSQScannerTest"/>
+            <class name="jetbrains.buildserver.sonarplugin.tool.SonarQubeToolProviderTest"/>
 
             <class name="jetbrains.buildserver.sonarplugin.manager.MigratingSQSManagerTest"/>
             <class name="jetbrains.buildserver.sonarplugin.manager.projectfeatures.SQSManagerProjectFeaturesTest"/>

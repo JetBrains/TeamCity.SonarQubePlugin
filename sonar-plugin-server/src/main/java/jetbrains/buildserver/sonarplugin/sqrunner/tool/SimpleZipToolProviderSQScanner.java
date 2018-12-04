@@ -10,12 +10,10 @@ import jetbrains.buildserver.sonarplugin.tool.SonarQubeToolProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,8 +29,8 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d+.)*\\d+)";
     private static final String ZIP_EXTENSION = "(\\.zip|\\.jar)";
     private static final String JAR_EXTENSION = "\\.jar";
-    static final String SCANNER_MAIN_CLASS_LOCATION = "/org/sonarsource/scanner/cli/Main.class";
-    static final String RUNNER_MAIN_CLASS_LOCATION = "/org/sonar/runner/Main.class";
+    public static final String SCANNER_MAIN_CLASS_LOCATION = "/org/sonarsource/scanner/cli/Main.class";
+    public static final String RUNNER_MAIN_CLASS_LOCATION = "/org/sonar/runner/Main.class";
     static final String LIB = "lib";
 
     @NotNull
