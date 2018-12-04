@@ -110,8 +110,6 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
     }
 
     public void unpackToolPackage(@NotNull final Path toolPath, @NotNull final Path targetPath) throws ToolException {
-        mySimpleZipToolProvider.validatePackedTool(toolPath);
-
         try {
             Files.createDirectory(targetPath);
         } catch (IOException ignore) {
