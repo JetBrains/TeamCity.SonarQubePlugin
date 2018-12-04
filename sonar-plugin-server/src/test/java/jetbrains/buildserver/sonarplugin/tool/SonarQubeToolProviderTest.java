@@ -23,13 +23,12 @@ import static org.assertj.core.api.BDDAssertions.then;
 @Test(dataProvider = "getFileSystemAndRoot", dataProviderClass = DataProviders.class)
 public class SonarQubeToolProviderTest {
 
-    private Mockery myMockery;
     private SimpleZipToolProviderSQScanner myToolProvider;
 
     @BeforeMethod
     public void setUp(@NotNull final Method method, @NotNull final Object[] testData) {
-        myMockery = new Mockery();
-        myToolProvider = new SimpleZipToolProviderSQScanner(myMockery.mock(PluginDescriptor.class), new SonarQubeScannerToolType());
+        final Mockery mockery = new Mockery();
+        myToolProvider = new SimpleZipToolProviderSQScanner(mockery.mock(PluginDescriptor.class), new SonarQubeScannerToolType());
     }
 
     public void testTryGetPackageVersion(@NotNull final FileSystem fs, @NotNull final String root) throws IOException {
@@ -67,12 +66,12 @@ public class SonarQubeToolProviderTest {
 
         // correct name, scanner class
         final GetPackageVersionResult scanner = sonarQubeToolProvider.tryGetPackageVersion(TestTools.prepareZip(fs.getPath(root), "sonar-scanner.3.2.0.1227.jar", zipFS -> TestTools.createFile(TestTools.fromZipString(zipFS, SimpleZipToolProviderSQScanner.SCANNER_MAIN_CLASS_LOCATION))));
-        then(scanner.getToolVersion()).isNotNull();
+        then(scanner.getToolVersion()).isNotNull(); assert scanner.getToolVersion() != null;
         then(scanner.getToolVersion().getId()).isEqualTo("sonar-qube-scanner.3.2.0.1227-scanner");
 
         // incorrect name, runner class
         final GetPackageVersionResult runner = sonarQubeToolProvider.tryGetPackageVersion(TestTools.prepareZip(fs.getPath(root), "sonar-scanner.3.2.0.1227.jar", zipFS -> TestTools.createFile(TestTools.fromZipString(zipFS, SimpleZipToolProviderSQScanner.RUNNER_MAIN_CLASS_LOCATION))));
-        then(runner.getToolVersion()).isNotNull();
+        then(runner.getToolVersion()).isNotNull(); assert runner.getToolVersion() != null;
         then(runner.getToolVersion().getId()).isEqualTo("sonar-qube-scanner.3.2.0.1227-runner");
     }
 
