@@ -106,34 +106,28 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
 
     @Override
     public void unpackToolPackage(@NotNull final File toolPackage, @NotNull final File targetDirectory) throws ToolException {
-        final Path toolPath = toolPackage.toPath();
-        {
-            final String error = checkFile(toolPath, "Cannot unpack " + toolPackage);
-            if (error != null) {
-                LOG.warn(error);
-                throw new ToolException(error);
-            }
-        }
+        unpackToolPackage(toolPackage.toPath(), targetDirectory.toPath());
+    }
 
+    public void unpackToolPackage(@NotNull final Path toolPath, @NotNull final Path targetPath) throws ToolException {
         mySimpleZipToolProvider.validatePackedTool(toolPath);
 
-        final Path targetPath = targetDirectory.toPath();
         try {
             Files.createDirectory(targetPath);
         } catch (IOException ignore) {
         }
 
         {
-            final String error = checkDirectory(targetPath, "Cannot unpack " + toolPackage + " to " + targetDirectory);
+            final String error = checkDirectory(targetPath, "Cannot unpack " + toolPath + " to " + targetPath);
             if (error != null) {
                 LOG.warn(error);
                 throw new ToolException(error);
             }
         }
 
-        final Matcher dirMatcher = myPackedSonarQubeScannerRootDirPattern.matcher(targetDirectory.getName());
+        final Matcher dirMatcher = myPackedSonarQubeScannerRootDirPattern.matcher(targetPath.getFileName().toString());
         if (!dirMatcher.matches()) {
-            throw new ToolException("Unexpected target directory name: should match '" + myPackedSonarQubeScannerRootDirPattern.pattern() + "' while got " + targetDirectory.getName());
+            throw new ToolException("Unexpected target directory name: should match '" + myPackedSonarQubeScannerRootDirPattern.pattern() + "' while got " + targetPath.getFileName().toString());
         }
 
         mySimpleZipToolProvider.layoutContents(toolPath, targetPath);
