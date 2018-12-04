@@ -146,30 +146,36 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
     }
 
     @Nullable
-    private String checkDirectory(@NotNull final Path bundledTools, final String description) {
-        if (!Files.exists(bundledTools)) {
-            return description + ": '" + bundledTools + "' expected to exist";
-        }
-        if (!Files.isReadable(bundledTools)) {
-            return description + ": cannot read '" + bundledTools + "'";
-        }
-        if (!Files.isDirectory(bundledTools)) {
-            return description + ": '" + bundledTools + "' is not a directory";
+    private String checkDirectory(@NotNull final Path bundledTool, final String description) {
+        String error = checkCommon(bundledTool, description);
+        if (error != null) return error;
+
+        if (!Files.isDirectory(bundledTool)) {
+            return description + ": '" + bundledTool + "' is not a directory";
         }
         return null;
     }
 
     @Nullable
     private String checkFile(@NotNull final Path bundledTool, final String description) {
-        if (!Files.exists(bundledTool)) {
-            return description + ": '" + bundledTool + "' expected to exist";
-        }
-        if (!Files.isReadable(bundledTool)) {
-            return description + ": cannot read '" + bundledTool + "'";
-        }
+        String error = checkCommon(bundledTool, description);
+        if (error != null) return error;
+
         if (!Files.isRegularFile(bundledTool)) {
             return description + ": '" + bundledTool + "' is not a file";
         }
         return null;
+    }
+
+    @Nullable
+    private String checkCommon(@NotNull final Path bundledTool, final String description) {
+        String error = null;
+        if (!Files.exists(bundledTool)) {
+            error = description + ": '" + bundledTool + "' expected to exist";
+        }
+        if (!Files.isReadable(bundledTool)) {
+            error = description + ": cannot read '" + bundledTool + "'";
+        }
+        return error;
     }
 }
