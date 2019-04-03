@@ -7,7 +7,7 @@
  =====
 
  The latest build of the plugin is available on public TeamCity server and could be downloaded from:
- http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build/.lastPinned/sonar-plugin.zip
+ https://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build/.lastPinned/sonar-plugin.zip
 
  2. Building sources
  =====
@@ -18,7 +18,7 @@
  3. Installing
  =====
 
- Install the plugin as described in: http://confluence.jetbrains.com/display/TCD8/Installing+Additional+Plugins
+ Install the plugin as described in: https://confluence.jetbrains.com/display/TCD8/Installing+Additional+Plugins
 
  4. License
  =====
