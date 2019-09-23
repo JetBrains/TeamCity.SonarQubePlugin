@@ -14,10 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static jetbrains.buildServer.util.OSType.WINDOWS;
 
@@ -98,7 +95,7 @@ public class SQRBuildService extends CommandLineBuildService {
         final SQRParametersAccessor accessor = new SQRParametersAccessor(SQRParametersUtil.mergeParameters(sharedConfigParameters, runnerParameters));
 
         final List<String> res = mySQArgsComposer.composeArgs(accessor, new JavaSonarQubeKeysProvider());
-        res.add("-Dscanner.home=" + sonarScannerRoot);
+        addSQRArg(res, "-Dscanner.home", sonarScannerRoot, myOsType);
 
         final Set<String> collectedReports = mySonarProcessListener.getCollectedReports();
         if (!collectedReports.isEmpty() && (accessor.getAdditionalParameters() == null || !accessor.getAdditionalParameters().contains("-Dsonar.junit.reportsPath"))) {
