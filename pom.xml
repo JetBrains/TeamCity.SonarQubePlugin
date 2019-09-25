@@ -21,14 +21,6 @@
     </pluginRepository>
   </pluginRepositories>
   <build>
-      <resources>
-          <resource>
-              <directory>servers/</directory>
-              <excludes>
-                  <exclude>*</exclude>
-              </excludes>
-          </resource>
-      </resources>
       <pluginManagement>
           <plugins>
               <plugin>
