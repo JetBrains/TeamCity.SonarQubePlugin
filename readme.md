@@ -18,14 +18,18 @@ http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_Tea
 
  ## 2. Building sources
 
-
- Run the following command in the root of the checked out repository:
+ From the TeamCity build targeted version bundle, copy into `repository/lib` the JAR file(s) from `webapps/ROOT/WEB-INF/lib/`:
  
-    `mvn clean package`
+ - `server-tools.jar`
+ - `common-tools.jar` (if exist, useless since TeamCity v2019.x)
+
+ And run the following command in the root of the checked out repository:
+ 
+    mvn clean package
 
  ## 3. Installing
  
- Install the plugin as described in the [TeamCity documentation](http://confluence.jetbrains.com/display/TCDL/Installing+Additional+Plugins).
+ Install the plugin as described in the [TeamCity documentation](https://www.jetbrains.com/help/teamcity/installing-additional-plugins.html).
 
 
 ## 4. Key features
