@@ -4,7 +4,7 @@
 <c:if test="${not empty sonar_url}">
     <tr><td></td>
         <td class="st">
-            <a href="${util:escapeUrlForQuotes(sonar_url)}">View in sonar</a>
+            <a href="${util:escapeUrlForQuotes(sonar_url)}">View in SonarQube</a>
         </td>
     </tr>
 </c:if>
