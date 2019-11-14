@@ -1,5 +1,5 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>sonar-plugin</artifactId>
@@ -16,22 +16,6 @@
                 <artifactId>maven-install-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>org.jetbrains.teamcity:common-tools</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <configuration>
-                            <groupId>org.jetbrains.teamcity</groupId>
-                            <artifactId>common-tools</artifactId>
-                            <version>2017.1</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/common-tools.jar</file>
-                            <createChecksum>true</createChecksum>
-                            <generatePom>true</generatePom>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>org.jetbrains.teamcity:server-tools</id>
                         <phase>validate</phase>
                         <goals>
@@ -40,7 +24,7 @@
                         <configuration>
                             <groupId>org.jetbrains.teamcity</groupId>
                             <artifactId>server-tools</artifactId>
-                            <version>2017.1</version>
+                            <version>${teamcity-version}</version>
                             <packaging>jar</packaging>
                             <file>${basedir}/lib/server-tools.jar</file>
                             <createChecksum>true</createChecksum>
@@ -51,4 +35,40 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>tc-previous-2019</id>
+            <activation>
+                <file>
+                    <exists>${basedir}/lib/common-tools.jar</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-install-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>org.jetbrains.teamcity:common-tools</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>install-file</goal>
+                                </goals>
+                                <configuration>
+                                    <groupId>org.jetbrains.teamcity</groupId>
+                                    <artifactId>common-tools</artifactId>
+                                    <version>${teamcity-version}</version>
+                                    <packaging>jar</packaging>
+                                    <file>${basedir}/lib/common-tools.jar</file>
+                                    <createChecksum>true</createChecksum>
+                                    <generatePom>true</generatePom>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

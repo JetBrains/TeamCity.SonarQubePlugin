@@ -15,7 +15,7 @@
 </div>
 
 <div class="parameter">
-    Sonar Server ID: <strong><props:displayValue name="sonarServer"/></strong>
+    SonarQube Server ID: <strong><props:displayValue name="sonarServer"/></strong>
 </div>
 
 <div class="parameter">

@@ -1,6 +1,6 @@
 
 
-[![official JetBrains project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![official JetBrains project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Build Status](https://teamcity.jetbrains.com/app/rest/builds/buildType:TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Develop/statusIcon.png)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Develop)
 
 
  TeamCity SonarQube plugin
@@ -18,14 +18,18 @@ http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_Tea
 
  ## 2. Building sources
 
-
- Run the following command in the root of the checked out repository:
+ From the TeamCity build targeted version bundle, copy into `repository/lib` the JAR file(s) from `webapps/ROOT/WEB-INF/lib/`:
  
-    `mvn clean package`
+ - `server-tools.jar`
+ - `common-tools.jar` (if exist, useless since TeamCity v2019.x)
+
+ And run the following command in the root of the checked out repository:
+ 
+    mvn clean package
 
  ## 3. Installing
  
- Install the plugin as described in the [TeamCity documentation](http://confluence.jetbrains.com/display/TCDL/Installing+Additional+Plugins).
+ Install the plugin as described in the [TeamCity documentation](https://www.jetbrains.com/help/teamcity/installing-additional-plugins.html).
 
 
 ## 4. Key features
