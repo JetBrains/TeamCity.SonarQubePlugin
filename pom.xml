@@ -22,7 +22,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
-      <teamcity-version>2017.1</teamcity-version>
+      <teamcity-version>2019.2</teamcity-version>
   </properties>
   <repositories>
     <repository>
@@ -37,14 +37,6 @@
     </pluginRepository>
   </pluginRepositories>
   <build>
-      <resources>
-          <resource>
-              <directory>servers/</directory>
-              <excludes>
-                  <exclude>*</exclude>
-              </excludes>
-          </resource>
-      </resources>
       <pluginManagement>
           <plugins>
               <plugin>
