@@ -45,4 +45,8 @@
     <bean class="jetbrains.buildserver.sonarplugin.manager.ServerManagementProjectTab"/>
     <bean class="jetbrains.buildserver.sonarplugin.manager.ManageSQSActionController"/>
     <bean class="jetbrains.buildserver.sonarplugin.manager.SQSInfoFactory"/>
+    
+    <bean class="jetbrains.buildserver.sonarplugin.buildfeatures.BranchesAndPullRequestsBuildFeature"/>
+    <bean class="jetbrains.buildserver.sonarplugin.buildfeatures.BranchesAndPullRequestsParametersPreprocessor"/>
+    
 </beans>
