@@ -26,6 +26,8 @@ import jetbrains.buildServer.messages.Status;
 import jetbrains.buildServer.serverSide.ParametersPreprocessor;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.serverSide.buildLog.MessageAttrs;
+import jetbrains.buildServer.version.ServerVersionHolder;
+import jetbrains.buildServer.version.ServerVersionInfo;
 
 /**
  * Provides SONARQUBE_SCANNER_PARAMS environment variable on build if feature activated
@@ -43,7 +45,7 @@ public class BranchesAndPullRequestsParametersPreprocessor implements Parameters
             return;
         }
 
-        if (!isTeamCityMinimalVersion(buildParams.get("system.teamcity.version"))) {
+        if (!isTeamCityMinimalVersion(getServerVersionInfo())) {
             build.getBuildLog().message(
                     String.format("Build feature '%s' requiers TeamCity 2019.2 or above", BranchesAndPullRequestsBuildFeature.BUILD_FEATURE_NAME),
                     Status.ERROR, MessageAttrs.attrs());
@@ -86,23 +88,22 @@ public class BranchesAndPullRequestsParametersPreprocessor implements Parameters
         buildParams.put(SQS_SYSENV, jsonString);
     }
 
+    protected ServerVersionInfo getServerVersionInfo() {
+        return ServerVersionHolder.getVersion();
+    }
+
     /**
      * Check TeamCity minimal version
      * 
      * @param version Current version
      * @return true if version is 2019.2 or above
      */
-    static boolean isTeamCityMinimalVersion(String version) {
-        if (StringUtils.isEmpty(version)) {
+    static boolean isTeamCityMinimalVersion(ServerVersionInfo version) {
+        if (version == null) {
             // If absent, version considered as OK
             return true;
         }
-
-        String[] v = version.replaceFirst(" ?\\(build.*\\)", "").split("\\.");
-        int major = v.length > 0 ? Integer.valueOf(v[0]) : 0;
-        int minor = v.length > 1 ? Integer.valueOf(v[1]) : 0;
-
-        return major > 2019 || (major == 2019 && minor >= 2);
+        return version.getDisplayVersionMajor() > 2019 || (version.getDisplayVersionMajor() == 2019 && version.getDisplayVersionMinor() >= 2);
     }
 
 }
