@@ -46,7 +46,7 @@ http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_Tea
 
  * **SonarQube Branches & Pull Requests Build Feature**
  
- [Branches](https://docs.sonarqube.org/latest/branches/overview/) and [Pull-Requests](https://docs.sonarqube.org/latest/analysis/pull-request/) analysis parameters automatically provided on build from VCS build information, using `SONARQUBE_SCANNER_PARAMS` environment variable. It requires TeamCity v2019.2 and SonarQube [Developer Edition or above](https://www.sonarsource.com/plans-and-pricing/).
+ [Branches](https://docs.sonarqube.org/latest/branches/overview/) and [Pull-Requests](https://docs.sonarqube.org/latest/analysis/pull-request/) analysis parameters automatically provided on build from VCS build information, using `SONARQUBE_SCANNER_PARAMS` environment variable. Works with this plugin or any SonarQube scanner execution (Maven, gradle, command line, ...). It requires TeamCity v2019.2 and SonarQube [Developer Edition or above](https://www.sonarsource.com/plans-and-pricing/).
 
  * **Build Breaker plugin integration**
 

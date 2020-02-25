@@ -40,6 +40,23 @@ public class BranchesAndPullRequestsParametersPreprocessorTest {
         Assert.assertFalse(buildParams.containsKey(SQS_SYSENV));
     }
 
+    public void testAlreadyDefinedOrMultipleCall() throws Exception {
+        Map<String, String> buildParams = new HashMap<>();
+        buildParams.put("vcsroot.url", "https://github.company.com/orga-test/repo-test");
+        buildParams.put("teamcity.build.branch.is_default", "false");
+        buildParams.put("teamcity.pullRequest.number", "1");
+        buildParams.put("teamcity.pullRequest.target.branch", "master");
+        buildParams.put("teamcity.pullRequest.title", "Update README.md");
+
+        final String someJson = "{\"status\",\"already defined !\"}";
+        buildParams.put(SQS_SYSENV, someJson);
+
+        executeProcessor(buildParams, true);
+
+        Assert.assertTrue(buildParams.containsKey(SQS_SYSENV));
+        Assert.assertEquals(buildParams.get(SQS_SYSENV), someJson);
+    }
+
     public void testGitHubPrUrlHttp() throws Exception {
         Map<String, String> buildParams = new HashMap<>();
         buildParams.put("vcsroot.url", "https://github.company.com/orga-test/repo-test");

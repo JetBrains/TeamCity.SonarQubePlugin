@@ -37,8 +37,9 @@ public class BranchesAndPullRequestsParametersPreprocessor implements Parameters
     @Override
     public void fixRunBuildParameters(SRunningBuild build, Map<String, String> runParameters, Map<String, String> buildParams) {
 
-        if (build.getBuildFeaturesOfType(BranchesAndPullRequestsBuildFeature.BUILD_FEATURE_TYPE).isEmpty()) {
-            // Currently only GitHub is supported => if defined, it is for GitHub
+        if (build.getBuildFeaturesOfType(BranchesAndPullRequestsBuildFeature.BUILD_FEATURE_TYPE).isEmpty() || buildParams.containsKey(SQS_SYSENV)) {
+            // Currently only GitHub is supported => if feature defined, it is for GitHub
+            // ParametersPreprocessor is called for each steps (or could be defined manually). So if sysenv already defined, skip process.
             return;
         }
 
