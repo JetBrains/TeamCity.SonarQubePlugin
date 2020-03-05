@@ -85,7 +85,7 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     @NotNull
     @Override
     public GetPackageVersionResult parseVersion(@NotNull final Path toolPackage, final String version) throws Exception {
-        try (final FileSystem fs = FileSystems.newFileSystem(toolPackage, null)) {
+        try (final FileSystem fs = FileSystems.newFileSystem(toolPackage, (ClassLoader)null)) {
             final Path sonarScannerMain = fs.getPath(SCANNER_MAIN_CLASS_LOCATION);
             if (Files.exists(sonarScannerMain)) {
                 return GetPackageVersionResult.version(new SonarQubeToolVersion(getToolType(), version, getToolType().getType() + "." + version + "-" + SONAR_QUBE_SCANNER_TYPE));

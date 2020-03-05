@@ -25,12 +25,12 @@ public final class TestTools {
         // write empty zip file
         Files.write(zip, new byte[]{0x50, 0x4B, 0x05, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
 
-        try (final FileSystem zipFs = FileSystems.newFileSystem(zip, null)) {
+        try (final FileSystem zipFs = FileSystems.newFileSystem(zip, (ClassLoader)null)) {
             consumer.consume(zipFs);
         }
         return zip;
     }
-
+ª
     public static Path createFile(@NotNull final Path file) throws IOException {
         Files.createDirectories(file.getParent());
         return Files.createFile(file);
