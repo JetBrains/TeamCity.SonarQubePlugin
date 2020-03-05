@@ -30,7 +30,7 @@ public final class TestTools {
         }
         return zip;
     }
-ª
+
     public static Path createFile(@NotNull final Path file) throws IOException {
         Files.createDirectories(file.getParent());
         return Files.createFile(file);
