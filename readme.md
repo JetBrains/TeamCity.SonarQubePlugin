@@ -44,6 +44,14 @@ http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_Tea
 
  The 'Edit project' permission is required to manage SonarQube servers (add/edit/remove, and view account).
 
+ * **SonarQube Branches & Pull Requests Build Feature**
+ 
+ [Branches](https://docs.sonarqube.org/latest/branches/overview/) and [Pull-Requests](https://docs.sonarqube.org/latest/analysis/pull-request/) analysis parameters automatically provided on build from VCS build information, using `SONARQUBE_SCANNER_PARAMS` environment variable. Works with this plugin or any SonarQube scanner execution (Maven, gradle, command line, ...). It requires TeamCity v2019.2 and SonarQube [Developer Edition or above](https://www.sonarsource.com/plans-and-pricing/).
+
  * **Build Breaker plugin integration**
 
  TeamCity will add build problems according to the results of the Build Breaker. TeamCity will look for the Build Breaker messages in the build log and parse them to produce TeamCity Build Problems.
+
+ 
+ 
+ 

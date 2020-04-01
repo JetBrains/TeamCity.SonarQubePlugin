@@ -9,4 +9,5 @@ servers
 **/.project
 **/.classpath
 **/.settings
+**/test-output/
 repository/lib
