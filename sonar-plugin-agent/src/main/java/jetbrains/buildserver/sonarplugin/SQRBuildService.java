@@ -118,7 +118,6 @@ public class SQRBuildService extends CommandLineBuildService {
 
                 // check jacoco.xml report first
                 String reportPath = sharedConfigParameters.get("teamcity.coverage.tempdir.path");
-                Loggers.AGENT.warn("reportPath " + reportPath);
                 if (reportPath != null) {
                     final File xmlReport = new File(reportPath,  "report" + File.separator + "jacocoReport.xml");
                     if (xmlReport.exists() && xmlReport.isFile()) {
@@ -127,16 +126,14 @@ public class SQRBuildService extends CommandLineBuildService {
                 }
 
                 if (jacocoXmlReportPaths == null) {
-                    Loggers.AGENT.warn("buildTemp " + buildTempDir);
                     final File[] files = buildTempDir.listFiles(new FileFilter() {
                         @Override
                         public boolean accept(File file) {
-                            Loggers.AGENT.warn("looking into " + file);
                             return file.getName().startsWith("JACOCO") && file.getName().endsWith("coverage") && new File(file, "report" + File.separator + "jacocoReport.xml").exists();
                         }
                     });
 
-                    if (files != null) {
+                    if (files != null && files.length > 0) {
                         for (int i = 0; i < files.length; i++) {
                             files[i] = new File(files[i], "report" + File.separator + "jacocoReport.xml");
                         }
