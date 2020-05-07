@@ -110,6 +110,8 @@ public class SQRBuildService extends CommandLineBuildService {
             addSQRArg(res, "-Dsonar.junit.reportsPath", collectReportsPath(collectedReports, accessor.getProjectModules()), myOsType);
         }
 
+        boolean xmlFound = false;
+        boolean jacocoEnabled = false;
         String jacocoXmlReportPaths = null;
         final String jacocoExecFilePath = sharedConfigParameters.get("teamcity.jacoco.coverage.datafile");
         if (jacocoExecFilePath != null) {
@@ -147,13 +149,25 @@ public class SQRBuildService extends CommandLineBuildService {
                     }
                 }
 
+                jacocoEnabled = true;
                 addSQRArg(res, "-Dsonar.java.coveragePlugin", "jacoco", myOsType);
                 if (jacocoXmlReportPaths != null) {
+                    xmlFound = true;
                     addSQRArg(res, "-Dsonar.coverage.jacoco.xmlReportPaths", jacocoXmlReportPaths, myOsType);
-                } else {
-                    addSQRArg(res, "-Dsonar.jacoco.reportPath", jacocoExecFilePath, myOsType);
                 }
+                addSQRArg(res, "-Dsonar.jacoco.reportPath", jacocoExecFilePath, myOsType);
             }
+        }
+
+        if (!xmlFound) {
+            final String jacocoXmlReportPath = sharedConfigParameters.get("teamcity.jacoco.coverage.xmlReport");
+            if (jacocoXmlReportPath != null) {
+                if (!jacocoEnabled) {
+                    addSQRArg(res, "-Dsonar.java.coveragePlugin", "jacoco", myOsType);
+                }
+                addSQRArg(res, "-Dsonar.coverage.jacoco.xmlReportPaths", jacocoXmlReportPath, myOsType);
+            }
+
         }
 
         return res;
