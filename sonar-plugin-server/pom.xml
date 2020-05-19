@@ -95,29 +95,5 @@
             <version>${teamcity-version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.jetbrains.teamcity</groupId>
-            <artifactId>server-tools</artifactId>
-            <version>${teamcity-version}</version>
-        </dependency>
-
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>tc-previous-2019</id>
-            <activation>
-                <file>
-                    <exists>${basedir}/../repository/lib/common-tools.jar</exists>
-                </file>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jetbrains.teamcity</groupId>
-                    <artifactId>common-tools</artifactId>
-                    <version>${teamcity-version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>
