@@ -65,10 +65,4 @@ public class BranchesAndPullRequestsBuildFeature extends BuildFeature {
     public boolean isMultipleFeaturesPerBuildTypeAllowed() {
         return false;
     }
-
-    @Override
-    public boolean isRequiresAgent() {
-        // SONARQUBE_SCANNER_PARAMS environment variable is filled before build start
-        return false;
-    }
 }
