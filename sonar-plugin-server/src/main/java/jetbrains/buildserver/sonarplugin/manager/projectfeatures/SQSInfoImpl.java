@@ -22,8 +22,17 @@ public class SQSInfoImpl extends BaseSQSInfo {
         super(projectFeatureToMap(fd));
     }
 
-    public SQSInfoImpl(@NotNull String id, @Nullable String name, @Nullable String url, @Nullable String login, @Nullable String password, @Nullable String jdbcUrl, @Nullable String jdbcUsername, @Nullable String jdbcPassword) {
-        super(id, name, url, login, password, jdbcUrl, jdbcUsername, jdbcPassword);
+    public SQSInfoImpl(@NotNull String id,
+                       @Nullable String name,
+                       @Nullable String url,
+                       @NotNull String useToken,
+                       @Nullable String token,
+                       @Nullable String login,
+                       @Nullable String password,
+                       @Nullable String jdbcUrl,
+                       @Nullable String jdbcUsername,
+                       @Nullable String jdbcPassword) {
+        super(id, name, url, useToken, token, login, password, jdbcUrl, jdbcUsername, jdbcPassword);
     }
 
     public SQSInfoImpl(@NotNull String id) {

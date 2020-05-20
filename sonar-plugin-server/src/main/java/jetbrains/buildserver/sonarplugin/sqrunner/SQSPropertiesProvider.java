@@ -57,6 +57,7 @@ public class SQSPropertiesProvider implements BuildStartContextProcessor {
 
     private void doUpdateParameters(@NotNull final SRunnerContext runnerContext, @NotNull final SQSInfo server) {
         addIfNotNull(runnerContext, Constants.SONAR_HOST_URL, server.getUrl());
+        addIfNotNull(runnerContext, Constants.SONAR_TOKEN, server.getToken());
         addIfNotNull(runnerContext, Constants.SONAR_LOGIN, server.getLogin());
         addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_URL, server.getJDBCUrl());
         addIfNotNull(runnerContext, Constants.SONAR_SERVER_JDBC_USERNAME, server.getJDBCUsername());
