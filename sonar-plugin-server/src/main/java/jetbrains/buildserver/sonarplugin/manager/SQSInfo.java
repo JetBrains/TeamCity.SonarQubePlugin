@@ -14,6 +14,11 @@ public interface SQSInfo {
     @Nullable
     String getUrl();
 
+    boolean isTokenLoginUsed();
+
+    @Nullable
+    String getToken();
+
      @Nullable
     String getLogin();
 

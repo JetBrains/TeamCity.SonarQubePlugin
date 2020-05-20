@@ -9,7 +9,7 @@ import java.util.Map;
 
 public final class SQRParametersUtil {
 
-    private static final List<String> AUTH_PARAMETER_KEYS = Arrays.asList(Constants.SONAR_LOGIN, Constants.SONAR_PASSWORD);
+    private static final List<String> AUTH_PARAMETER_KEYS = Arrays.asList(Constants.SONAR_LOGIN, Constants.SONAR_PASSWORD, Constants.SONAR_TOKEN);
 
     private SQRParametersUtil() {
     }

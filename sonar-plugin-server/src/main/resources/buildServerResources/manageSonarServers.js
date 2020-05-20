@@ -11,6 +11,13 @@ SonarPlugin = {
         }).keydown(function () {
             $pf.attr("data-modified", "modified");
         });
+        var $tf = $j(".runnerFormTable input[id='sonar.token_field']");
+        $tf.click(function () {
+            $tf.val("");
+            $tf.attr("data-modified", "modified");
+        }).keydown(function () {
+            $tf.attr("data-modified", "modified");
+        });
         var $pjf = $j(".runnerFormTable input[id='sonar.jdbc.password_field']");
         $pjf.click(function () {
             $pjf.val("");
@@ -21,6 +28,16 @@ SonarPlugin = {
         $j(".enableDatabaseSettings").click(function () {
             $j(".databaseSettings").show();
             $j(".enableDatabaseSettings").hide();
+        });
+        $j('input[name="sonar.useTokenLogin"]').click(function () {
+            let tokenSelected = $j('input[id="sonar.useTokenLogin.true"]').prop("checked");
+            if (tokenSelected) {
+                $j(".tokenAuthBlock").show();
+                $j(".loginAuthBlock").hide();
+            } else {
+                $j(".tokenAuthBlock").hide();
+                $j(".loginAuthBlock").show();
+            }
         });
     },
     encryptPassword: function(pass) {
@@ -46,8 +63,9 @@ SonarPlugin = {
         $j(".runnerFormTable input[id='serverinfo.id']").prop("disabled", true);
     },
     addServer: function(projectId) {
-        SonarPlugin.ServerConnectionDialog.showDialog('addSqs', {id: '', name: '', url: '', login: '', password: '', JDBCUsername: '', JDBCPassword: '', projectId: projectId});
+        SonarPlugin.ServerConnectionDialog.showDialog('addSqs', {id: '', name: '', url: '', tokenLoginUsed: 'true', token: '', login: '', password: '', JDBCUsername: '', JDBCPassword: '', projectId: projectId});
         $j(".runnerFormTable input[id='sonar.password_field']").attr("data-modified",  "modified");
+        $j(".runnerFormTable input[id='sonar.token_field']").attr("data-modified",  "modified");
         $j(".runnerFormTable input[id='sonar.jdbc.password_field']").attr("data-modified",  "modified");
     },
     ServerConnectionDialog: OO.extend(BS.AbstractWebForm, OO.extend(BS.AbstractModalDialog, {
@@ -70,8 +88,20 @@ SonarPlugin = {
             $j("input[id='serverinfo.id']").val(data.id);
             $j(".runnerFormTable input[id='serverinfo.name']").val(data.name);
             $j(".runnerFormTable input[id='sonar.host.url']").val(data.url);
-            $j(".runnerFormTable input[id='sonar.login']").val(data.login);
-            $j(".runnerFormTable input[id='sonar.password']").val(data.password).removeAttr("data-modified");
+            if (data.tokenLoginUsed === "true") {
+                $j('input[id="sonar.useTokenLogin.true"]').prop("checked", "checked");
+                $j(".tokenAuthBlock").show();
+                $j(".loginAuthBlock").hide();
+                $j(".runnerFormTable input[id='sonar.login']").val("");
+                $j(".runnerFormTable input[id='sonar.password']").val("").removeAttr("data-modified");
+            } else {
+                $j('input[id="sonar.useTokenLogin.false"]').prop("checked", "checked");
+                $j(".tokenAuthBlock").hide();
+                $j(".loginAuthBlock").show();
+                $j(".runnerFormTable input[id='sonar.login']").val(data.login);
+                $j(".runnerFormTable input[id='sonar.password']").val(data.password).removeAttr("data-modified");
+            }
+            $j(".runnerFormTable input[id='sonar.token_field']").val(data.token ? "*****" : "").removeAttr("data-modified");
             $j(".runnerFormTable input[id='sonar.password_field']").val(data.password ? "*****" : "").removeAttr("data-modified");
             $j(".runnerFormTable input[id='sonar.jdbc.url']").val(data.JDBCUrl);
             $j(".runnerFormTable input[id='sonar.jdbc.username']").val(data.JDBCUsername);
@@ -117,6 +147,15 @@ SonarPlugin = {
                 errorFound = true;
             }
 
+            if ($j(".runnerFormTable input[name='sonar.useTokenLogin']:checked").val() === "true") {
+                var token = $j('input[id="sonar.token_field"]');
+                if (token.val() == "") {
+                    this.error(token, "Please set the token value or use login access");
+                    errorFound = true;
+                }
+            }
+
+
             return !errorFound;
         },
 
@@ -130,6 +169,7 @@ SonarPlugin = {
             var parameters = {
                 "serverinfo.name": $j(".runnerFormTable input[id='serverinfo.name']").val(),
                 "sonar.host.url" : $j(".runnerFormTable input[id='sonar.host.url']").val(),
+                "sonar.useTokenLogin": $j(".runnerFormTable input[name='sonar.useTokenLogin']:checked").val(),
                 "sonar.login": $j(".runnerFormTable input[id='sonar.login']").val(),
                 "sonar.jdbc.url": $j(".runnerFormTable input[id='sonar.jdbc.url']").val(),
                 "sonar.jdbc.username": $j(".runnerFormTable input[id='sonar.jdbc.username']").val(),
@@ -151,6 +191,13 @@ SonarPlugin = {
                 parameters["sonar.password"] = SonarPlugin.encryptPassword($passwordField.val());
             } else {
                 parameters["sonar.password_preserve"] = "true";
+            }
+
+            var $tokenField = $j(".runnerFormTable input[id='sonar.token_field']");
+            if ($tokenField.attr("data-modified") == "modified") {
+                parameters["sonar.token"] = SonarPlugin.encryptPassword($tokenField.val());
+            } else {
+                parameters["sonar.token_preserve"] = "true";
             }
 
             var dialog = this;
