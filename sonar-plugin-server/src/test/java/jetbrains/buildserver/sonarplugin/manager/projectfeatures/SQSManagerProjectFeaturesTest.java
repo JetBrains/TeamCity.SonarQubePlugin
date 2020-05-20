@@ -2,7 +2,6 @@ package jetbrains.buildserver.sonarplugin.manager.projectfeatures;
 
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.SProjectFeatureDescriptor;
-import jetbrains.buildServer.serverSide.crypt.EncryptionManager;
 import jetbrains.buildserver.sonarplugin.manager.BaseSQSInfo;
 import jetbrains.buildserver.sonarplugin.sqrunner.manager.TestUtil;
 import org.assertj.core.api.Condition;
