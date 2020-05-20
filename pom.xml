@@ -34,7 +34,7 @@
               <plugin>
                 <groupId>org.jetbrains.teamcity</groupId>
                 <artifactId>teamcity-sdk-maven-plugin</artifactId>
-                <version>0.4</version>
+                <version>0.4.1</version>
                 <inherited>false</inherited>
               </plugin>
           </plugins>
