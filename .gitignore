@@ -6,7 +6,9 @@ rel.sh
 start.sh
 stop.sh
 servers
+servers/**
 **/.project
 **/.classpath
 **/.settings
+**/test-output/
 repository/lib
