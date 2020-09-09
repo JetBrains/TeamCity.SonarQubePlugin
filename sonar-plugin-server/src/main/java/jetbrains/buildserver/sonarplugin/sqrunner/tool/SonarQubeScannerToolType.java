@@ -48,7 +48,7 @@ public final class SonarQubeScannerToolType extends ToolTypeAdapter {
     @NotNull
     @Override
     public String getDescription() {
-        return "Tool to run SonarQube analyzis during the build";
+        return "Tool to run SonarQube analysis during the build";
     }
 
     @Override
