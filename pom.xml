@@ -47,7 +47,7 @@
                       <target>1.6</target>
                   </configuration>
               </plugin>
-              <plugin>
+              <plugin> 
                 <groupId>org.jetbrains.teamcity</groupId>
                 <artifactId>teamcity-sdk-maven-plugin</artifactId>
                 <version>0.4</version>
@@ -56,8 +56,19 @@
           </plugins>
       </pluginManagement>
   </build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <!-- v7.x required with Eclipse plugin and no internet connection (https://github.com/cbeust/testng-eclipse/issues/505) -->
+        <version>7.3.0</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <modules>
-      <module>repository</module>
+    <module>repository</module>
     <module>sonar-plugin-server</module>
     <module>sonar-plugin-agent</module>
     <module>sonar-plugin-common</module>
