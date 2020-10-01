@@ -52,6 +52,8 @@ http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_Tea
 
  TeamCity will add build problems according to the results of the Build Breaker. TeamCity will look for the Build Breaker messages in the build log and parse them to produce TeamCity Build Problems.
 
+### useful to check quality gate
+
  
  
  
