@@ -25,15 +25,29 @@ import jetbrains.buildServer.messages.Status;
 import jetbrains.buildServer.serverSide.BuildStartContext;
 import jetbrains.buildServer.serverSide.BuildStartContextProcessor;
 import jetbrains.buildServer.serverSide.buildLog.MessageAttrs;
+import jetbrains.buildServer.util.positioning.PositionAware;
+import jetbrains.buildServer.util.positioning.PositionConstraint;
 import jetbrains.buildServer.version.ServerVersionHolder;
 import jetbrains.buildServer.version.ServerVersionInfo;
 
 /**
  * Provides SONARQUBE_SCANNER_PARAMS environment variable on build if feature activated
  */
-public class BranchesAndPullRequestsBuildStartContextProcessor implements BuildStartContextProcessor {
+public class BranchesAndPullRequestsBuildStartContextProcessor implements BuildStartContextProcessor, PositionAware {
 
     static final String SQS_SYSENV = Constants.ENV_PREFIX + "SONARQUBE_SCANNER_PARAMS";
+
+    @Override
+    public PositionConstraint getConstraint() {
+        // Technically "PositionConstraint.after("jetbrains.buildServer.pullRequests.impl.PullRequestParametersProcessor")"
+        // last avoid any class name change
+        return PositionConstraint.last();
+    }
+
+    @Override
+    public String getOrderId() {
+        return "SonarQubeBranchesPullRequestsSupport";
+    }
 
     @Override
     public void updateParameters(BuildStartContext context) {
