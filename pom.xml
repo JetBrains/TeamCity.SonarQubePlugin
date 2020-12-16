@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>jetbrains.buildServer.sonarplugin</groupId>
   <artifactId>sonar-plugin</artifactId>
@@ -23,6 +23,10 @@
   <packaging>pom</packaging>
   <properties>
       <teamcity-version>2020.1</teamcity-version>
+      <maven.compiler.source>1.8</maven.compiler.source>
+      <maven.compiler.target>1.8</maven.compiler.target>
+      <maven.compiler.testSource>1.8</maven.compiler.testSource>
+      <maven.compiler.testTarget>1.8</maven.compiler.testTarget>
   </properties>
   <repositories>
     <repository>
@@ -74,4 +78,5 @@
     <module>sonar-plugin-common</module>
     <module>build</module>
   </modules>
+
 </project>
