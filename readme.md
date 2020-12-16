@@ -19,7 +19,8 @@ http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_Tea
  ## 2. Building sources
 
  From the TeamCity build targeted version bundle, copy into `repository/lib` the JAR file(s) from `webapps/ROOT/WEB-INF/lib/`:
- 
+ `mvn install:install-file -DgroupId=org.jetbrains.teamcity -Dpackaging=jar -DartifactId=server-tools -Dversion=2019.2 -Dfile=./.idea_artifacts/web_deployment_debug/WEB-INF/lib/server-tools.jar`
+
  - `server-tools.jar`
  - `common-tools.jar` (if exist, useless since TeamCity v2019.x)
 
