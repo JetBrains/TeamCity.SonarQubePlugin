@@ -31,7 +31,7 @@
   <repositories>
     <repository>
         <id>JetBrains</id>
-	<url>https://download.jetbrains.com/teamcity-repository</url>
+        <url>https://download.jetbrains.com/teamcity-repository</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -54,7 +54,7 @@
               <plugin> 
                 <groupId>org.jetbrains.teamcity</groupId>
                 <artifactId>teamcity-sdk-maven-plugin</artifactId>
-                <version>0.4.1</version>
+                <version>0.4.2</version>
                 <inherited>false</inherited>
               </plugin>
           </plugins>
@@ -72,7 +72,7 @@
     </dependencies>
   </dependencyManagement>
   <modules>
-      <module>repository</module>
+    <module>repository</module>
     <module>sonar-plugin-server</module>
     <module>sonar-plugin-agent</module>
     <module>sonar-plugin-common</module>
