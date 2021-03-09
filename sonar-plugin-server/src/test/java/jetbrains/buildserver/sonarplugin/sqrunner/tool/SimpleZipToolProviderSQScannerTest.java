@@ -14,7 +14,11 @@ import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.BDDAssertions.then;
 
@@ -34,11 +38,34 @@ public class SimpleZipToolProviderSQScannerTest {
         myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-qube-scanner-1.2.3-scanner.zip", root, "some", "path"));
         myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-qube-scanner-1-scanner.zip", root, "some", "path"));
         myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-qube-scanner-1.2.3.4-scanner.zip", root, "some", "path"));
+        myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-scanner-cli-4.6.0.2311-macosx.zip", root, "some", "path"));
+        myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-scanner-cli-4.6.0.2311.zip", root, "some", "path"));
 
         assertThatThrownBy(() -> myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-qube-scanner-scanner.zip", root, "some", "path"))).isInstanceOf(ToolException.class);
         assertThatThrownBy(() -> myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-qube-scanne-1.2.3-scanner.zip", root, "some", "path"))).isInstanceOf(ToolException.class);
         assertThatThrownBy(() -> myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-qube-scanner-1.2.3a-scanner.zip", root, "some", "path"))).isInstanceOf(ToolException.class);
         assertThatThrownBy(() -> myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-qube-scanner-1.2.3.ip", root, "some", "path"))).isInstanceOf(ToolException.class);
+    }
+
+    public void testTryParsePackedPackage(@NotNull final FileSystem jimfs, @NotNull final String root) throws IOException, ToolException {
+        assertThat(tryParsePackedPackage("sonar-qube-scanner.1.2.3-scanner.zip").getToolVersion())
+                .extracting("version", "type.type", "id")
+                .containsExactly("1.2.3", SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID, "sonar-qube-scanner.1.2.3-scanner");
+        assertThat(tryParsePackedPackage("sonar-qube-scanner.1.2.3-runner.zip").getToolVersion())
+                .extracting("version", "type.type", "id")
+                .containsExactly("1.2.3", SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID, "sonar-qube-scanner.1.2.3-runner");
+        assertThat(tryParsePackedPackage("sonar-scanner-cli-4.6.0.2311.zip").getToolVersion())
+                .extracting("version", "type.type", "id")
+                .containsExactly("4.6.0.2311", SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID, "sonar-qube-scanner.4.6.0.2311-scanner");
+        assertThat(tryParsePackedPackage("sonar-scanner-cli-4.6.0.2311-arm7.zip").getToolVersion())
+                .extracting("version", "type.type", "id")
+                .containsExactly("4.6.0.2311-arm7", SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID, "sonar-qube-scanner.4.6.0.2311-arm7-scanner");
+    }
+
+    private GetPackageVersionResult tryParsePackedPackage(String expectedPath) {
+        Path path = Paths.get(expectedPath);
+        Matcher matcher = Pattern.compile(myToolProvider.getPackedZipPattern()).matcher(path.getFileName().toString());
+        return myToolProvider.tryParsePackedPackage(path, matcher);
     }
 
     public void testParseVersion(@NotNull final FileSystem jimfs, @NotNull final String root) throws Exception {

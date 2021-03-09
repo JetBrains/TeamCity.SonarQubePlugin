@@ -44,9 +44,11 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
     private static final Logger LOG = Logger.getInstance(SimpleZipToolProviderSQMSBuild.class.getName());
 
     private static final String DEFAULT_BUNDLED_VERSION = "3.0.3.778";
-    private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d+.)*\\d+)";
+    private static final String SONAR_FILE_NAME_PARTS_SEPARATOR = "[\\.-]";
+    private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d[\\d\\\\.]*)(-[\\w\\.]+)?)";
     private static final String ZIP_EXTENSION = "\\.zip";
     static final String SONAR_QUBE_SCANNER_MSBUILD_EXE = "SonarQube.Scanner.MSBuild.exe";
+    static final String SONAR_QUBE_SCANNER_MSBUILD_ALT_EXE = "SonarScanner.MSBuild.exe";
     static final String BIN = "bin";
     static final String TEAMCITY_PLUGIN_XML = "teamcity-plugin.xml";
     static final String SONAR_SCANNER_PREFIX = "sonar-scanner";
@@ -61,8 +63,8 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
                                           @NotNull final SonarQubeMSBuildToolType sonarQubeScannerToolType) {
         myPluginDescriptor = pluginDescriptor;
         myToolType = sonarQubeScannerToolType;
-        myPackedSonarQubeScannerRootZipPattern = myToolType.getType() + "[\\.-]" + VERSION_PATTERN + ZIP_EXTENSION;
-        myPackedSonarQubeScannerRootDirPattern = myToolType.getType() + "[\\.-]" + VERSION_PATTERN;
+        myPackedSonarQubeScannerRootZipPattern = myToolType.getType() + SONAR_FILE_NAME_PARTS_SEPARATOR + VERSION_PATTERN + ZIP_EXTENSION;
+        myPackedSonarQubeScannerRootDirPattern = myToolType.getType() + SONAR_FILE_NAME_PARTS_SEPARATOR + VERSION_PATTERN;
     }
 
     @NotNull
@@ -105,13 +107,17 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
     @Override
     public GetPackageVersionResult parseVersion(final Path toolPackage, final String version) throws Exception {
         try (final FileSystem fs = FileSystems.newFileSystem(toolPackage, (ClassLoader)null)) {
-            final Path executable = fs.getPath("/" + SONAR_QUBE_SCANNER_MSBUILD_EXE);
-            if (Files.exists(executable) && Files.isRegularFile(executable)) {
+            if (existsAndExecutable(fs, "/" + SONAR_QUBE_SCANNER_MSBUILD_EXE) || existsAndExecutable(fs, "/" + SONAR_QUBE_SCANNER_MSBUILD_ALT_EXE)) {
                 return GetPackageVersionResult.version(new SonarQubeToolVersion(getToolType(), version, getToolType().getType() + "." + version));
             } else {
                 return GetPackageVersionResult.error("Doesn't seem like SonarScanner for MSBuild: cannot find '" + SONAR_QUBE_SCANNER_MSBUILD_EXE + "'");
             }
         }
+    }
+
+    private boolean existsAndExecutable(FileSystem fs, String path) {
+        final Path executable = fs.getPath(path);
+        return Files.exists(executable) && Files.isRegularFile(executable);
     }
 
     @NotNull

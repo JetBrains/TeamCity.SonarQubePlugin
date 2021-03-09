@@ -33,6 +33,8 @@ import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerConstants.SONAR_QUBE_SCANNER_TOOL_TYPE_ID_ALT;
+
 public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     private static final Logger LOG = Logger.getInstance(SimpleZipToolProviderSQScanner.class.getName());
 
@@ -41,8 +43,8 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     private static final String SONAR_QUBE_SCANNER_TYPE = "scanner";
     private static final String SONAR_QUBE_RUNNER_TYPE = "runner";
     private static final String DEFAULT_BUNDLED_VERSION = "2.4";
-    private static final String SONAR_QUBE_SCANNER_TYPE_SUFFIX = "-(?<" + TYPE_GROUP_NAME + ">" + SONAR_QUBE_RUNNER_TYPE + "|"+ SONAR_QUBE_SCANNER_TYPE + ")";
-    private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d+.)*\\d+)";
+    private static final String SONAR_QUBE_SCANNER_TYPE_SUFFIX = "(?<" + TYPE_GROUP_NAME + ">-?(" + SONAR_QUBE_RUNNER_TYPE + "|"+ SONAR_QUBE_SCANNER_TYPE + ")?)";
+    private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d[\\d\\\\.]*)((?!-scanner|-runner)(-[\\w\\.]+))?)";
     private static final String ZIP_EXTENSION = "(\\.zip|\\.jar)";
     private static final String JAR_EXTENSION = "\\.jar";
     public static final String SCANNER_MAIN_CLASS_LOCATION = "/org/sonarsource/scanner/cli/Main.class";
@@ -58,8 +60,8 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     public SimpleZipToolProviderSQScanner(@NotNull final PluginDescriptor pluginDescriptor, @NotNull final SonarQubeScannerToolType sonarQubeScannerToolType) {
         myPluginDescriptor = pluginDescriptor;
         myToolType = sonarQubeScannerToolType;
-        myPackedSonarQubeScannerRootZipPattern = myToolType.getType() + "[\\.-]" + VERSION_PATTERN + SONAR_QUBE_SCANNER_TYPE_SUFFIX + ZIP_EXTENSION;
-        myPackedSonarQubeScannerRootDirPattern = myToolType.getType() + "[\\.-]" + VERSION_PATTERN + SONAR_QUBE_SCANNER_TYPE_SUFFIX;
+        myPackedSonarQubeScannerRootDirPattern = "(" + myToolType.getType() + "|" + SONAR_QUBE_SCANNER_TOOL_TYPE_ID_ALT + ")[\\.-]" + VERSION_PATTERN + SONAR_QUBE_SCANNER_TYPE_SUFFIX;
+        myPackedSonarQubeScannerRootZipPattern = myPackedSonarQubeScannerRootDirPattern + ZIP_EXTENSION;
     }
 
     @NotNull
@@ -122,10 +124,10 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
         if (matcher.matches()) {
             final String version = matcher.group(SonarQubeToolProvider.VERSION_GROUP_NAME);
 
-            if (matcher.group(TYPE_GROUP_NAME).equals(SONAR_QUBE_SCANNER_TYPE)) {
-                return GetPackageVersionResult.version(new SonarQubeToolVersion(myToolType, version, myToolType.getType() + "." + version + "-" + SONAR_QUBE_SCANNER_TYPE));
-            } else {
+            if (matcher.group(TYPE_GROUP_NAME).equals("-" + SONAR_QUBE_RUNNER_TYPE)) {
                 return GetPackageVersionResult.version(new SonarQubeToolVersion(myToolType, version, myToolType.getType() + "." + version + "-" + SONAR_QUBE_RUNNER_TYPE));
+            } else {
+                return GetPackageVersionResult.version(new SonarQubeToolVersion(myToolType, version, myToolType.getType() + "." + version + "-" + SONAR_QUBE_SCANNER_TYPE));
             }
         } else {
             LOG.warn("Unexpected package " + path.getFileName().toString() + ", only " + myToolType.getType() + " and " + SONAR_QUBE_SCANNER_TYPE_SUFFIX + " with " + SonarQubeToolProvider.VERSION_GROUP_NAME + " suffix are allowed.");

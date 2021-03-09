@@ -42,8 +42,10 @@ public class SQMSBuildExecutableFactory implements ExecutableFactory {
             throw new RunBuildException("No SonarScanner for MSBuild selected");
         }
 
-        final File executableFile = new File(msBuildScannerRoot, "MSBuild.SonarQube.Runner.exe");
-
+        File executableFile = new File(msBuildScannerRoot, "MSBuild.SonarQube.Runner.exe");
+        if (!executableFile.exists()) {
+            executableFile = new File(msBuildScannerRoot, "SonarScanner.MSBuild.exe");
+        }
         checkExecutable(executableFile);
 
         return new Executable(executableFile.getAbsolutePath(), Collections.<String>emptyList());
