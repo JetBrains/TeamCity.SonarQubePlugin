@@ -45,7 +45,7 @@ public class XMLBasedSQSInfo extends BaseSQSInfo implements XmlStorable {
                            @Nullable final String jdbcUrl,
                            @Nullable final String jdbcUsername,
                            @Nullable final String jdbcPassword) {
-        super(id, name, url, login, password, jdbcUrl, jdbcUsername, jdbcPassword);
+        super(id, name, url, "false", null, login, password, jdbcUrl, jdbcUsername, jdbcPassword);
     }
 
     public void readFrom(final Element element) {

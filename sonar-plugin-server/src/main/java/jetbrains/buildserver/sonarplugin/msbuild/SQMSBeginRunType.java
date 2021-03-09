@@ -92,7 +92,7 @@ public class SQMSBeginRunType extends RunType {
         map.put(Constants.SONAR_PROJECT_KEY, Constants.DEFAULT_PROJECT_KEY);
         map.put(Constants.SONAR_PROJECT_VERSION, Constants.DEFAULT_PROJECT_VERSION);
         map.put(Constants.SONAR_PROJECT_SOURCES, Constants.DEFAULT_SOURCE_PATH);
-        map.put(SQMSConstants.SONAR_QUBE_MSBUILD_VERSION_PARAMETER, "%teamcity.tool." + SQMSConstants.SONAR_QUBE_MSBUILD_RUN_TYPE_ID + ".DEFAULT%");
+        map.put(SQMSConstants.SONAR_QUBE_MSBUILD_VERSION_PARAMETER, "%teamcity.tool." + SQMSConstants.SONAR_QUBE_MSBUILD_TOOL_TYPE_ID + ".DEFAULT%");
         return map;
     }
 }

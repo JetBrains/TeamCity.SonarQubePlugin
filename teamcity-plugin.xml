@@ -26,5 +26,6 @@
       <url>@VendorURL@</url>
     </vendor>
   </info>
+  <requirements min-build="78475" />
   <deployment use-separate-classloader="true" />
 </teamcity-plugin>

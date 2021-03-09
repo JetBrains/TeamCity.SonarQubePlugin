@@ -15,13 +15,10 @@
   ~ limitations under the License.
   --%>
 
-<jsp:useBean id="constants" class="jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerConstants"/>
-
 <jsp:include page="../SQSEditRunnerCommon.jsp">
-    <jsp:param name="selectToolFragment" value="/tools/editToolUsage.html?toolType=${constants.toolTypeId}&versionParameterName=${constants.sonarQubeScannerVersionParameter}&class=longField"/>
+    <jsp:param name="selectToolFragment" value="/tools/editToolUsage.html?toolType=sonar-qube-scanner&versionParameterName=teamcity.tool.sonarquberunner&class=longField"/>
     <jsp:param name="includeSourceParameters" value="${true}"/>
 </jsp:include>
-
 
 <props:javaSettings/>
 

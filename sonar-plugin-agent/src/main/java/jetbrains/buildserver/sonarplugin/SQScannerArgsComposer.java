@@ -52,8 +52,12 @@ public class SQScannerArgsComposer implements SQArgsComposer {
         addSQRArg(res, keys.getBinaries(), accessor.getProjectBinaries(), myOsType);
         addSQRArg(res, keys.getJavaBinaries(), accessor.getProjectBinaries(), myOsType);
         addSQRArg(res, keys.getModules(), accessor.getProjectModules(), myOsType);
-        addSQRArg(res, keys.getPassword(), accessor.getPassword(), myOsType);
-        addSQRArg(res, keys.getLogin(), accessor.getLogin(), myOsType);
+        if (accessor.getToken() != null) {
+            addSQRArg(res, keys.getLogin(), accessor.getToken(), myOsType);
+        } else {
+            addSQRArg(res, keys.getPassword(), accessor.getPassword(), myOsType);
+            addSQRArg(res, keys.getLogin(), accessor.getLogin(), myOsType);
+        }
         final String additionalParameters = accessor.getAdditionalParameters();
         if (additionalParameters != null) {
             res.addAll(Arrays.asList(additionalParameters.split("\\n")));

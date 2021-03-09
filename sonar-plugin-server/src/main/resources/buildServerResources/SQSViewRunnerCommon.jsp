@@ -16,7 +16,7 @@
   ~ limitations under the License.
   --%>
 
-<jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
+%><jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
 <div class="parameter">
     Project name: <strong><props:displayValue name="sonarProjectName"/></strong>

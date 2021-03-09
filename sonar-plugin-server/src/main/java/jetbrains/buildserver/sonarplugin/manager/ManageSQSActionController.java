@@ -28,9 +28,6 @@ import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
-import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
-import jetbrains.buildserver.sonarplugin.manager.SQSInfoFactory;
-import jetbrains.buildserver.sonarplugin.manager.SQSManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +45,9 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
     private static final String SERVERINFO_ID = "serverinfo.id";
     private static final String SERVERINFO_NAME = "serverinfo.name";
     private static final String SONAR_URL = "sonar.host.url";
+    private static final String SONAR_USE_TOKEN_LOGIN = "sonar.useTokenLogin";
+    private static final String SONAR_TOKEN = "sonar.token";
+    private static final String SONAR_TOKEN_PRESERVE = "sonar.token_preserve";
     private static final String SONAR_LOGIN = "sonar.login";
     private static final String SONAR_PASSWORD = "sonar.password";
     private static final String SONAR_PASSWORD_PRESERVE = "sonar.password_preserve";
@@ -158,9 +158,10 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
             return null;
         }
 
+        final String token = getToken(request, old);
         final String pass = getPassword(request, old);
         final String jdbcPass = getJDBCPassword(request, old);
-        final SQSInfo info = createServerInfo(request, serverInfoId, pass, jdbcPass);
+        final SQSInfo info = createServerInfo(request, serverInfoId, pass, jdbcPass, token);
         final SQSManager.SQSActionResult result = mySqsManager.editServer(project, info);
         if (!result.isError()) {
             ajaxResponse.setAttribute("status", "OK");
@@ -180,13 +181,22 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
         return Boolean.parseBoolean(request.getParameter(SONAR_PASSWORD_PRESERVE)) ? old.getPassword() : decryptIfNeeded(request.getParameter(SONAR_PASSWORD));
     }
 
+    @Nullable
+    private String getToken(@NotNull HttpServletRequest request, @NotNull final SQSInfo old) {
+        return Boolean.parseBoolean(request.getParameter(SONAR_TOKEN_PRESERVE)) ? old.getToken() : decryptIfNeeded(request.getParameter(SONAR_TOKEN));
+    }
+
     @NotNull
-    private SQSInfo createServerInfo(@NotNull HttpServletRequest request, String serverInfoId, String pass, String jdbcPass) {
+    private SQSInfo createServerInfo(@NotNull HttpServletRequest request, String serverInfoId, String pass, String jdbcPass, String token) {
+        final String useTokenString = StringUtil.nullIfEmpty(request.getParameter(SONAR_USE_TOKEN_LOGIN));
+        boolean useToken = useTokenString != null ? Boolean.parseBoolean(useTokenString) : request.getParameter(SONAR_TOKEN) != null;
         return mySQSInfoFactory.create(serverInfoId,
                 StringUtil.nullIfEmpty(request.getParameter(SERVERINFO_NAME)),
+                useTokenString,
+                useToken ? StringUtil.nullIfEmpty(token) : null,
                 StringUtil.nullIfEmpty(request.getParameter(SONAR_URL)),
-                StringUtil.nullIfEmpty(request.getParameter(SONAR_LOGIN)),
-                StringUtil.nullIfEmpty(pass),
+                !useToken ? StringUtil.nullIfEmpty(request.getParameter(SONAR_LOGIN)) : null,
+                !useToken ? StringUtil.nullIfEmpty(pass) : null,
                 StringUtil.nullIfEmpty(request.getParameter(SONAR_JDBC_URL)),
                 StringUtil.nullIfEmpty(request.getParameter(SONAR_JDBC_USERNAME)),
                 StringUtil.nullIfEmpty(jdbcPass));
@@ -218,7 +228,7 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
                                   @NotNull final SProject project,
                                   @NotNull final Element ajaxResponse) throws IOException {
         if (validate(request, ajaxResponse)) {
-            final SQSInfo serverInfo = createServerInfo(request, null, decryptIfNeeded(request.getParameter(SONAR_PASSWORD)), decryptIfNeeded(request.getParameter(SONAR_JDBC_PASSWORD)));
+            final SQSInfo serverInfo = createServerInfo(request, null, decryptIfNeeded(request.getParameter(SONAR_PASSWORD)), decryptIfNeeded(request.getParameter(SONAR_JDBC_PASSWORD)), decryptIfNeeded(request.getParameter(SONAR_TOKEN)));
             final SQSManager.SQSActionResult result = mySqsManager.addServer(project, serverInfo);
             if (!result.isError()) {
                 ajaxResponse.setAttribute("status", "OK");

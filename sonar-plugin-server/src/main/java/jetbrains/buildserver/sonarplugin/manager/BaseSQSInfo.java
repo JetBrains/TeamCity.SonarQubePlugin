@@ -31,12 +31,14 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
     public static final String JDBC_USERNAME = "jdbcUsername";
     public static final String JDBC_PASSWORD = "jdbcPassword";
     public static final String URL = "url";
+    public static final String USE_TOKEN = "useToken";
+    public static final String TOKEN = "token";
     public static final String LOGIN = "login";
     public static final String PASSWORD = "password";
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
-    public static final String[] OPEN_FIELDS = new String[] {ID, JDBC_URL, JDBC_USERNAME, URL, LOGIN, NAME, DESCRIPTION};
-    public static final String[] ENCRYPTED_FIELDS = new String[] {JDBC_PASSWORD, PASSWORD};
+    public static final String[] OPEN_FIELDS = new String[] {ID, JDBC_URL, JDBC_USERNAME, URL, LOGIN, NAME, DESCRIPTION, USE_TOKEN};
+    public static final String[] ENCRYPTED_FIELDS = new String[] {JDBC_PASSWORD, PASSWORD, TOKEN};
 
     public BaseSQSInfo(@Nullable final Map<String, String> properties) {
         super(properties);
@@ -45,6 +47,8 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
     public BaseSQSInfo(@NotNull final String id,
                        @Nullable final String name,
                        @Nullable final String url,
+                       @NotNull final String useToken,
+                       @Nullable final String token,
                        @Nullable final String login,
                        @Nullable final String password,
                        @Nullable final String jdbcUrl,
@@ -54,6 +58,8 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
         setProperty(ID, id);
         setProperty(NAME, name);
         setProperty(URL, url);
+        setProperty(USE_TOKEN, useToken);
+        setProperty(TOKEN, token);
         setProperty(LOGIN, login);
         setProperty(PASSWORD, password);
         setProperty(JDBC_PASSWORD, jdbcPassword);
@@ -79,6 +85,18 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
     @Nullable
     public String getUrl() {
         return get(URL);
+    }
+
+    @Override
+    public boolean isTokenLoginUsed() {
+        final String useToken = get(USE_TOKEN);
+        return useToken != null ? Boolean.parseBoolean(useToken) : get(TOKEN) != null;
+    }
+
+    @Nullable
+    @Override
+    public String getToken() {
+        return get(TOKEN);
     }
 
     @Nullable

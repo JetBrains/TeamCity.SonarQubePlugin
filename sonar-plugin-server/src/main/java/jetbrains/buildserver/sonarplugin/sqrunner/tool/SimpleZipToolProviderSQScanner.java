@@ -26,12 +26,10 @@ import jetbrains.buildserver.sonarplugin.tool.SonarQubeToolProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,8 +43,11 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     private static final String DEFAULT_BUNDLED_VERSION = "2.4";
     private static final String SONAR_QUBE_SCANNER_TYPE_SUFFIX = "-(?<" + TYPE_GROUP_NAME + ">" + SONAR_QUBE_RUNNER_TYPE + "|"+ SONAR_QUBE_SCANNER_TYPE + ")";
     private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d+.)*\\d+)";
-    private static final String ZIP_EXTENSION = "\\.zip";
+    private static final String ZIP_EXTENSION = "(\\.zip|\\.jar)";
     private static final String JAR_EXTENSION = "\\.jar";
+    public static final String SCANNER_MAIN_CLASS_LOCATION = "/org/sonarsource/scanner/cli/Main.class";
+    public static final String RUNNER_MAIN_CLASS_LOCATION = "/org/sonar/runner/Main.class";
+    static final String LIB = "lib";
 
     @NotNull
     private final ToolType myToolType;
@@ -57,8 +58,8 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     public SimpleZipToolProviderSQScanner(@NotNull final PluginDescriptor pluginDescriptor, @NotNull final SonarQubeScannerToolType sonarQubeScannerToolType) {
         myPluginDescriptor = pluginDescriptor;
         myToolType = sonarQubeScannerToolType;
-        myPackedSonarQubeScannerRootZipPattern = myToolType.getType() + "\\." + VERSION_PATTERN + SONAR_QUBE_SCANNER_TYPE_SUFFIX + ZIP_EXTENSION;
-        myPackedSonarQubeScannerRootDirPattern = myToolType.getType() + "\\." + VERSION_PATTERN + SONAR_QUBE_SCANNER_TYPE_SUFFIX;
+        myPackedSonarQubeScannerRootZipPattern = myToolType.getType() + "[\\.-]" + VERSION_PATTERN + SONAR_QUBE_SCANNER_TYPE_SUFFIX + ZIP_EXTENSION;
+        myPackedSonarQubeScannerRootDirPattern = myToolType.getType() + "[\\.-]" + VERSION_PATTERN + SONAR_QUBE_SCANNER_TYPE_SUFFIX;
     }
 
     @NotNull
@@ -100,12 +101,12 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     @NotNull
     @Override
     public GetPackageVersionResult parseVersion(@NotNull final Path toolPackage, final String version) throws Exception {
-        try (final FileSystem fs = FileSystems.newFileSystem(URI.create("jar:file:" + toolPackage.toAbsolutePath()), Collections.emptyMap())) {
-            final Path sonarScannerMain = fs.getPath("/org/sonarsource/scanner/cli/Main.class");
+        try (final FileSystem fs = FileSystems.newFileSystem(toolPackage, (ClassLoader)null)) {
+            final Path sonarScannerMain = fs.getPath(SCANNER_MAIN_CLASS_LOCATION);
             if (Files.exists(sonarScannerMain)) {
                 return GetPackageVersionResult.version(new SonarQubeToolVersion(getToolType(), version, getToolType().getType() + "." + version + "-" + SONAR_QUBE_SCANNER_TYPE));
             } else {
-                final Path sonarRunnerMain = fs.getPath("/org/sonar/runner/Main.class");
+                final Path sonarRunnerMain = fs.getPath(RUNNER_MAIN_CLASS_LOCATION);
                 if (Files.exists(sonarRunnerMain)) {
                     return GetPackageVersionResult.version(new SonarQubeToolVersion(getToolType(), version, getToolType().getType() + "." + version + "-" + SONAR_QUBE_RUNNER_TYPE));
                 } else {
@@ -141,7 +142,7 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     @NotNull
     @Override
     public GetPackageVersionResult describeBrokenPackage() {
-        return GetPackageVersionResult.error("Should be single jar. The name should contain version, eg: sonar-runner.2.4.jar or sonar-scanner-cli-3.0.3.jar");
+        return GetPackageVersionResult.error("Should be single jar with. The name should contain version, eg: sonar-runner.2.4.jar or sonar-scanner-cli-3.0.3.jar");
     }
 
     @Override
@@ -157,9 +158,9 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     public void layoutContents(@NotNull final Path toolPath, @NotNull final Path targetPath) throws ToolException {
         final Path libDirectory;
         try {
-            libDirectory = Files.createDirectories(targetPath.resolve("lib"));
+            libDirectory = Files.createDirectories(targetPath.resolve(LIB));
         } catch (IOException e) {
-            throw new ToolException("Cannot create directory for unpacked tool: '" + targetPath.resolve("lib") + "'", e);
+            throw new ToolException("Cannot create directory for unpacked tool: '" + targetPath.resolve(LIB) + "'", e);
         }
         final Path targetJarLocation = libDirectory.resolve(toolPath.getFileName());
         try {

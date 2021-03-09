@@ -16,7 +16,9 @@
 
 package jetbrains.buildserver.sonarplugin;
 
+import com.intellij.util.Function;
 import jetbrains.buildServer.RunBuildException;
+import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.runner.CommandLineBuildService;
 import jetbrains.buildServer.agent.runner.JavaCommandLineBuilder;
 import jetbrains.buildServer.agent.runner.JavaRunnerUtil;
@@ -29,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.*;
 
@@ -66,7 +69,8 @@ public class SQRBuildService extends CommandLineBuildService {
         if (sonarScannerRoot == null) {
             throw new RunBuildException("No SonarQube Scanner selected");
         }
-        final List<String> programArgs = composeSQRArgs(getRunnerContext().getRunnerParameters(), getBuild().getSharedConfigParameters(), sonarScannerRoot);
+        final AgentRunningBuild agentBuild = getBuild();
+        final List<String> programArgs = composeSQRArgs(getRunnerContext().getRunnerParameters(), agentBuild.getSharedConfigParameters(), sonarScannerRoot, agentBuild.getBuildTempDirectory());
 
         final boolean useScanner = isUseScannerMain(sonarScannerRoot);
         final JavaCommandLineBuilder builder = new JavaCommandLineBuilder();
@@ -74,7 +78,7 @@ public class SQRBuildService extends CommandLineBuildService {
         final ProgramCommandLine build = builder.withClassPath(getClasspath())
                 .withMainClass(getMainClass(useScanner))
                 .withJavaHome(jdkHome)
-                .withBaseDir(getBuild().getCheckoutDirectory().getAbsolutePath())
+                .withBaseDir(agentBuild.getCheckoutDirectory().getAbsolutePath())
                 .withEnvVariables(getRunnerContext().getBuildParameters().getEnvironmentVariables())
                 .withJvmArgs(JavaRunnerUtil.extractJvmArgs(getRunnerContext().getRunnerParameters()))
                 .withClassPath(getClasspath())
@@ -103,11 +107,13 @@ public class SQRBuildService extends CommandLineBuildService {
      * @param runnerParameters Parameters to compose arguments from
      * @param sharedConfigParameters Shared config parameters to compose arguments from
      * @param sonarScannerRoot
+     * @param buildTempDir
      * @return List of arguments to be passed to the SQR
      */
     private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters,
                                         @NotNull final Map<String, String> sharedConfigParameters,
-                                        @NotNull final String sonarScannerRoot) {
+                                        @NotNull final String sonarScannerRoot,
+                                        @NotNull final File buildTempDir) {
         final SQRParametersAccessor accessor = new SQRParametersAccessor(SQRParametersUtil.mergeParameters(sharedConfigParameters, runnerParameters));
 
         final List<String> res = mySQArgsComposer.composeArgs(accessor, new JavaSonarQubeKeysProvider());
@@ -119,13 +125,64 @@ public class SQRBuildService extends CommandLineBuildService {
             addSQRArg(res, "-Dsonar.junit.reportsPath", collectReportsPath(collectedReports, accessor.getProjectModules()), myOsType);
         }
 
+        boolean xmlFound = false;
+        boolean jacocoEnabled = false;
+        String jacocoXmlReportPaths = null;
         final String jacocoExecFilePath = sharedConfigParameters.get("teamcity.jacoco.coverage.datafile");
         if (jacocoExecFilePath != null) {
             final File file = new File(jacocoExecFilePath);
             if (file.exists() && file.isFile() && file.canRead()) {
+
+                // check jacoco.xml report first
+                String reportPath = sharedConfigParameters.get("teamcity.coverage.tempdir.path");
+                if (reportPath != null) {
+                    final File xmlReport = new File(reportPath,  "report" + File.separator + "jacocoReport.xml");
+                    if (xmlReport.exists() && xmlReport.isFile()) {
+                        jacocoXmlReportPaths = xmlReport.getAbsolutePath();
+                    }
+                }
+
+                if (jacocoXmlReportPaths == null) {
+                    final File[] files = buildTempDir.listFiles(new FileFilter() {
+                        @Override
+                        public boolean accept(File file) {
+                            return file.getName().startsWith("JACOCO") && file.getName().endsWith("coverage") && new File(file, "report" + File.separator + "jacocoReport.xml").exists();
+                        }
+                    });
+
+                    if (files != null && files.length > 0) {
+                        for (int i = 0; i < files.length; i++) {
+                            files[i] = new File(files[i], "report" + File.separator + "jacocoReport.xml");
+                        }
+
+                        jacocoXmlReportPaths = StringUtil.join(files, new Function<File, String>() {
+                            @Override
+                            public String fun(File file) {
+                                return file.getAbsolutePath();
+                            }
+                        }, ",");
+                    }
+                }
+
+                jacocoEnabled = true;
                 addSQRArg(res, "-Dsonar.java.coveragePlugin", "jacoco", myOsType);
+                if (jacocoXmlReportPaths != null) {
+                    xmlFound = true;
+                    addSQRArg(res, "-Dsonar.coverage.jacoco.xmlReportPaths", jacocoXmlReportPaths, myOsType);
+                }
                 addSQRArg(res, "-Dsonar.jacoco.reportPath", jacocoExecFilePath, myOsType);
             }
+        }
+
+        if (!xmlFound) {
+            final String jacocoXmlReportPath = sharedConfigParameters.get("teamcity.jacoco.coverage.xmlReport");
+            if (jacocoXmlReportPath != null) {
+                if (!jacocoEnabled) {
+                    addSQRArg(res, "-Dsonar.java.coveragePlugin", "jacoco", myOsType);
+                }
+                addSQRArg(res, "-Dsonar.coverage.jacoco.xmlReportPaths", jacocoXmlReportPath, myOsType);
+            }
+
         }
 
         return res;

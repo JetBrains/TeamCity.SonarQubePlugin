@@ -35,9 +35,6 @@
                     <version>2.17</version>
                     <configuration>
                         <reportFormat>xml</reportFormat>
-                        <suiteXmlFiles>
-                            <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-                        </suiteXmlFiles>
                     </configuration>
                 </plugin>
             </plugins>
@@ -55,7 +52,6 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -98,15 +94,16 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.jetbrains.teamcity.internal</groupId>
-            <artifactId>server</artifactId>
-            <version>${teamcity-version}</version>
+	<dependency>
+            <groupId>com.google.jimfs</groupId>
+            <artifactId>jimfs</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.jetbrains.teamcity</groupId>
-            <artifactId>server-tools</artifactId>
+            <groupId>org.jetbrains.teamcity.internal</groupId>
+            <artifactId>server</artifactId>
             <version>${teamcity-version}</version>
         </dependency>
 
