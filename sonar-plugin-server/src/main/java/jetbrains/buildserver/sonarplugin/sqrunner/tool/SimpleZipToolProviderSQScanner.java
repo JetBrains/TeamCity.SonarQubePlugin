@@ -42,7 +42,7 @@ public class SimpleZipToolProviderSQScanner implements SimpleZipToolProvider {
     private static final String SONAR_QUBE_RUNNER_TYPE = "runner";
     private static final String DEFAULT_BUNDLED_VERSION = "2.4";
     private static final String SONAR_QUBE_SCANNER_TYPE_SUFFIX = "-(?<" + TYPE_GROUP_NAME + ">" + SONAR_QUBE_RUNNER_TYPE + "|"+ SONAR_QUBE_SCANNER_TYPE + ")";
-    private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d+.)*\\d+)";
+    private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d+.)*[\\w\\\\.]+?)";
     private static final String ZIP_EXTENSION = "(\\.zip|\\.jar)";
     private static final String JAR_EXTENSION = "\\.jar";
     public static final String SCANNER_MAIN_CLASS_LOCATION = "/org/sonarsource/scanner/cli/Main.class";
