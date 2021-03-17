@@ -3,23 +3,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="afn" uri="/WEB-INF/functions/authz" %>
 <%@ include file="/include-internal.jsp" %>
-<%--
-  ~ Copyright 2000-2021 JetBrains s.r.o.
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~ http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  --%>
-
-<%--@elvariable id="availableServersMap" type="java.util.Map<jetbrains.buildServer.serverSide.SProject, java.util.List<jetbrains.buildserver.sonarplugin.sqrunner.manager.SQSInfo>"--%>
+<%--@elvariable id="availableServersMap" type="java.util.Map<jetbrains.buildServer.serverSide.SProject, java.util.List<jetbrains.buildserver.sonarplugin.manager.SQSInfo>"--%>
 <%--@elvariable id="projectId" type="java.lang.String"--%>
 <%--@elvariable id="userHasPermissionManagement" type="java.lang.Boolean"--%>
 
@@ -70,9 +54,16 @@
                                         <div class="url"><c:out value="${server.url}"/></div>
                                         <c:if test="${userHasPermissionManagement && afn:permissionGrantedForProject(projectServersEntry.key, 'EDIT_PROJECT')}">
                                             <c:choose>
-                                                <c:when test="${not empty server.login}">
-                                                    <div class="login">Username: <c:out value="${server.login}"/></div>
-                                                    <div class="password">Password: *****</div>
+                                                <c:when test="${not empty server.login or not empty server.token}">
+                                                    <c:choose>
+                                                        <c:when test="${server.tokenLoginUsed}">
+                                                            <div class="password">Token: *****</div>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <div class="login">Username: <c:out value="${server.login}"/></div>
+                                                            <div class="password">Password: *****</div>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <div class="authentication grayNote">Anonymous</div>
@@ -109,7 +100,8 @@
                                         </td>
                                         <td class="edit">
                                             <a id="editServer" href="#"
-                                            onclick="SonarPlugin.editServer({id: '${server.id}', name: '${server.name}', url: '${server.url}', login: '${server.login}',
+                                            onclick="SonarPlugin.editServer({id: '${server.id}', name: '${server.name}', url: '${server.url}', tokenLoginUsed: '${server.tokenLoginUsed}',
+                                                    token: '${not empty server.token ? "*****" : ""}', login: '${server.login}',
                                                     password: '${not empty server.login ? "*****" : ""}', JDBCUrl: '${server.JDBCUrl}', JDBCUsername: '${server.JDBCUsername}',
                                                     JDBCPassword: '${not empty server.JDBCUsername ? "*****" : ""}', projectId: '${projectServersEntry.key.externalId}'}); return false">edit</a>
                                         </td>
@@ -159,12 +151,28 @@
                     <td colspan="2">Authentication</td>
                 </tr>
                 <tr>
+                    <th>Mode</th>
+                    <td>
+                        <label for="sonar.useTokenLogin.false">login </label> <input type="radio" value="false" id="sonar.useTokenLogin.false" name="sonar.useTokenLogin"/>
+                        <label for="sonar.useTokenLogin.true">token </label> <input type="radio" value="true" id="sonar.useTokenLogin.true" name="sonar.useTokenLogin"/>
+                    </td>
+                </tr>
+                <tr class="tokenAuthBlock">
+                    <th>Token</th>
+                    <td>
+                        <div>
+                            <input type="password" id="sonar.token_field" name="sonar.token_field"/>
+                            <input type="hidden" id="sonar.token" name="sonar.token"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="loginAuthBlock">
                     <th>Login</th>
                     <td>
                         <div><input type="text" id="sonar.login" name="sonar.login"/></div>
                     </td>
                 </tr>
-                <tr>
+                <tr class="loginAuthBlock">
                     <th>Password</th>
                     <td>
                         <div>

@@ -1,19 +1,3 @@
-/*
- * Copyright 2000-2021 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package jetbrains.buildserver.sonarplugin.tool;
 
 import com.intellij.openapi.diagnostic.Logger;
@@ -44,7 +28,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
     @NotNull private final Pattern myPackedSonarQubeScannerRootDirPattern;
     @NotNull private final String myDefaultBundledVersionString;
 
-    @NotNull private final Pattern mySonarQubeScannerJarPattern;
+    @NotNull private final Pattern myUploadedPackagePattern;
 
     @NotNull private final SimpleZipToolProvider mySimpleZipToolProvider;
 
@@ -53,7 +37,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
         myDefaultBundledVersionString = mySimpleZipToolProvider.getDefaultBundledVersion();
         myPackedSonarQubeScannerRootZipPattern = Pattern.compile(mySimpleZipToolProvider.getPackedZipPattern());
         myPackedSonarQubeScannerRootDirPattern = Pattern.compile(mySimpleZipToolProvider.getPackedDirPattern());
-        mySonarQubeScannerJarPattern = Pattern.compile(mySimpleZipToolProvider.getVersionPattern());
+        myUploadedPackagePattern = Pattern.compile(mySimpleZipToolProvider.getVersionPattern());
     }
 
     @NotNull
@@ -107,7 +91,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
 
     @NotNull
     public GetPackageVersionResult tryGetPackageVersion(@NotNull final Path toolPackage) {
-        final Matcher matcher = mySonarQubeScannerJarPattern.matcher(toolPackage.getFileName().toString());
+        final Matcher matcher = myUploadedPackagePattern.matcher(toolPackage.getFileName().toString());
 
         if (matcher.matches()) {
             try {
@@ -122,32 +106,26 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
 
     @Override
     public void unpackToolPackage(@NotNull final File toolPackage, @NotNull final File targetDirectory) throws ToolException {
-        final Path toolPath = toolPackage.toPath();
-        {
-            final String error = checkFile(toolPath, "Cannot unpack " + toolPackage);
-            if (error != null) {
-                LOG.warn(error);
-                throw new ToolException(error);
-            }
-        }
+        unpackToolPackage(toolPackage.toPath(), targetDirectory.toPath());
+    }
 
-        final Path targetPath = targetDirectory.toPath();
+    public void unpackToolPackage(@NotNull final Path toolPath, @NotNull final Path targetPath) throws ToolException {
         try {
             Files.createDirectory(targetPath);
         } catch (IOException ignore) {
         }
 
         {
-            final String error = checkDirectory(targetPath, "Cannot unpack " + toolPackage + " to " + targetDirectory);
+            final String error = checkDirectory(targetPath, "Cannot unpack " + toolPath + " to " + targetPath);
             if (error != null) {
                 LOG.warn(error);
                 throw new ToolException(error);
             }
         }
 
-        final Matcher dirMatcher = myPackedSonarQubeScannerRootDirPattern.matcher(targetDirectory.getName());
+        final Matcher dirMatcher = myPackedSonarQubeScannerRootDirPattern.matcher(targetPath.getFileName().toString());
         if (!dirMatcher.matches()) {
-            throw new ToolException("Unexpected target directory name: should match '" + myPackedSonarQubeScannerRootDirPattern.pattern() + "' while got " + targetDirectory.getName());
+            throw new ToolException("Unexpected target directory name: should match '" + myPackedSonarQubeScannerRootDirPattern.pattern() + "' while got " + targetPath.getFileName().toString());
         }
 
         mySimpleZipToolProvider.layoutContents(toolPath, targetPath);
@@ -160,23 +138,12 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
     }
 
     @Nullable
-    private String checkDirectory(@NotNull final Path bundledTools, final String description) {
-        String error = checkCommon(bundledTools, description);
+    private String checkDirectory(@NotNull final Path bundledTool, final String description) {
+        String error = checkCommon(bundledTool, description);
         if (error != null) return error;
 
-        if (!Files.isDirectory(bundledTools)) {
-            return description + ": '" + bundledTools + "' is not a directory";
-        }
-        return null;
-    }
-
-    @Nullable
-    private String checkCommon(@NotNull final Path bundledTools, final String description) {
-        if (!Files.exists(bundledTools)) {
-            return description + ": '" + bundledTools + "' expected to exist";
-        }
-        if (!Files.isReadable(bundledTools)) {
-            return description + ": cannot read '" + bundledTools + "'";
+        if (!Files.isDirectory(bundledTool)) {
+            return description + ": '" + bundledTool + "' is not a directory";
         }
         return null;
     }
@@ -190,5 +157,17 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
             return description + ": '" + bundledTool + "' is not a file";
         }
         return null;
+    }
+
+    @Nullable
+    private String checkCommon(@NotNull final Path bundledTool, final String description) {
+        String error = null;
+        if (!Files.exists(bundledTool)) {
+            error = description + ": '" + bundledTool + "' expected to exist";
+        }
+        if (!Files.isReadable(bundledTool)) {
+            error = description + ": cannot read '" + bundledTool + "'";
+        }
+        return error;
     }
 }
