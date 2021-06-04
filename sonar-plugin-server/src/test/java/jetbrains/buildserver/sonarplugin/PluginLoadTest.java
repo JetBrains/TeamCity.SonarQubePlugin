@@ -29,7 +29,7 @@ public class PluginLoadTest {
         } catch (Exception e) {
             Assert.assertTrue(
                     e.getMessage().contains("No qualifying bean of type 'jetbrains.buildServer.web.openapi.WebControllerManager' available"),
-                    e.getMessage());
+                    "Error message must say that WebControllerManager is not available");
         }
     }
    
