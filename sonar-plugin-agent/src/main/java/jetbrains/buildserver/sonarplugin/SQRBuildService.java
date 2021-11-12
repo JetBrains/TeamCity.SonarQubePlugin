@@ -19,21 +19,25 @@ package jetbrains.buildserver.sonarplugin;
 import com.intellij.util.Function;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.AgentRunningBuild;
+import jetbrains.buildServer.agent.BuildAgentConfiguration;
 import jetbrains.buildServer.agent.runner.CommandLineBuildService;
 import jetbrains.buildServer.agent.runner.JavaCommandLineBuilder;
 import jetbrains.buildServer.agent.runner.JavaRunnerUtil;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
+import jetbrains.buildServer.agent.ssl.TrustedCertificatesDirectory;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.runner.JavaRunnerConstants;
 import jetbrains.buildServer.util.OSType;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildserver.sonarplugin.sqrunner.tool.SonarQubeScannerConstants;
+import jetbrains.buildserver.sonarplugin.util.SSLTools;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
+import java.nio.file.Path;
 import java.util.*;
 
 import static jetbrains.buildServer.util.OSType.WINDOWS;
@@ -50,11 +54,16 @@ public class SQRBuildService extends CommandLineBuildService {
     private final OSType myOsType;
     @NotNull
     private final SQArgsComposer mySQArgsComposer;
+    @NotNull
+    private final BuildAgentConfiguration myBuildAgentConfiguration;
 
     public SQRBuildService(@NotNull final SonarProcessListener sonarProcessListener,
-                           @NotNull final OSType osType) {
+                           @NotNull final OSType osType,
+                           @NotNull final BuildAgentConfiguration buildAgentConfiguration
+    ) {
         mySonarProcessListener = sonarProcessListener;
         myOsType = osType;
+        myBuildAgentConfiguration = buildAgentConfiguration;
         mySQArgsComposer = new SQScannerArgsComposer(osType);
     }
 
@@ -76,12 +85,20 @@ public class SQRBuildService extends CommandLineBuildService {
         final boolean useScanner = isUseScannerMain(sonarScannerRoot);
         final JavaCommandLineBuilder builder = new JavaCommandLineBuilder();
 
+        String agentHomePath = myBuildAgentConfiguration.getAgentHomeDirectory().getPath();
+        String syncCertPathToFolder = TrustedCertificatesDirectory.getServerCertificatesDirectoryFromHome(agentHomePath);
+        Path pathToTemporaryTrustStore = SSLTools.cloneKeyStoreWithTC(jdkHome, syncCertPathToFolder);
+        List<String> jvmAgrs = new ArrayList<>(JavaRunnerUtil.extractJvmArgs(getRunnerContext().getRunnerParameters()));
+        if (pathToTemporaryTrustStore != null)
+            jvmAgrs.add("-Djavax.net.ssl.trustStore=" + pathToTemporaryTrustStore);
+
+
         final ProgramCommandLine build = builder.withClassPath(getClasspath())
                 .withMainClass(getMainClass(useScanner))
                 .withJavaHome(jdkHome)
                 .withBaseDir(agentBuild.getCheckoutDirectory().getAbsolutePath())
                 .withEnvVariables(getRunnerContext().getBuildParameters().getEnvironmentVariables())
-                .withJvmArgs(JavaRunnerUtil.extractJvmArgs(getRunnerContext().getRunnerParameters()))
+                .withJvmArgs(jvmAgrs)
                 .withClassPath(getClasspath())
                 .withProgramArgs(programArgs)
                 .withWorkingDir(getRunnerContext().getWorkingDirectory().getAbsolutePath()).build();
