@@ -93,7 +93,7 @@ public class BuildBreakerProblemListener extends AgentLifeCycleAdapter {
 
     private static class SonarBuildBreakerMessage extends MessageWithAttributes {
         public SonarBuildBreakerMessage(@NotNull final String description) {
-            super(ServiceMessageTypes.BUILD_PORBLEM, attributesMap(description));
+            super(ServiceMessageTypes.BUILD_PROBLEM, attributesMap(description));
         }
 
         private static Map<String, String> attributesMap(@NotNull final String description) {
