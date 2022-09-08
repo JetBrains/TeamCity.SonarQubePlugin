@@ -72,7 +72,7 @@ public class SQRPasswordProvider implements PasswordsProvider {
      * @param list List to add parameter to.
      * @param id Server ID
      * @param parameterValue Parameter value. The parameter will not be added if the value is null or empty.
-     * @param parameterName Parameter name. NB: resulting Parameter will have name in form "secure:teamcity.password.&lt;parameterName&gt;".
+     * @param parameterName Parameter name.
      */
     private void addParameterIfNeeded(@NotNull final List<Parameter> list,
                                       @NotNull final String id,
