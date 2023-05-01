@@ -67,7 +67,7 @@
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <!-- v7.x required with Eclipse plugin and no internet connection (https://github.com/cbeust/testng-eclipse/issues/505) -->
-                <version>7.3.0</version>
+                <version>7.7.0</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
