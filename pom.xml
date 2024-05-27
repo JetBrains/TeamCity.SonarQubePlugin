@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -8,13 +6,136 @@
     <artifactId>sonar-plugin</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <description>Allows configuring and running SonarQube analysis on the TeamCity server</description>
+
+    <organization>
+        <name>JetBrains</name>
+        <url>https://www.jetbrains.com</url>
+    </organization>
+
     <properties>
         <teamcity-version>2020.2</teamcity-version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.testSource>1.8</maven.compiler.testSource>
-        <maven.compiler.testTarget>1.8</maven.compiler.testTarget>
+        <teamcity.version>2020.2</teamcity.version>
+        <sonar.plugin.vendor>${project.organization.name}</sonar.plugin.vendor>
+        <sonar.plugin.vendorUrl>${project.organization.url}</sonar.plugin.vendorUrl>
+        <sonar.plugin.version>${project.version}</sonar.plugin.version>
     </properties>
+
+    <modules>
+        <module>repository</module>
+        <module>sonar-plugin-server</module>
+        <module>sonar-plugin-agent</module>
+        <module>sonar-plugin-common</module>
+        <module>sonar-build</module>
+    </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jetbrains.teamcity</groupId>
+                    <artifactId>teamcity-sdk-maven-plugin</artifactId>
+                    <version>0.4.2</version>
+                    <inherited>false</inherited>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.17</version>
+                    <configuration>
+                        <reportFormat>xml</reportFormat>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jetbrains.teamcity</groupId>
+                <artifactId>agent-api</artifactId>
+                <version>${teamcity.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.teamcity</groupId>
+                <artifactId>tests-support</artifactId>
+                <version>${teamcity.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.teamcity</groupId>
+                <artifactId>server-api</artifactId>
+                <version>${teamcity.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.teamcity.internal</groupId>
+                <artifactId>server</artifactId>
+                <version>${teamcity.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <!-- v7.x required with Eclipse plugin and no internet connection (https://github.com/cbeust/testng-eclipse/issues/505) -->
+                <version>7.3.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>jetbrains.buildServer.sonarplugin</groupId>
+                <artifactId>sonar-plugin-agent</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jetbrains.buildServer.sonarplugin</groupId>
+                <artifactId>sonar-plugin-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jetbrains.buildServer.sonarplugin</groupId>
+                <artifactId>sonar-plugin-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.13.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>1.16.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-tls</artifactId>
+                <version>4.9.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>4.9.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>3.19.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>1.10.19</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <repositories>
         <repository>
             <id>JetBrains</id>
@@ -27,42 +148,4 @@
             <url>https://download.jetbrains.com/teamcity-repository</url>
         </pluginRepository>
     </pluginRepositories>
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.jetbrains.teamcity</groupId>
-                    <artifactId>teamcity-sdk-maven-plugin</artifactId>
-                    <version>0.4.2</version>
-                    <inherited>false</inherited>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <!-- v7.x required with Eclipse plugin and no internet connection (https://github.com/cbeust/testng-eclipse/issues/505) -->
-                <version>7.3.0</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-    <modules>
-        <module>repository</module>
-        <module>sonar-plugin-server</module>
-        <module>sonar-plugin-agent</module>
-        <module>sonar-plugin-common</module>
-        <module>build</module>
-    </modules>
 </project>

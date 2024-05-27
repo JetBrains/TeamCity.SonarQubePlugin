@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.2.0 https://maven.apache.org/xsd/assembly-2.2.0.xsd">
+    <id>plugin-agent-assembly</id>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <formats>
+        <format>zip</format>
+        <format>dir</format>
+    </formats>
+
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+            <outputFileNameMapping>${artifact.artifactId}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
+            <includes>
+                <include>:sonar-plugin-agent</include>
+                <include>:sonar-plugin-common</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
+    <files>
+        <file>
+            <source>${project.build.outputDirectory}/teamcity-agent-plugin.xml</source>
+            <destName>teamcity-plugin.xml</destName>
+        </file>
+    </files>
+</assembly>
