@@ -9,19 +9,19 @@
     <properties>
         <teamcity-version>2020.2</teamcity-version>
         <teamcity.version>2020.2</teamcity.version>
+        <sonar.plugin.vendor></sonar.plugin.vendor>
+        <sonar.plugin.vendorUrl></sonar.plugin.vendorUrl>
+        <sonar.plugin.version>${project.version}</sonar.plugin.version>
     </properties>
-    <repositories>
-        <repository>
-            <id>JetBrains</id>
-            <url>https://download.jetbrains.com/teamcity-repository</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>JetBrains</id>
-            <url>https://download.jetbrains.com/teamcity-repository</url>
-        </pluginRepository>
-    </pluginRepositories>
+
+    <modules>
+        <module>repository</module>
+        <module>sonar-plugin-server</module>
+        <module>sonar-plugin-agent</module>
+        <module>sonar-plugin-common</module>
+        <module>sonar-build</module>
+    </modules>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -50,6 +50,7 @@
             </plugins>
         </pluginManagement>
     </build>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -126,11 +127,17 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    <modules>
-        <module>repository</module>
-        <module>sonar-plugin-server</module>
-        <module>sonar-plugin-agent</module>
-        <module>sonar-plugin-common</module>
-        <module>build</module>
-    </modules>
+
+    <repositories>
+        <repository>
+            <id>JetBrains</id>
+            <url>https://download.jetbrains.com/teamcity-repository</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>JetBrains</id>
+            <url>https://download.jetbrains.com/teamcity-repository</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

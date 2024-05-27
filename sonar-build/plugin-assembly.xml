@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
-
-
-<assembly>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.2.0 https://maven.apache.org/xsd/assembly-2.2.0.xsd">
   <id>plugin-assembly</id>
   <includeBaseDirectory>false</includeBaseDirectory>
   <formats>
@@ -18,26 +17,16 @@
          <outputDirectory>agent</outputDirectory>
      </file> 
   </files>
-  <moduleSets>
-    <moduleSet>
-       <useAllReactorProjects>true</useAllReactorProjects>
-       <includes>
-           <include>jetbrains.buildServer.sonarplugin:sonar-plugin-server</include>
-           <include>jetbrains.buildServer.sonarplugin:sonar-plugin-common</include>
-       </includes>
-       <binaries>
-           <outputDirectory>server</outputDirectory>
-           <unpack>false</unpack>
-           <dependencySets>
-               <dependencySet>
-                    <excludes>
-                         <exclude>*</exclude>
-                    </excludes>
-               </dependencySet>
-           </dependencySets>
-       </binaries>
-    </moduleSet>
-  </moduleSets>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>server</outputDirectory>
+      <outputFileNameMapping>${artifact.artifactId}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
+      <includes>
+        <include>:sonar-plugin-server</include>
+        <include>:sonar-plugin-common</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
     <fileSets>
         <fileSet>
             <directory>../bundled/</directory>
