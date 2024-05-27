@@ -8,14 +8,14 @@
     <format>dir</format>
   </formats>
   <files>
-     <file>
-         <source>target/teamcity-plugin.xml</source>
-         <outputDirectory>/</outputDirectory>
-     </file> 
-     <file>
-         <source>target/sonar-plugin-agent.zip</source>
-         <outputDirectory>agent</outputDirectory>
-     </file> 
+    <file>
+      <source>${project.build.outputDirectory}/teamcity-plugin.xml</source>
+      <destName>teamcity-plugin.xml</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/sonar-plugin-agent.zip</source>
+      <outputDirectory>agent</outputDirectory>
+    </file>
   </files>
   <dependencySets>
     <dependencySet>
@@ -27,13 +27,13 @@
       </includes>
     </dependencySet>
   </dependencySets>
-    <fileSets>
-        <fileSet>
-            <directory>../bundled/</directory>
-            <outputDirectory>bundled/</outputDirectory>
-            <includes>
-                <include>*.zip</include>
-            </includes>
-        </fileSet>
-    </fileSets>
+  <fileSets>
+    <fileSet>
+      <directory>bundled/</directory>
+      <outputDirectory>bundled/</outputDirectory>
+      <includes>
+        <include>*.zip</include>
+      </includes>
+    </fileSet>
+  </fileSets>
 </assembly>

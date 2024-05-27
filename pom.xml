@@ -6,11 +6,19 @@
     <artifactId>sonar-plugin</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <description>Allows configuring and running SonarQube analysis on the TeamCity server</description>
+
+    <organization>
+        <name>JetBrains</name>
+        <url>https://www.jetbrains.com</url>
+    </organization>
+
     <properties>
         <teamcity-version>2020.2</teamcity-version>
         <teamcity.version>2020.2</teamcity.version>
-        <sonar.plugin.vendor></sonar.plugin.vendor>
-        <sonar.plugin.vendorUrl></sonar.plugin.vendorUrl>
+        <sonar.plugin.vendor>${project.organization.name}</sonar.plugin.vendor>
+        <sonar.plugin.vendorUrl>${project.organization.url}</sonar.plugin.vendorUrl>
         <sonar.plugin.version>${project.version}</sonar.plugin.version>
     </properties>
 

@@ -9,7 +9,7 @@
     <relativePath>../</relativePath>
   </parent>
   <artifactId>sonar-build</artifactId>
-  <packaging>pom</packaging>
+
   <properties>
     <maven.build.timestamp.format>yyyyddMMHHmmss</maven.build.timestamp.format>
   </properties>
@@ -30,38 +30,14 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
     <plugins>
-      <plugin>
-        <groupId>com.google.code.maven-replacer-plugin</groupId>
-        <artifactId>replacer</artifactId>
-        <version>1.5.2</version>
-        <executions>
-          <execution>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>replace</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <file>${basedir}/../teamcity-plugin.xml</file>
-          <outputFile>${basedir}/target/teamcity-plugin.xml</outputFile>
-          <replacements>
-            <replacement>
-              <token>@Version@</token>
-              <value>${sonar.plugin.version}</value>
-            </replacement>
-            <replacement>
-              <token>@VendorName@</token>
-              <value>${sonar.plugin.vendor}</value>
-            </replacement>
-            <replacement>
-              <token>@VendorURL@</token>
-              <value>${sonar.plugin.vendorUrl}</value>
-            </replacement>
-          </replacements>
-        </configuration>
-      </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.4</version>

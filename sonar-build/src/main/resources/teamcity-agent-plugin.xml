@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <teamcity-agent-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <plugin-deployment use-separate-classloader="true"/>
 </teamcity-agent-plugin>

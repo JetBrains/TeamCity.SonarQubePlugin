@@ -7,18 +7,7 @@
         <format>zip</format>
         <format>dir</format>
     </formats>
-    <fileSets>
-        <fileSet>
-            <directory>../sonar-plugin-agent/sonar-qube-runner/</directory>
-            <outputDirectory>/sonar-qube-runner</outputDirectory>
-            <includes><include>**/*</include></includes>
-        </fileSet>
-        <fileSet>
-            <directory>../sonar-plugin-agent/</directory>
-            <outputDirectory>/</outputDirectory>
-            <includes><include>teamcity-plugin.xml</include></includes>
-        </fileSet>
-    </fileSets>
+
     <dependencySets>
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
@@ -29,4 +18,10 @@
             </includes>
         </dependencySet>
     </dependencySets>
+    <files>
+        <file>
+            <source>${project.build.outputDirectory}/teamcity-agent-plugin.xml</source>
+            <destName>teamcity-plugin.xml</destName>
+        </file>
+    </files>
 </assembly>
