@@ -6,7 +6,7 @@ import jetbrains.buildServer.XmlStorable;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import jetbrains.buildserver.sonarplugin.Util;
 import jetbrains.buildserver.sonarplugin.manager.BaseSQSInfo;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -4,7 +4,7 @@ package jetbrains.buildserver.sonarplugin.manager.projectsettings;
 
 import jetbrains.buildServer.serverSide.settings.ProjectSettings;
 import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
