@@ -1,10 +1,12 @@
 package jetbrains.buildserver.sonarplugin;
 
-import jetbrains.buildServer.serverSide.BuildServerAdapter;
-import jetbrains.buildServer.serverSide.BuildServerListener;
-import jetbrains.buildServer.serverSide.ProjectManager;
+import com.intellij.openapi.diagnostic.Logger;
+import jetbrains.buildServer.serverSide.*;
+import jetbrains.buildServer.serverSide.executors.ExecutorServices;
 import jetbrains.buildServer.util.EventDispatcher;
+import jetbrains.buildserver.sonarplugin.manager.MigratingSQSManager;
 import jetbrains.buildserver.sonarplugin.manager.SQSInfo;
+import jetbrains.buildserver.sonarplugin.manager.SQSManager;
 import jetbrains.buildserver.sonarplugin.manager.projectfeatures.SQSInfoImpl;
 import jetbrains.buildserver.sonarplugin.manager.projectfeatures.SQSManagerProjectFeatures;
 import org.jetbrains.annotations.NotNull;
@@ -21,33 +23,56 @@ public class SonarQubeSecureParametersProcessor extends BuildServerAdapter {
     @NotNull
     private final ProjectManager myProjectManager;
     @NotNull
-    private final SQSManagerProjectFeatures mySQSManagerProjectFeatures;
+    private final MigratingSQSManager myMigratingSQSManager;
+    @NotNull
+    private final ExecutorServices myExecutorServices;
+    @NotNull
+    private final ConfigActionFactory myConfigActionFactory;
+    @NotNull
+    private final static Logger LOG = Logger.getInstance(SonarQubeSecureParametersProcessor.class);
 
 
-    public SonarQubeSecureParametersProcessor(@NotNull SQSManagerProjectFeatures sqsManagerProjectFeatures,
+    public SonarQubeSecureParametersProcessor(@NotNull MigratingSQSManager migratingSQSManager,
                                               @NotNull ProjectManager myProjectManager,
-                                              @NotNull EventDispatcher<BuildServerListener> dispatcher) {
+                                              @NotNull EventDispatcher<BuildServerListener> dispatcher,
+                                              @NotNull ExecutorServices executorServices,
+                                              @NotNull ConfigActionFactory myConfigActionFactory) {
         this.myProjectManager = myProjectManager;
-        this.mySQSManagerProjectFeatures = sqsManagerProjectFeatures;
+        this.myMigratingSQSManager = migratingSQSManager;
+        this.myExecutorServices = executorServices;
+        this.myConfigActionFactory = myConfigActionFactory;
         dispatcher.addListener(this);
     }
 
     @Override
     public void serverStartup() {
-        myProjectManager.getProjects().forEach(project -> {
-            if (project.isReadOnly()) {
-                return;
-            }
-            List<SQSInfo> servers = mySQSManagerProjectFeatures.getOwnAvailableServers(project);
-            if (servers.isEmpty()) return;
-            for (SQSInfo server : servers) {
-                Map<String, String> parameters = server.getParameters();
-                if (parameters.containsKey(PASSWORD) || parameters.containsKey(TOKEN) || parameters.containsKey(JDBC_PASSWORD)) {
-                    Map<String, String> newParameters = new HashMap<>(parameters);
-                    changeParameter(parameters, newParameters, PASSWORD);
-                    changeParameter(parameters, newParameters, TOKEN);
-                    changeParameter(parameters, newParameters, JDBC_PASSWORD);
-                    mySQSManagerProjectFeatures.editServer(project, new SQSInfoImpl(newParameters));
+        myExecutorServices.getLowPriorityExecutorService().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    myProjectManager.getProjects().forEach(project -> {
+                        if (project.isReadOnly()) {
+                            return;
+                        }
+                        List<SQSInfo> servers = myMigratingSQSManager.getOwnAvailableServers(project);
+                        if (servers.isEmpty()) return;
+                        for (SQSInfo server : servers) {
+                            Map<String, String> parameters = server.getParameters();
+                            if (parameters.containsKey(PASSWORD) || parameters.containsKey(TOKEN) || parameters.containsKey(JDBC_PASSWORD)) {
+                                Map<String, String> newParameters = new HashMap<>(parameters);
+                                changeParameter(parameters, newParameters, PASSWORD);
+                                changeParameter(parameters, newParameters, TOKEN);
+                                changeParameter(parameters, newParameters, JDBC_PASSWORD);
+                                SQSManager.SQSActionResult result = myMigratingSQSManager.editServer(project, new SQSInfoImpl(newParameters));
+                                if (!result.isError()) {
+                                    ConfigAction configAction = myConfigActionFactory.createAction(project, "parameters of SonarQube Server '" + server.getName() + "' were changed to secured version");
+                                    project.persist(configAction);
+                                }
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    LOG.warnAndDebugDetails("An error occurred during changing parameters in SonarQube runner plugin", e);
                 }
             }
         });

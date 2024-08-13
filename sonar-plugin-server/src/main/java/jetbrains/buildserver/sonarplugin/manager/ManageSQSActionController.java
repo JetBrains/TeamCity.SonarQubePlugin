@@ -201,7 +201,7 @@ public class ManageSQSActionController extends BaseAjaxActionController implemen
         } else {
             final SQSManager.SQSActionResult result = mySqsManager.removeServer(project, serverinfoId);
             if (!result.isError()) {
-                ajaxResponse.setAttribute("status", result.getReason());
+                ajaxResponse.setAttribute("status", "OK");
                 return result.getBeforeAction();
             } else {
                 ajaxResponse.setAttribute("error", result.getReason());

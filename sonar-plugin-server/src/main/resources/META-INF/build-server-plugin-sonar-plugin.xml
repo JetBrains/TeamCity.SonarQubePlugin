@@ -51,8 +51,6 @@
     <bean class="jetbrains.buildserver.sonarplugin.buildfeatures.BranchesAndPullRequestsBuildFeature"/>
     <bean class="jetbrains.buildserver.sonarplugin.buildfeatures.BranchesAndPullRequestsBuildStartContextProcessor"/>
 
-    <bean class="jetbrains.buildserver.sonarplugin.SonarQubeSecureParametersProcessor">
-        <constructor-arg index="0" ref="newManager"/>
-    </bean>
+    <bean class="jetbrains.buildserver.sonarplugin.SonarQubeSecureParametersProcessor"/>
     
 </beans>

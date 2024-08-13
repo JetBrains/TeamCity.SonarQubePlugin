@@ -82,6 +82,7 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
     @Nullable
     @Override
     public String getToken() {
+        // Firstly, read new parameter name, if not present, check if this entity still has old parameter
         return get(TOKEN) != null ? get(TOKEN) : get("token");
     }
 
@@ -92,6 +93,7 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
 
     @Nullable
     public String getPassword() {
+        // Firstly, read new parameter name, if not present, check if this entity still has old parameter
         return get(PASSWORD) != null ? get(PASSWORD) : get("password");
     }
 
@@ -107,6 +109,7 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
 
     @Nullable
     public String getJDBCPassword() {
+        // Firstly, read new parameter name, if not present, check if this entity still has old parameter
         return get(JDBC_PASSWORD) != null ? get(JDBC_PASSWORD) : get("jdbcPassword");
     }
 
