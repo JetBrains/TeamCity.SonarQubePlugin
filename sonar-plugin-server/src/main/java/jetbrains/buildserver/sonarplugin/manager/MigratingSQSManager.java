@@ -111,8 +111,7 @@ public class MigratingSQSManager implements SQSManager {
             }
         }
 
-        final SQSActionResult sqsInfo = myEditManager.removeServer(project, serverId);
-        return oldSqsInfo == null || !oldSqsInfo.isError() ? sqsInfo : oldSqsInfo;
+        return myEditManager.removeServer(project, serverId);
     }
 
     @NotNull
