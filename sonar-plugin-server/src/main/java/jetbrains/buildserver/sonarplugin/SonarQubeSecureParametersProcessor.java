@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.RejectedExecutionException;
 
 public class SonarQubeSecureParametersProcessor extends BuildServerAdapter {
     private final static String PASSWORD = "password";
@@ -45,33 +46,37 @@ public class SonarQubeSecureParametersProcessor extends BuildServerAdapter {
 
     @Override
     public void serverStartup() {
-        myExecutorServices.getLowPriorityExecutorService().submit(() -> {
-            try {
-                myProjectManager.getProjects().forEach(project -> {
-                    if (project.isReadOnly()) {
-                        return;
-                    }
-                    List<SQSInfo> servers = myMigratingSQSManager.getOwnAvailableServers(project);
-                    if (servers.isEmpty()) return;
-                    for (SQSInfo server : servers) {
-                        Map<String, String> parameters = server.getParameters();
-                        if (parameters.containsKey(PASSWORD) || parameters.containsKey(TOKEN) || parameters.containsKey(JDBC_PASSWORD)) {
-                            Map<String, String> newParameters = new HashMap<>(parameters);
-                            changeParameter(parameters, newParameters, PASSWORD);
-                            changeParameter(parameters, newParameters, TOKEN);
-                            changeParameter(parameters, newParameters, JDBC_PASSWORD);
-                            SQSManager.SQSActionResult result = myMigratingSQSManager.editServer(project, new SQSInfoImpl(newParameters));
-                            if (!result.isError()) {
-                                ConfigAction configAction = myConfigActionFactory.createAction(project, "parameters of SonarQube Server '" + server.getName() + "' were changed to secured version");
-                                project.persist(configAction);
+        try {
+            myExecutorServices.getLowPriorityExecutorService().submit(() -> {
+                try {
+                    myProjectManager.getProjects().forEach(project -> {
+                        if (project.isReadOnly()) {
+                            return;
+                        }
+                        List<SQSInfo> servers = myMigratingSQSManager.getOwnAvailableServers(project);
+                        if (servers.isEmpty()) return;
+                        for (SQSInfo server : servers) {
+                            Map<String, String> parameters = server.getParameters();
+                            if (parameters.containsKey(PASSWORD) || parameters.containsKey(TOKEN) || parameters.containsKey(JDBC_PASSWORD)) {
+                                Map<String, String> newParameters = new HashMap<>(parameters);
+                                changeParameter(parameters, newParameters, PASSWORD);
+                                changeParameter(parameters, newParameters, TOKEN);
+                                changeParameter(parameters, newParameters, JDBC_PASSWORD);
+                                SQSManager.SQSActionResult result = myMigratingSQSManager.editServer(project, new SQSInfoImpl(newParameters));
+                                if (!result.isError()) {
+                                    ConfigAction configAction = myConfigActionFactory.createAction(project, "parameters of SonarQube Server '" + server.getName() + "' were changed to secure version");
+                                    project.schedulePersisting(configAction);
+                                }
                             }
                         }
-                    }
-                });
-            } catch (Exception e) {
-                LOG.warnAndDebugDetails("An error occurred during changing parameters in SonarQube runner plugin", e);
-            }
-        });
+                    });
+                } catch (Throwable e) {
+                    LOG.warnAndDebugDetails("An error occurred during changing parameters in SonarQube runner plugin", e);
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            LOG.warnAndDebugDetails("Failed to start task to change parameters in SonarQube runner plugin", e);
+        }
 
     }
 
