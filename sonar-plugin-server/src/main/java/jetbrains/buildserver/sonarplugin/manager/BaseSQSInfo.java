@@ -15,12 +15,12 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
     public static final String ID = "id";
     public static final String JDBC_URL = "jdbcUrl";
     public static final String JDBC_USERNAME = "jdbcUsername";
-    public static final String JDBC_PASSWORD = "jdbcPassword";
+    public static final String JDBC_PASSWORD = "secure:jdbcPassword";
     public static final String URL = "url";
     public static final String USE_TOKEN = "useToken";
-    public static final String TOKEN = "token";
+    public static final String TOKEN = "secure:token";
     public static final String LOGIN = "login";
-    public static final String PASSWORD = "password";
+    public static final String PASSWORD = "secure:password";
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
     public static final String[] OPEN_FIELDS = new String[] {ID, JDBC_URL, JDBC_USERNAME, URL, LOGIN, NAME, DESCRIPTION, USE_TOKEN};
@@ -75,14 +75,15 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
 
     @Override
     public boolean isTokenLoginUsed() {
-        final String useToken = get(USE_TOKEN);
-        return useToken != null ? Boolean.parseBoolean(useToken) : get(TOKEN) != null;
+        final String useToken = getToken();
+        return useToken != null ? Boolean.parseBoolean(useToken) : getToken() != null;
     }
 
     @Nullable
     @Override
     public String getToken() {
-        return get(TOKEN);
+        // Firstly, read new parameter name, if not present, check if this entity still has old parameter
+        return get(TOKEN) != null ? get(TOKEN) : get("token");
     }
 
     @Nullable
@@ -92,7 +93,8 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
 
     @Nullable
     public String getPassword() {
-        return get(PASSWORD);
+        // Firstly, read new parameter name, if not present, check if this entity still has old parameter
+        return get(PASSWORD) != null ? get(PASSWORD) : get("password");
     }
 
     @Nullable
@@ -107,7 +109,8 @@ public class BaseSQSInfo extends BasePropertiesBean implements SQSInfo {
 
     @Nullable
     public String getJDBCPassword() {
-        return get(JDBC_PASSWORD);
+        // Firstly, read new parameter name, if not present, check if this entity still has old parameter
+        return get(JDBC_PASSWORD) != null ? get(JDBC_PASSWORD) : get("jdbcPassword");
     }
 
     @NotNull
