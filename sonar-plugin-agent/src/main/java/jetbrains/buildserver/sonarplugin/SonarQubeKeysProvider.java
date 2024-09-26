@@ -18,4 +18,5 @@ public interface SonarQubeKeysProvider {
     String getModules();
     String getPassword();
     String getLogin();
+    String getToken();
 }
