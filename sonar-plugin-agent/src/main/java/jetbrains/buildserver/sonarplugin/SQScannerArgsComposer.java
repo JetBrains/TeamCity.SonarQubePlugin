@@ -39,7 +39,7 @@ public class SQScannerArgsComposer implements SQArgsComposer {
         addSQRArg(res, keys.getJavaBinaries(), accessor.getProjectBinaries(), myOsType);
         addSQRArg(res, keys.getModules(), accessor.getProjectModules(), myOsType);
         if (accessor.getToken() != null) {
-            addSQRArg(res, keys.getLogin(), accessor.getToken(), myOsType);
+            addSQRArg(res, keys.getToken(), accessor.getToken(), myOsType);
         } else {
             addSQRArg(res, keys.getPassword(), accessor.getPassword(), myOsType);
             addSQRArg(res, keys.getLogin(), accessor.getLogin(), myOsType);

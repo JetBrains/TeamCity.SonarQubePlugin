@@ -77,4 +77,8 @@ public class JavaSonarQubeKeysProvider implements SonarQubeKeysProvider {
     public String getLogin() {
         return "-Dsonar.login=";
     }
+    @Override
+    public String getToken() {
+        return "-Dsonar.token=";
+    }
 }

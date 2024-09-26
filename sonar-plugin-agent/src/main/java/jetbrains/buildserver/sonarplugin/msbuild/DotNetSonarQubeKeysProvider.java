@@ -79,4 +79,9 @@ public class DotNetSonarQubeKeysProvider implements SonarQubeKeysProvider {
     public String getLogin() {
         return "/d:sonar.login=";
     }
+
+    @Override
+    public String getToken() {
+        return "/d:sonar.token=";
+    }
 }
