@@ -2,6 +2,8 @@
 
 package jetbrains.buildserver.sonarplugin.util;
 
+import java.util.HashMap;
+import java.util.Map;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.runner.CommandLineBuildService;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
@@ -36,12 +38,13 @@ public class SimpleExecute extends CommandLineBuildService  {
     @NotNull
     @Override
     public ProgramCommandLine makeProgramCommandLine() throws RunBuildException {
-        final Executable executable = myChain.modify(myExecutableFactory.create(getRunnerContext()), getRunnerContext());
+        Map<String, String> environmentVariables = new HashMap<>(getRunnerContext().getBuildParameters().getEnvironmentVariables());
+        final Executable executable = myChain.modify(myExecutableFactory.create(getRunnerContext()), getRunnerContext(), environmentVariables);
 
         return new SimpleProgramCommandLine(
-                getRunnerContext().getBuildParameters().getEnvironmentVariables(),
-                myAbsolutePath != null ? myAbsolutePath : getRunnerContext().getWorkingDirectory().getAbsolutePath(),
-                executable.myExecutable,
-                executable.myArguments);
+          environmentVariables,
+          myAbsolutePath != null ? myAbsolutePath : getRunnerContext().getWorkingDirectory().getAbsolutePath(),
+          executable.myExecutable,
+          executable.myArguments);
     }
 }

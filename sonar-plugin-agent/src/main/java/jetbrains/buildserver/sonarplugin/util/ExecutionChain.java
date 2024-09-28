@@ -2,6 +2,7 @@
 
 package jetbrains.buildserver.sonarplugin.util;
 
+import java.util.Map;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,10 +18,10 @@ public class ExecutionChain implements Execution {
 
     @NotNull
     @Override
-    public Executable modify(@NotNull final Executable old, final BuildRunnerContext runnerContext) {
+    public Executable modify(@NotNull final Executable old, final BuildRunnerContext runnerContext, @NotNull final Map<String, String> environmentVariables) {
         Executable current = old;
         for (Execution execution : myChain) {
-            current = execution.modify(current, runnerContext);
+            current = execution.modify(current, runnerContext, environmentVariables);
         }
         return current;
     }
