@@ -40,6 +40,7 @@ public class SimpleZipToolProviderSQMSBuildTest {
         myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-scanner-msbuild-5.1.0.28487-net5.0.zip", root, "some", "path"));
         myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-scanner-msbuild-5.1.0.28487-netcoreapp2.0.zip", root, "some", "path"));
         myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-scanner-msbuild-5.1.0.28487-net46.zip", root, "some", "path"));
+        myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-scanner-9.0.0.100868-net-framework.zip", root, "some", "path"));
 
         assertThatThrownBy(() -> myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-scanner-msbuild.zip", root, "some", "path"))).isInstanceOf(ToolException.class);
         assertThatThrownBy(() -> myToolProvider.validatePackedTool(prepareCorrectPluginWithName(jimfs, "sonar-scanner-msbuil-1.2.3.zip", root, "some", "path"))).isInstanceOf(ToolException.class);

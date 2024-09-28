@@ -32,6 +32,7 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
     private static final String DEFAULT_BUNDLED_VERSION = "3.0.3.778";
     private static final String SONAR_FILE_NAME_PARTS_SEPARATOR = "[\\.-]";
     private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d[\\d\\\\.]*)(-[\\w\\.]+)?)";
+    private static final String NET_FRAMEWORK = "(-net-framework)?";
     private static final String ZIP_EXTENSION = "\\.zip";
     static final String SONAR_QUBE_SCANNER_MSBUILD_EXE = "SonarQube.Scanner.MSBuild.exe";
     static final String SONAR_QUBE_SCANNER_MSBUILD_ALT_EXE = "SonarScanner.MSBuild.exe";
@@ -49,8 +50,12 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
                                           @NotNull final SonarQubeMSBuildToolType sonarQubeScannerToolType) {
         myPluginDescriptor = pluginDescriptor;
         myToolType = sonarQubeScannerToolType;
-        myPackedSonarQubeScannerRootZipPattern = myToolType.getType() + SONAR_FILE_NAME_PARTS_SEPARATOR + VERSION_PATTERN + ZIP_EXTENSION;
-        myPackedSonarQubeScannerRootDirPattern = myToolType.getType() + SONAR_FILE_NAME_PARTS_SEPARATOR + VERSION_PATTERN;
+        String toolType = myToolType.getType();
+        if ("sonar-scanner-msbuild".equalsIgnoreCase(myToolType.getType())) {
+            toolType = "sonar-scanner(-msbuild)?";
+        }
+        myPackedSonarQubeScannerRootZipPattern = toolType + SONAR_FILE_NAME_PARTS_SEPARATOR + VERSION_PATTERN + NET_FRAMEWORK + ZIP_EXTENSION;
+        myPackedSonarQubeScannerRootDirPattern = toolType + SONAR_FILE_NAME_PARTS_SEPARATOR + VERSION_PATTERN;
     }
 
     @NotNull
@@ -86,7 +91,8 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
     @NotNull
     @Override
     public String getVersionPattern() {
-        return ".*?[.-]" + VERSION_PATTERN + ZIP_EXTENSION;
+        //sonar-scanner-9.0.0.100868-net-framework.zip
+        return ".*?[.-]" + VERSION_PATTERN +"(-net-framework)? " + ZIP_EXTENSION;
     }
 
     @NotNull
