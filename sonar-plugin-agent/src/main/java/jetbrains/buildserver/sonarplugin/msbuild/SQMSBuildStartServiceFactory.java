@@ -2,6 +2,7 @@
 
 package jetbrains.buildserver.sonarplugin.msbuild;
 
+import java.util.Map;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.AgentBuildRunnerInfo;
 import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
@@ -81,7 +82,7 @@ public class SQMSBuildStartServiceFactory implements CommandLineBuildServiceFact
     private static class BeginExecutionWrapper implements Execution {
         @NotNull
         @Override
-        public Executable modify(@NotNull final Executable old, final BuildRunnerContext runnerContext) {
+        public Executable modify(@NotNull final Executable old, final BuildRunnerContext runnerContext, Map<String, String> environmentVariables) {
             final ArrayList<String> arguments = new ArrayList<String>(old.myArguments);
             arguments.add("begin");
             return new Executable(old.myExecutable, arguments);

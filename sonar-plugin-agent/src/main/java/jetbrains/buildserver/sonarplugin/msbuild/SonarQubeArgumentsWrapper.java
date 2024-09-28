@@ -2,6 +2,7 @@
 
 package jetbrains.buildserver.sonarplugin.msbuild;
 
+import java.util.Map;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildserver.sonarplugin.SQArgsComposer;
 import jetbrains.buildserver.sonarplugin.SQRParametersAccessor;
@@ -30,10 +31,11 @@ public class SonarQubeArgumentsWrapper implements Execution {
     @NotNull
     @Override
     public Executable modify(@NotNull final Executable old,
-                             @NotNull final BuildRunnerContext runnerContext) {
+                             @NotNull final BuildRunnerContext runnerContext,
+                             @NotNull Map<String, String> environmentVariables) {
         final SQRParametersAccessor accessor = mySQRParametersAccessorFactory.createAccessor(runnerContext);
 
-        final List<String> args = mySQArgsComposer.composeArgs(accessor, new DotNetSonarQubeKeysProvider());
+        final List<String> args = mySQArgsComposer.composeArgs(accessor, new DotNetSonarQubeKeysProvider(), environmentVariables);
         final List<String> res = new ArrayList<String>(old.myArguments);
         res.addAll(args);
 

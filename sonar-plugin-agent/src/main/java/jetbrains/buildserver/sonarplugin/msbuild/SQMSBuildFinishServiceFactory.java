@@ -2,6 +2,7 @@
 
 package jetbrains.buildserver.sonarplugin.msbuild;
 
+import java.util.Map;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.agent.runner.CommandLineBuildService;
@@ -107,7 +108,7 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
     private static class EndExecution implements Execution {
         @NotNull
         @Override
-        public Executable modify(@NotNull final Executable old, final BuildRunnerContext runnerContext) {
+        public Executable modify(@NotNull final Executable old, final BuildRunnerContext runnerContext, Map<String, String> environmentVariables) {
             final ArrayList<String> arguments = new ArrayList<String>(old.myArguments);
             arguments.add("end");
             return new Executable(old.myExecutable, arguments);

@@ -2,6 +2,7 @@
 
 package jetbrains.buildserver.sonarplugin.msbuild;
 
+import java.util.Map;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.util.OSType;
 import jetbrains.buildserver.sonarplugin.util.Executable;
@@ -25,7 +26,7 @@ public class MonoWrapper implements Execution {
 
     @NotNull
     @Override
-    public Executable modify(@NotNull final Executable old, final BuildRunnerContext runnerContext) {
+    public Executable modify(@NotNull final Executable old, final BuildRunnerContext runnerContext, @NotNull Map<String, String> environmentVariables) {
         if (myOSType != OSType.WINDOWS) {
             final List<String> newArgs = new ArrayList<String>(old.myArguments.size() + 1);
             newArgs.add(old.myExecutable);

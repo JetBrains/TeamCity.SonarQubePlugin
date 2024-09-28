@@ -11,7 +11,6 @@ import jetbrains.buildServer.agent.runner.JavaCommandLineBuilder;
 import jetbrains.buildServer.agent.runner.JavaRunnerUtil;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.agent.ssl.TrustedCertificatesDirectory;
-import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.runner.JavaRunnerConstants;
 import jetbrains.buildServer.util.OSType;
 import jetbrains.buildServer.util.StringUtil;
@@ -66,7 +65,8 @@ public class SQRBuildService extends CommandLineBuildService {
             throw new RunBuildException("No SonarQube Scanner selected");
         }
         final AgentRunningBuild agentBuild = getBuild();
-        final List<String> programArgs = composeSQRArgs(getRunnerContext().getRunnerParameters(), agentBuild.getSharedConfigParameters(), sonarScannerRoot, agentBuild.getBuildTempDirectory());
+        Map<String, String> environmentVariables = new HashMap<>(getRunnerContext().getBuildParameters().getEnvironmentVariables());
+        final List<String> programArgs = composeSQRArgs(getRunnerContext().getRunnerParameters(), agentBuild.getSharedConfigParameters(), sonarScannerRoot, agentBuild.getBuildTempDirectory(), environmentVariables);
 
         final boolean useScanner = isUseScannerMain(sonarScannerRoot);
         final JavaCommandLineBuilder builder = new JavaCommandLineBuilder();
@@ -80,14 +80,14 @@ public class SQRBuildService extends CommandLineBuildService {
 
 
         final ProgramCommandLine build = builder.withClassPath(getClasspath())
-                .withMainClass(getMainClass(useScanner))
-                .withJavaHome(jdkHome)
-                .withBaseDir(agentBuild.getCheckoutDirectory().getAbsolutePath())
-                .withEnvVariables(getRunnerContext().getBuildParameters().getEnvironmentVariables())
-                .withJvmArgs(jvmAgrs)
-                .withClassPath(getClasspath())
-                .withProgramArgs(programArgs)
-                .withWorkingDir(getRunnerContext().getWorkingDirectory().getAbsolutePath()).build();
+                                                .withMainClass(getMainClass(useScanner))
+                                                .withJavaHome(jdkHome)
+                                                .withBaseDir(agentBuild.getCheckoutDirectory().getAbsolutePath())
+                                                .withEnvVariables(environmentVariables)
+                                                .withJvmArgs(jvmAgrs)
+                                                .withClassPath(getClasspath())
+                                                .withProgramArgs(programArgs)
+                                                .withWorkingDir(getRunnerContext().getWorkingDirectory().getAbsolutePath()).build();
 
         getLogger().message("Starting SQS from " + sonarScannerRoot);
         for (String str : build.getArguments()) {
@@ -108,19 +108,22 @@ public class SQRBuildService extends CommandLineBuildService {
 
     /**
      * Composes SonarQube Runner arguments.
-     * @param runnerParameters Parameters to compose arguments from
+     *
+     * @param runnerParameters       Parameters to compose arguments from
      * @param sharedConfigParameters Shared config parameters to compose arguments from
      * @param sonarScannerRoot
      * @param buildTempDir
+     * @param environmentVariables
      * @return List of arguments to be passed to the SQR
      */
     private List<String> composeSQRArgs(@NotNull final Map<String, String> runnerParameters,
                                         @NotNull final Map<String, String> sharedConfigParameters,
                                         @NotNull final String sonarScannerRoot,
-                                        @NotNull final File buildTempDir) {
+                                        @NotNull final File buildTempDir,
+                                        @NotNull final Map<String, String> environmentVariables) {
         final SQRParametersAccessor accessor = new SQRParametersAccessor(SQRParametersUtil.mergeParameters(sharedConfigParameters, runnerParameters));
 
-        final List<String> res = mySQArgsComposer.composeArgs(accessor, new JavaSonarQubeKeysProvider());
+        final List<String> res = mySQArgsComposer.composeArgs(accessor, new JavaSonarQubeKeysProvider(), environmentVariables);
         addSQRArg(res, "-Dscanner.home", sonarScannerRoot, myOsType);
 
         final Set<String> collectedReports = mySonarProcessListener.getCollectedReports();

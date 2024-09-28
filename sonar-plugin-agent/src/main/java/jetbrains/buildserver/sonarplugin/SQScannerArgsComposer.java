@@ -2,6 +2,7 @@
 
 package jetbrains.buildserver.sonarplugin;
 
+import java.util.Map;
 import jetbrains.buildServer.util.OSType;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ public class SQScannerArgsComposer implements SQArgsComposer {
 
     @Override
     public List<String> composeArgs(@NotNull final SQRParametersAccessor accessor,
-                                    @NotNull final SonarQubeKeysProvider keys) {
+                                    @NotNull final SonarQubeKeysProvider keys, Map<String, String> environmentVariables) {
         final List<String> res = new LinkedList<String>();
         addSQRArg(res, keys.getProjectHome(), accessor.getProjectHome(), myOsType);
         addSQRArg(res, keys.getHostUrl(), accessor.getHostUrl(), myOsType);
@@ -39,7 +40,7 @@ public class SQScannerArgsComposer implements SQArgsComposer {
         addSQRArg(res, keys.getJavaBinaries(), accessor.getProjectBinaries(), myOsType);
         addSQRArg(res, keys.getModules(), accessor.getProjectModules(), myOsType);
         if (accessor.getToken() != null) {
-            addSQRArg(res, keys.getToken(), accessor.getToken(), myOsType);
+            environmentVariables.put("SONAR_TOKEN", accessor.getToken());
         } else {
             addSQRArg(res, keys.getPassword(), accessor.getPassword(), myOsType);
             addSQRArg(res, keys.getLogin(), accessor.getLogin(), myOsType);
