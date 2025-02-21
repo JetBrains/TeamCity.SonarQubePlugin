@@ -52,7 +52,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
     @Override
     public Collection<InstalledToolVersion> getBundledToolVersions() {
         final Path bundledTools = mySimpleZipToolProvider.getBundledVersionsRoot();
-        LOG.warn(" - getBundledToolVersions in " + bundledTools);
+        LOG.debug(" - getBundledToolVersions in " + bundledTools);
 
         final String error = checkDirectory(bundledTools, "Cannot get bundled " + mySimpleZipToolProvider.getName() + " version");
         if (error != null) {
@@ -63,7 +63,7 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
         final List<InstalledToolVersion> res = new ArrayList<>();
         try (final DirectoryStream<Path> contents = Files.newDirectoryStream(bundledTools)) {
             for (Path path : contents) {
-                LOG.warn(" - getBundledToolVersions found package " + path);
+                LOG.debug(" - getBundledToolVersions found package " + path);
                 final String errorFiles = checkFile(path, "Cannot parse SonarQube Scanner package");
                 if (errorFiles != null) {
                     LOG.warn(errorFiles);
@@ -71,7 +71,9 @@ public class SonarQubeToolProvider extends ServerToolProviderAdapter {
                     final String fileName = path.getFileName().toString();
 
                     final Matcher matcher = myPackedSonarQubeScannerRootZipPattern.matcher(fileName);
-
+                    if (!matcher.matches()) { // the folder contains some tools supported by different tool provider, the check is needed to avoid warnings
+                        continue;
+                    }
                     final GetPackageVersionResult result = mySimpleZipToolProvider.tryParsePackedPackage(path, matcher);
                     if (result.getToolVersion() != null) {
                         res.add(new SimpleInstalledToolVersion(result.getToolVersion(), null, null, path.toFile()));
