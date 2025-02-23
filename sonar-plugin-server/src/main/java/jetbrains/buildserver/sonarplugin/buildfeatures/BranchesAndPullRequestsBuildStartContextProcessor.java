@@ -2,8 +2,6 @@
 
 package jetbrains.buildserver.sonarplugin.buildfeatures;
 
-import org.springframework.util.StringUtils;
-
 import com.google.gson.JsonObject;
 
 import jetbrains.buildServer.agent.Constants;
@@ -11,6 +9,7 @@ import jetbrains.buildServer.messages.Status;
 import jetbrains.buildServer.serverSide.BuildStartContext;
 import jetbrains.buildServer.serverSide.BuildStartContextProcessor;
 import jetbrains.buildServer.serverSide.buildLog.MessageAttrs;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.util.positioning.PositionAware;
 import jetbrains.buildServer.util.positioning.PositionConstraint;
 import jetbrains.buildServer.version.ServerVersionHolder;
@@ -53,7 +52,7 @@ public class BranchesAndPullRequestsBuildStartContextProcessor implements BuildS
         }
 
         String branchIsDefault = context.getSharedParameters().get("teamcity.build.branch.is_default");
-        if (StringUtils.isEmpty(branchIsDefault) || Boolean.TRUE.equals(Boolean.valueOf(branchIsDefault))) {
+        if (StringUtil.isEmpty(branchIsDefault) || Boolean.TRUE.equals(Boolean.valueOf(branchIsDefault))) {
             // No information or default branch, nothing to provide
             return;
         }
@@ -61,7 +60,7 @@ public class BranchesAndPullRequestsBuildStartContextProcessor implements BuildS
         final String type;
         final JsonObject json = new JsonObject();
         final String prNumber = context.getSharedParameters().get("teamcity.pullRequest.number");
-        if (StringUtils.isEmpty(prNumber)) {
+        if (StringUtil.isEmpty(prNumber)) {
             // Branch
             type = "branch";
             final String vcsBranch = context.getSharedParameters().get("vcsroot.branch");

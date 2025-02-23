@@ -4,14 +4,13 @@ package jetbrains.buildserver.sonarplugin.buildfeatures;
 
 import java.util.Map;
 
-import org.springframework.util.StringUtils;
-
 import com.google.gson.JsonObject;
 
 import jetbrains.buildServer.messages.Status;
 import jetbrains.buildServer.serverSide.ParametersPreprocessor;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.serverSide.buildLog.MessageAttrs;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.version.ServerVersionHolder;
 import jetbrains.buildServer.version.ServerVersionInfo;
 
@@ -39,7 +38,7 @@ public class BranchesAndPullRequestsParametersPreprocessor implements Parameters
         }
 
         String branchIsDefault = buildParams.get("teamcity.build.branch.is_default");
-        if (StringUtils.isEmpty(branchIsDefault) || Boolean.TRUE.equals(Boolean.valueOf(branchIsDefault))) {
+        if (StringUtil.isEmpty(branchIsDefault) || Boolean.TRUE.equals(Boolean.valueOf(branchIsDefault))) {
             // No information or default branch, nothing to provide
             return;
         }
@@ -47,7 +46,7 @@ public class BranchesAndPullRequestsParametersPreprocessor implements Parameters
         final String type;
         final JsonObject json = new JsonObject();
         final String prNumber = buildParams.get("teamcity.pullRequest.number");
-        if (StringUtils.isEmpty(prNumber)) {
+        if (StringUtil.isEmpty(prNumber)) {
             // Branch
             type = "branch";
             final String vcsBranch = buildParams.get("vcsroot.branch");
