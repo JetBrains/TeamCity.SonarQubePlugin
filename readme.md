@@ -1,6 +1,6 @@
 
 
-[![official JetBrains project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Build Status](https://teamcity.jetbrains.com/app/rest/builds/buildType:TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Develop/statusIcon.png)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Develop)
+[![official JetBrains project](https://jb.gg/badges/official.svg)](https://github.com/JetBrains#jetbrains-on-github) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Build Status](https://teamcity.jetbrains.com/app/rest/builds/buildType:TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Develop/statusIcon.png)](https://teamcity.jetbrains.com/buildConfiguration/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Develop)
 
 
  TeamCity SonarQube plugin
@@ -11,10 +11,10 @@
 ## 1. Downloading binaries
  
  The latest build of the plugin is available on the public TeamCity server and can be downloaded from the public TeamCity server:
-  * [for TeamCity 2017.1+](
-http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build20171x/.lastPinned/sonar-plugin.zip)
-  * [for TeamCity 10]( http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build100x/.lastPinned/sonar-plugin.zip)
-  * [for prior versions](http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build/.lastPinned/sonar-plugin.zip)
+  * [for TeamCity 2020.1+](https://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build20201x/.lastPinned/sonar-plugin.zip)
+  * [for TeamCity 2017.1+](https://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build20171x/.lastPinned/sonar-plugin.zip)
+  * [for TeamCity 10](https://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build100x/.lastPinned/sonar-plugin.zip)
+  * [for TeamCity 9](https://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCitySonarQubePlugin_Build90x91x/.lastPinned/sonar-plugin.zip)
 
  ## 2. Building sources
 
@@ -47,7 +47,7 @@ http://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_Tea
 
  * **SonarQube Branches & Pull Requests Build Feature**
  
- [Branches](https://docs.sonarqube.org/latest/branches/overview/) and [Pull-Requests](https://docs.sonarqube.org/latest/analysis/pull-request/) analysis parameters automatically provided on build from VCS build information, using `SONARQUBE_SCANNER_PARAMS` environment variable. It requires TeamCity v2019.2 and SonarQube [Developer Edition or above](https://www.sonarsource.com/plans-and-pricing/).
+ [Branches](https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/branch-analysis/introduction/) and [Pull-Requests](https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/pull-request-analysis/introduction/) analysis parameters automatically provided on build from VCS build information, using `SONARQUBE_SCANNER_PARAMS` environment variable. It requires TeamCity v2019.2 and SonarQube [Developer Edition or above](https://www.sonarsource.com/plans-and-pricing/).
 
  * **Build Breaker plugin integration**
 
