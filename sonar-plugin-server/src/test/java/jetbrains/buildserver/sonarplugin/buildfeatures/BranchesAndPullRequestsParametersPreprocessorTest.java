@@ -10,13 +10,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.util.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import jetbrains.buildServer.serverSide.SBuildFeatureDescriptor;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.serverSide.buildLog.BuildLog;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.version.ServerVersionInfo;
 
 @Test
@@ -339,7 +339,7 @@ public class BranchesAndPullRequestsParametersPreprocessorTest {
      * @return {@link ServerVersionInfo}
      */
     private static ServerVersionInfo mockServerVersionInfo(String version) {
-        if (StringUtils.isEmpty(version)) {
+        if (StringUtil.isEmpty(version)) {
             return null;
         }
         int major = 0;
