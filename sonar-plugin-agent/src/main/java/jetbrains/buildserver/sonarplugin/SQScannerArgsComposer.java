@@ -5,6 +5,7 @@ package jetbrains.buildserver.sonarplugin;
 import java.util.Map;
 import jetbrains.buildServer.util.OSType;
 import jetbrains.buildServer.util.StringUtil;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +41,13 @@ public class SQScannerArgsComposer implements SQArgsComposer {
         addSQRArg(res, keys.getJavaBinaries(), accessor.getProjectBinaries(), myOsType);
         addSQRArg(res, keys.getModules(), accessor.getProjectModules(), myOsType);
         if (accessor.getToken() != null) {
+            if (versionLessThanOrEqual(new ComparableVersion(accessor.getToolVersion()), new ComparableVersion("5.12"))) {
+                // version <= 5.12 requires token to pass in sonar.login parameter
+                addSQRArg(res, keys.getLogin(), accessor.getToken(), myOsType);
+            } else {
+                // version 5.13 supports sonar.token parameter
+                addSQRArg(res, keys.getToken(), accessor.getToken(), myOsType);
+            }
             environmentVariables.put("SONAR_TOKEN", accessor.getToken());
         } else {
             addSQRArg(res, keys.getPassword(), accessor.getPassword(), myOsType);
@@ -51,6 +59,10 @@ public class SQScannerArgsComposer implements SQArgsComposer {
         }
 
         return res;
+    }
+
+    private boolean versionLessThanOrEqual(ComparableVersion toolVersion, ComparableVersion comparableVersion) {
+        return toolVersion.compareTo(comparableVersion) <=0;
     }
 
     protected static void addSQRArg(@NotNull final List<String> argList, @Nullable final String key, @Nullable final String value, @NotNull final OSType osType) {

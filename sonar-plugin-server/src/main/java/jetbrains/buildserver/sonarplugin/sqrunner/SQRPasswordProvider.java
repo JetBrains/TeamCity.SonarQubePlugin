@@ -45,6 +45,8 @@ public class SQRPasswordProvider implements PasswordsProvider {
         final List<SQSInfo> servers = findSQSInfos(build.getBuildType());
         final List<Parameter> list = new ArrayList<Parameter>();
         for (final SQSInfo server : servers) {
+            addParameterIfNeeded(list, server.getId(), server.getLogin(), Constants.SONAR_LOGIN);
+            addParameterIfNeeded(list, server.getId(), server.getToken(), Constants.SONAR_TOKEN);
             addParameterIfNeeded(list, server.getId(), server.getPassword(), Constants.SONAR_PASSWORD);
             addParameterIfNeeded(list, server.getId(), server.getJDBCPassword(), Constants.SONAR_SERVER_JDBC_PASSWORD);
         }

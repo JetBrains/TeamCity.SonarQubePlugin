@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>jetbrains.buildServer.sonarplugin</groupId>
     <artifactId>sonar-plugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <description>Allows configuring and running SonarQube analysis on the TeamCity server</description>
@@ -15,8 +15,8 @@
     </organization>
 
     <properties>
-        <teamcity-version>2020.2</teamcity-version>
-        <teamcity.version>2020.2</teamcity.version>
+        <revision>${teamcity.version}</revision>
+        <teamcity.version>2025.03</teamcity.version>
         <sonar.plugin.vendor>${project.organization.name}</sonar.plugin.vendor>
         <sonar.plugin.vendorUrl>${project.organization.url}</sonar.plugin.vendorUrl>
         <sonar.plugin.version>${project.version}</sonar.plugin.version>
@@ -28,6 +28,7 @@
         <module>sonar-plugin-agent</module>
         <module>sonar-plugin-common</module>
         <module>sonar-build</module>
+        <module>sonar-test</module>
     </modules>
 
     <build>
@@ -44,8 +45,12 @@
                 <plugin>
                     <groupId>org.jetbrains.teamcity</groupId>
                     <artifactId>teamcity-sdk-maven-plugin</artifactId>
-                    <version>0.4.2</version>
+                    <version>0.4.3</version>
                     <inherited>false</inherited>
+                    <configuration>
+                        <teamcityVersion>${teamcity.version}</teamcityVersion>
+                        <teamcityDir>servers/${teamcity.version}</teamcityDir>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -63,23 +68,10 @@
         <dependencies>
             <dependency>
                 <groupId>org.jetbrains.teamcity</groupId>
-                <artifactId>agent-api</artifactId>
+                <artifactId>bom</artifactId>
                 <version>${teamcity.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.teamcity</groupId>
-                <artifactId>tests-support</artifactId>
-                <version>${teamcity.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.teamcity</groupId>
-                <artifactId>server-api</artifactId>
-                <version>${teamcity.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.teamcity.internal</groupId>
-                <artifactId>server</artifactId>
-                <version>${teamcity.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>

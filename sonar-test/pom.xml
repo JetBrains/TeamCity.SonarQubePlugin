@@ -10,14 +10,9 @@
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>sonar-plugin-common</artifactId>
+  <artifactId>sonar-test</artifactId>
 
   <dependencies>
-    <dependency>
-      <groupId>org.jetbrains.teamcity</groupId>
-      <artifactId>common-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>org.jetbrains</groupId>
       <artifactId>annotations</artifactId>

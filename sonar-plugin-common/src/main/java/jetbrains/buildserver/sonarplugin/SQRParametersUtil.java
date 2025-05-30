@@ -2,12 +2,10 @@
 
 package jetbrains.buildserver.sonarplugin;
 
+import jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class SQRParametersUtil {
 
@@ -35,6 +33,15 @@ public final class SQRParametersUtil {
 
         merged.keySet().retainAll(AUTH_PARAMETER_KEYS);
 
+        return merged;
+    }
+
+    public static Map<String, String> mergeAuthAndToolPathParameters(@NotNull final Map<String, String> sharedParameters,
+                                                          @NotNull final Map<String, String> runnerParameters) {
+        Map<String, String> merged = mergeParameters(sharedParameters, runnerParameters);
+        List<String> keysToKeep = new ArrayList<>(AUTH_PARAMETER_KEYS);
+        keysToKeep.add(SQMSConstants.SONAR_QUBE_MSBUILD_VERSION_PARAMETER);
+        merged.keySet().retainAll(keysToKeep);
         return merged;
     }
 }

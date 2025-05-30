@@ -7,4 +7,6 @@ import org.jetbrains.annotations.NotNull;
 public interface MonoLocator {
     @NotNull
     String getMono();
+
+    boolean isMono();
 }

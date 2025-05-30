@@ -13,3 +13,4 @@ servers/**
 **/test-output/
 repository/lib
 *.zip
+.DS_Store

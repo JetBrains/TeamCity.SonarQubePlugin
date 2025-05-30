@@ -86,9 +86,9 @@ public class SQMSBuildFinishServiceFactory implements CommandLineBuildServiceFac
                                 return sqrParametersAccessor;
                             }
                         }),
-                        new MonoWrapper(myOSType, myMonoLocator),
+                        new MonoWrapper(myMonoLocator),
                         new EndExecution())),
-                new SQMSBuildExecutableFactory(msBuildScannerLocator), workingDirectory.getAbsolutePath());
+                new SQMSBuildExecutableFactory(msBuildScannerLocator, myMonoLocator), workingDirectory.getAbsolutePath());
     }
 
     @NotNull

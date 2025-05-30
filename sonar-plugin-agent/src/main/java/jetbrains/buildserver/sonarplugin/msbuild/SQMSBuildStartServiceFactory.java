@@ -55,7 +55,10 @@ public class SQMSBuildStartServiceFactory implements CommandLineBuildServiceFact
                         public String getExecutablePath(@NotNull final BuildRunnerContext runnerContext) throws RunBuildException {
                             return mySonarQubeMSBuildScannerLocator.getExecutablePath(runner);
                         }
-                    }, runner.getWorkingDirectory(), new SQRParametersAccessor(SQRParametersUtil.mergeAuthParameters(runner.getBuild().getSharedConfigParameters(), runner.getRunnerParameters())));
+                    }, runner.getWorkingDirectory(), new SQRParametersAccessor(
+                            SQRParametersUtil.mergeAuthAndToolPathParameters(runner.getBuild().getSharedConfigParameters(), runner.getRunnerParameters())
+                        )
+                    );
                 }
             }
         });
@@ -64,13 +67,14 @@ public class SQMSBuildStartServiceFactory implements CommandLineBuildServiceFact
     @NotNull
     @Override
     public CommandLineBuildService createService() {
+
         return new SimpleExecute(
                 new ExecutionChain(
                         Arrays.asList(
                                 new SonarQubeArgumentsWrapper(new SQScannerArgsComposer(myOSType)),
-                                new MonoWrapper(myOSType, myMonoLocator),
+                                new MonoWrapper(myMonoLocator),
                                 new BeginExecutionWrapper())),
-                new SQMSBuildExecutableFactory(mySonarQubeMSBuildScannerLocator));
+                new SQMSBuildExecutableFactory(mySonarQubeMSBuildScannerLocator, myMonoLocator));
     }
 
     @NotNull

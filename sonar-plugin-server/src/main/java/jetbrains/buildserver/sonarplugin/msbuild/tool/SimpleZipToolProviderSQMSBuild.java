@@ -31,7 +31,7 @@ public class SimpleZipToolProviderSQMSBuild implements SimpleZipToolProvider {
 
     private static final String DEFAULT_BUNDLED_VERSION = "3.0.3.778";
     private static final String SONAR_FILE_NAME_PARTS_SEPARATOR = "[\\.-]";
-    private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d[\\d\\\\.]*)(-[\\w\\.]+)?)";
+    private static final String VERSION_PATTERN = "(?<" + SonarQubeToolProvider.VERSION_GROUP_NAME + ">(\\d[\\d\\\\.]*)(-[\\w\\.]+)?(-[\\w\\.]+)?)";
     private static final String ZIP_EXTENSION = "\\.zip";
     static final String SONAR_QUBE_SCANNER_MSBUILD_EXE = "SonarQube.Scanner.MSBuild.exe";
     static final String SONAR_QUBE_SCANNER_MSBUILD_ALT_EXE = "SonarScanner.MSBuild.exe";

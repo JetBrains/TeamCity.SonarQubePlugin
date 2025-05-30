@@ -2,6 +2,8 @@
 
 package jetbrains.buildserver.sonarplugin;
 
+import com.intellij.openapi.diagnostic.Logger;
+import jetbrains.buildserver.sonarplugin.msbuild.tool.SQMSConstants;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.Map;
  * Accessor to simplify SQR parameters managing
  */
 public class SQRParametersAccessor {
+    private static final Logger LOG = Logger.getInstance(SQRParametersAccessor.class);
     @NotNull
     private final Map<String, String> myParameters;
 
@@ -48,7 +51,11 @@ public class SQRParametersAccessor {
     }
 
     public String getHostUrl() {
-        return myParameters.get(Constants.SONAR_HOST_URL);
+        String value = myParameters.get(Constants.SONAR_HOST_URL);
+        if (value != null && !value.startsWith("http")) {
+            value = "http://" + value;
+        }
+        return value;
     }
 
     public String getJDBCUrl() {
@@ -81,5 +88,19 @@ public class SQRParametersAccessor {
 
     public String getProjectHome() {
         return myParameters.get(Constants.PROJECT_HOME);
+    }
+
+    public String getToolVersion() {
+        String path = myParameters.get(SQMSConstants.SONAR_QUBE_MSBUILD_VERSION_PARAMETER);
+        try {
+            if (path != null) {
+                String parts[] = myParameters.get(SQMSConstants.SONAR_QUBE_MSBUILD_VERSION_PARAMETER).split("/");
+                String versionPart = parts[parts.length - 1].split("\\.", 2)[1];
+                return versionPart;
+            }
+        } catch (Throwable e) {
+            LOG.debug("Can't parse string version from tool: {}");
+        }
+        return "unknown";
     }
 }

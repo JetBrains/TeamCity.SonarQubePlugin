@@ -14,20 +14,16 @@ import java.util.List;
 
 public class MonoWrapper implements Execution {
     @NotNull
-    private final OSType myOSType;
-    @NotNull
     private final MonoLocator myMonoLocator;
 
-    public MonoWrapper(@NotNull final OSType osType,
-                       @NotNull final MonoLocator monoLocator) {
-        myOSType = osType;
+    public MonoWrapper(@NotNull final MonoLocator monoLocator) {
         myMonoLocator = monoLocator;
     }
 
     @NotNull
     @Override
     public Executable modify(@NotNull final Executable old, final BuildRunnerContext runnerContext, @NotNull Map<String, String> environmentVariables) {
-        if (myOSType != OSType.WINDOWS) {
+        if (myMonoLocator.isMono()) {
             final List<String> newArgs = new ArrayList<String>(old.myArguments.size() + 1);
             newArgs.add(old.myExecutable);
             newArgs.addAll(old.myArguments);

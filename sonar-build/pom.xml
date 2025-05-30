@@ -5,8 +5,8 @@
   <parent>
     <artifactId>sonar-plugin</artifactId>
     <groupId>jetbrains.buildServer.sonarplugin</groupId>
-    <version>1.0-SNAPSHOT</version>
-    <relativePath>../</relativePath>
+    <version>${revision}</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>sonar-build</artifactId>
 
