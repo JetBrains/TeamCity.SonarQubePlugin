@@ -15,7 +15,8 @@
     </organization>
 
     <properties>
-        <revision>${teamcity.version}</revision>
+        <revision>${teamcity.version}-${build.number}</revision>
+        <build.number>SNAPSHOT</build.number>
         <teamcity.version>2025.03</teamcity.version>
         <sonar.plugin.vendor>${project.organization.name}</sonar.plugin.vendor>
         <sonar.plugin.vendorUrl>${project.organization.url}</sonar.plugin.vendorUrl>
