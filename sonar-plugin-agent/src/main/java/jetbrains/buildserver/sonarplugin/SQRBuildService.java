@@ -235,8 +235,31 @@ public class SQRBuildService extends CommandLineBuildService {
     protected static void addSQRArg(@NotNull final List<String> argList, @NotNull final String key, @Nullable final String value, @NotNull final OSType osType) {
         if (!Util.isEmpty(value)) {
             final String paramValue = key + "=" + value;
-            argList.add(osType == WINDOWS ? StringUtil.doubleQuote(StringUtil.escapeQuotes(paramValue)) : paramValue);
+            argList.add(osType == WINDOWS ? quoteWindowsArgument(paramValue) : paramValue);
         }
+    }
+
+    @NotNull
+    protected static String quoteWindowsArgument(@NotNull final String paramValue) {
+        return StringUtil.doubleQuote(escapeTrailingBackslashes(StringUtil.escapeQuotes(paramValue)));
+    }
+
+    @NotNull
+    private static String escapeTrailingBackslashes(@NotNull final String value) {
+        int firstTrailingBackslash = value.length();
+        while (firstTrailingBackslash > 0 && value.charAt(firstTrailingBackslash - 1) == '\\') {
+            firstTrailingBackslash--;
+        }
+        if (firstTrailingBackslash == value.length()) {
+            return value;
+        }
+
+        final StringBuilder result = new StringBuilder(value.length() + value.length() - firstTrailingBackslash);
+        result.append(value);
+        for (int i = firstTrailingBackslash; i < value.length(); i++) {
+            result.append('\\');
+        }
+        return result.toString();
     }
 
     /**

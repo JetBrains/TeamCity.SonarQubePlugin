@@ -4,7 +4,6 @@ package jetbrains.buildserver.sonarplugin;
 
 import java.util.Map;
 import jetbrains.buildServer.util.OSType;
-import jetbrains.buildServer.util.StringUtil;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,6 +69,6 @@ public class SQScannerArgsComposer implements SQArgsComposer {
             return;
         }
         final String paramValue = key + value;
-        argList.add(osType == WINDOWS ? StringUtil.doubleQuote(StringUtil.escapeQuotes(paramValue)) : paramValue);
+        argList.add(osType == WINDOWS ? SQRBuildService.quoteWindowsArgument(paramValue) : paramValue);
     }
 }
